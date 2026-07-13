@@ -21,6 +21,7 @@ _MAX_TRAJECTORY_SEC = 8.0
 _BALL_STALE_SEC = 1.5
 _SETTLE_WINDOW_SEC = 0.35
 _SETTLE_MAX_TRAVEL_M = 0.025
+_MIN_KICK_TRAVEL_M = 0.05
 
 
 @dataclass
@@ -153,6 +154,11 @@ class KickDataRecorder:
         if len(points) < 3 or points[-1]["t_sec"] < _SETTLE_WINDOW_SEC:
             return False
         last = points[-1]
+        initial = points[0]
+        total_dx = last["x"] - initial["x"]
+        total_dy = last["y"] - initial["y"]
+        if total_dx * total_dx + total_dy * total_dy < _MIN_KICK_TRAVEL_M * _MIN_KICK_TRAVEL_M:
+            return False
         window = [
             point
             for point in points
