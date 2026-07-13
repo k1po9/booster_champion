@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>追球者选择算法演示</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700;900&display=swap');
+        body {
+            font-family: 'Noto Sans SC', sans-serif;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+        .pitch-grid {
+            background-image: 
+                linear-gradient(rgba(255, 255, 255, 0.08) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.08) 1px, transparent 1px);
+            background-size: 24px 24px;
+        }
+        .shadow-glow-chaser {
+            box-shadow: 0 0 20px rgba(234, 179, 8, 0.8), 0 0 40px rgba(234, 179, 8, 0.4);
+        }
+        .shadow-glow-supporter {
+            box-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
+        }
+        .danger-zone {
+            background-color: rgba(239, 68, 68, 0.1);
+            border: 2px dashed rgba(239, 68, 68, 0.5);
+        }
+        .distance-line {
+            stroke: rgba(255, 255, 255, 0.2);
+            stroke-width: 1;
+        }
+        .info-popup {
+            pointer-events: none;
+            transform: translateY(-50%);
+        }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-100 h-screen w-screen overflow-hidden flex items-center justify-center">
+        <div id="tactical-pitch" class="relative w-full max-w-4xl bg-emerald-950 border-4 border-slate-700 rounded-2xl overflow-hidden shadow-inner flex flex-col cursor-crosshair" style="width: min(100vw - 4rem, calc((100vh - 2rem) * 16 / 9)); aspect-ratio: 16/9;">
+            <!-- 草皮条纹 -->
+            <div class="absolute inset-0 flex pointer-events-none opacity-5">
+                <div class="flex-1 bg-black"></div><div class="flex-1 bg-transparent"></div>
+                <div class="flex-1 bg-black"></div><div class="flex-1 bg-transparent"></div>
+                <div class="flex-1 bg-black"></div><div class="flex-1 bg-transparent"></div>
+            </div>
+            <!-- 网格线 -->
+            <div class="absolute inset-0 pitch-grid opacity-10 pointer-events-none"></div>
+            <!-- 中线 -->
+            <div class="absolute top-0 bottom-0 left-1/2 w-0.5 bg-slate-100/20 -translate-x-1/2 pointer-events-none"></div>
+            <!-- 中圈 -->
+            <div class="absolute top-1/2 left-1/2 w-24 h-24 border-2 border-slate-100/20 rounded-full -translate-x-1/2 -translate-y-1/2 pointer-events-none"></div>
+            
+            <!-- 己方禁区（危险区）- 缩小 -->
+            <div class="absolute top-[20%] left-0 right-[75%] bottom-[20%] danger-zone pointer-events-none rounded-r-lg">
+                <div class="absolute inset-x-0 top-2 text-center">
+                    <span class="px-2 py-0.5 bg-red-500/20 text-red-400 text-[9px] font-bold rounded border border-red-500/30">危险区域</span>
+                </div>
+            </div>
+            
+            <!-- 进攻方向指示 -->
+            <div class="absolute top-6 left-[10%] right-[10%] flex flex-col items-center pointer-events-none z-10">
+                <div class="w-full flex items-center">
+                    <div class="h-[2px] bg-gradient-to-r from-slate-100/5 via-slate-100/50 to-slate-100/80 flex-1 relative">
+                        <div class="absolute right-0 top-1/2 -translate-y-1/2 w-0 h-0 border-t-4 border-t-transparent border-b-4 border-b-transparent border-l-[8px] border-l-slate-100"></div>
+                    </div>
+                </div>
+                <span class="text-[9px] text-slate-100/60 font-bold tracking-widest mt-1">进攻方向 →</span>
+            </div>
+
+            <!-- 距离连线层 -->
+            <svg id="distance-lines" class="absolute inset-0 w-full h-full pointer-events-none z-5">
+                <line id="line-center" class="distance-line" />
+                <line id="line-side" class="distance-line" />
+                <line id="line-keeper" class="distance-line" />
+            </svg>
+
+            <!-- 距离标注层 -->
+            <div id="distance-labels" class="absolute inset-0 pointer-events-none z-6"></div>
+
+            <!-- 动态球员层 -->
+            <!-- CENTER 球员 -->
+            <div id="player-center" class="absolute w-16 h-16 flex flex-col items-center justify-center transition-all duration-300 z-20 -translate-x-1/2 -translate-y-1/2" data-slot="CENTER" data-player-id="1">
+                <div id="marker-center" class="w-10 h-10 rounded-full bg-blue-500 border-2 border-white shadow-glow-supporter flex items-center justify-center text-white font-black text-sm">
+                    C
+                </div>
+                <span id="label-center" class="text-[9px] font-bold bg-slate-900/90 px-1.5 py-0.5 rounded border border-blue-500/30 text-blue-300 mt-0.5 whitespace-nowrap">Center Slot</span>
+                <!-- 悬浮信息 -->
+                <div id="popup-center" class="info-popup absolute top-1/2 bg-slate-900/95 border border-slate-700 rounded-lg p-2 text-[10px] whitespace-nowrap z-30">
+                    <div class="text-slate-400">Player with Center Slot</div>
+                    <div class="text-blue-400">评分: <span id="score-center">--</span></div>
+                    <div class="text-slate-500">偏置: -0.20</div>
+                    <div id="eligible-center-popup" class="text-green-400 mt-1">有资格</div>
+                </div>
+            </div>
+
+            <!-- SIDE 球员 -->
+            <div id="player-side" class="absolute w-16 h-16 flex flex-col items-center justify-center transition-all duration-300 z-20 -translate-x-1/2 -translate-y-1/2" data-slot="SIDE" data-player-id="2">
+                <div id="marker-side" class="w-10 h-10 rounded-full bg-blue-500 border-2 border-white shadow-glow-supporter flex items-center justify-center text-white font-black text-sm">
+                    S
+                </div>
+                <span id="label-side" class="text-[9px] font-bold bg-slate-900/90 px-1.5 py-0.5 rounded border border-blue-500/30 text-blue-300 mt-0.5 whitespace-nowrap">Side Slot</span>
+                <!-- 悬浮信息 -->
+                <div id="popup-side" class="info-popup absolute top-1/2 bg-slate-900/95 border border-slate-700 rounded-lg p-2 text-[10px] whitespace-nowrap z-30">
+                    <div class="text-slate-400">Player with Side Slot</div>
+                    <div class="text-blue-400">评分: <span id="score-side">--</span></div>
+                    <div class="text-slate-500">偏置: -0.10</div>
+                    <div id="eligible-side-popup" class="text-green-400 mt-1">有资格</div>
+                </div>
+            </div>
+
+            <!-- KEEPER 球员 -->
+            <div id="player-keeper" class="absolute w-16 h-16 flex flex-col items-center justify-center transition-all duration-300 z-20 -translate-x-1/2 -translate-y-1/2" data-slot="KEEPER" data-player-id="3">
+                <div id="marker-keeper" class="w-10 h-10 rounded-full bg-blue-500 border-2 border-white shadow-glow-supporter flex items-center justify-center text-white font-black text-sm">
+                    K
+                </div>
+                <span id="label-keeper" class="text-[9px] font-bold bg-slate-900/90 px-1.5 py-0.5 rounded border border-blue-500/30 text-blue-300 mt-0.5 whitespace-nowrap">Keeper Slot</span>
+                <!-- 悬浮信息 -->
+                <div id="popup-keeper" class="info-popup absolute top-1/2 bg-slate-900/95 border border-slate-700 rounded-lg p-2 text-[10px] whitespace-nowrap z-30">
+                    <div class="text-slate-400">Player with Keeper Slot</div>
+                    <div class="text-blue-400">评分: <span id="score-keeper">--</span></div>
+                    <div class="text-slate-500">偏置: <span id="bias-keeper-popup">+14.00</span></div>
+                    <div id="eligible-keeper-popup" class="text-red-400 mt-1">无资格</div>
+                </div>
+            </div>
+
+            <!-- 足球 -->
+            <div id="soccer-ball" class="absolute w-12 h-12 flex flex-col items-center justify-center transition-all duration-200 z-30 cursor-grab active:cursor-grabbing -translate-x-1/2 -translate-y-1/2">
+                <div class="relative">
+                    <div class="absolute inset-0 bg-white/40 rounded-full blur-sm scale-150 animate-pulse"></div>
+                    <div class="relative w-8 h-8 bg-white rounded-full shadow-2xl flex items-center justify-center border-2 border-slate-900 hover:scale-110 transition-transform">
+                        <i class="fa-solid fa-soccer-ball text-slate-900 text-base"></i>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    <script>
+        const pitch = document.getElementById('tactical-pitch');
+        const soccerBall = document.getElementById('soccer-ball');
+        const playerCenter = document.getElementById('player-center');
+        const playerSide = document.getElementById('player-side');
+        const playerKeeper = document.getElementById('player-keeper');
+
+        let ballX = 50;
+        let ballY = 50;
+        let centerX = 35, centerY = 35;
+        let sideX = 35, sideY = 70;
+        let keeperX = 15, keeperY = 50;
+
+        let isDragging = false;
+        let draggedElement = null;
+
+        function getDistance(x1, y1, x2, y2) {
+            return Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
+        }
+
+        function isBallInDangerZone(bx, by) {
+            return bx < 25;
+        }
+
+        function sideShouldChallenge(bx) {
+            return bx > 50;
+        }
+
+        function selectChaser() {
+            const ballInDanger = isBallInDangerZone(ballX, ballY);
+            const sideCanChallenge = sideShouldChallenge(ballX);
+
+            const players = [
+                { id: 1, slot: 'CENTER', x: centerX, y: centerY, canChallenge: true },
+                { id: 2, slot: 'SIDE', x: sideX, y: sideY, canChallenge: sideCanChallenge },
+                { id: 3, slot: 'KEEPER', x: keeperX, y: keeperY, canChallenge: ballInDanger }
+            ];
+
+            const eligiblePlayers = players.filter(p => p.canChallenge);
+            const eligibleCount = eligiblePlayers.length;
+
+            let scores = eligiblePlayers.map(p => {
+                let distance = getDistance(p.x, p.y, ballX, ballY) / 10;
+                let bias;
+                if (p.slot === 'CENTER') bias = -0.20;
+                else if (p.slot === 'SIDE') bias = -0.10;
+                else if (p.slot === 'KEEPER') bias = ballInDanger ? -0.75 : 14.0;
+                return { ...p, distance, bias, score: distance + bias };
+            });
+
+            scores.sort((a, b) => a.score - b.score);
+
+            let chaser = null;
+            let reason = '';
+
+            if (scores.length === 0) {
+                chaser = players[0];
+                reason = '无合格球员，默认选择';
+            } else if (scores.length === 1) {
+                chaser = scores[0];
+                reason = '唯一合格球员';
+            } else {
+                const minScore = scores[0].score;
+                const secondMinScore = scores[1].score;
+                if (secondMinScore - minScore < 0.15) {
+                    chaser = scores.reduce((a, b) => a.id < b.id ? a : b);
+                    reason = '平局仲裁：选 player_id 最小的';
+                } else {
+                    chaser = scores[0];
+                    reason = `评分最低 (${minScore.toFixed(2)})`;
+                }
+            }
+
+            return { chaser, reason, scores, eligibleCount, ballInDanger, sideCanChallenge };
+        }
+
+        function updateUI() {
+            const result = selectChaser();
+            const { chaser, reason, scores, eligibleCount, ballInDanger, sideCanChallenge } = result;
+
+            soccerBall.style.left = `${ballX}%`;
+            soccerBall.style.top = `${ballY}%`;
+
+            playerCenter.style.left = `${centerX}%`;
+            playerCenter.style.top = `${centerY}%`;
+            playerSide.style.left = `${sideX}%`;
+            playerSide.style.top = `${sideY}%`;
+            playerKeeper.style.left = `${keeperX}%`;
+            playerKeeper.style.top = `${keeperY}%`;
+
+            const centerScore = scores.find(s => s.slot === 'CENTER');
+            const sideScore = scores.find(s => s.slot === 'SIDE');
+            const keeperScore = scores.find(s => s.slot === 'KEEPER');
+
+            document.getElementById('score-center').innerText = centerScore ? `${centerScore.score.toFixed(2)}` : '--';
+            document.getElementById('eligible-center-popup').className = 'text-green-400 mt-1';
+            document.getElementById('eligible-center-popup').innerText = '有资格';
+
+            document.getElementById('score-side').innerText = sideScore ? `${sideScore.score.toFixed(2)}` : '--';
+            const sideEligibleEl = document.getElementById('eligible-side-popup');
+            if (sideCanChallenge) {
+                sideEligibleEl.className = 'text-green-400 mt-1';
+                sideEligibleEl.innerText = '有资格';
+            } else {
+                sideEligibleEl.className = 'text-red-400 mt-1';
+                sideEligibleEl.innerText = '无资格';
+            }
+
+            document.getElementById('score-keeper').innerText = keeperScore ? `${keeperScore.score.toFixed(2)}` : '--';
+            const keeperEligibleEl = document.getElementById('eligible-keeper-popup');
+            const biasKeeperPopup = document.getElementById('bias-keeper-popup');
+            if (ballInDanger) {
+                keeperEligibleEl.className = 'text-green-400 mt-1';
+                keeperEligibleEl.innerText = '有资格';
+                biasKeeperPopup.innerText = '-0.75';
+            } else {
+                keeperEligibleEl.className = 'text-red-400 mt-1';
+                keeperEligibleEl.innerText = '无资格';
+                biasKeeperPopup.innerText = '+14.00';
+            }
+
+            ['CENTER', 'SIDE', 'KEEPER'].forEach(slot => {
+                const marker = document.getElementById(`marker-${slot.toLowerCase()}`);
+                const label = document.getElementById(`label-${slot.toLowerCase()}`);
+                const popup = document.getElementById(`popup-${slot.toLowerCase()}`);
+                const scoreSpan = document.getElementById(`score-${slot.toLowerCase()}`);
+                const playerX = slot === 'CENTER' ? centerX : slot === 'SIDE' ? sideX : keeperX;
+                const slotName = `${slot} Slot`;
+                
+                if (chaser.slot === slot) {
+                    marker.className = 'w-10 h-10 rounded-full bg-amber-500 border-2 border-white shadow-glow-chaser flex items-center justify-center text-slate-950 font-black text-sm';
+                    label.className = 'text-[9px] font-bold bg-amber-500/20 px-1.5 py-0.5 rounded border border-amber-500/50 text-amber-300 mt-0.5 whitespace-nowrap';
+                    label.innerText = `${slotName}    >Chaser<`;
+                    popup.classList.add('border-amber-500/50', 'bg-amber-500/5');
+                    popup.classList.remove('border-slate-700');
+                    scoreSpan.className = 'text-amber-400';
+                } else {
+                    marker.className = 'w-10 h-10 rounded-full bg-blue-500 border-2 border-white shadow-glow-supporter flex items-center justify-center text-white font-black text-sm';
+                    label.className = 'text-[9px] font-bold bg-slate-900/90 px-1.5 py-0.5 rounded border border-blue-500/30 text-blue-300 mt-0.5 whitespace-nowrap';
+                    label.innerText = slotName;
+                    popup.classList.remove('border-amber-500/50', 'bg-amber-500/5');
+                    popup.classList.add('border-slate-700');
+                    scoreSpan.className = 'text-blue-400';
+                }
+
+                let showOnRight;
+                if (playerX < 25) {
+                    showOnRight = true;
+                } else if (playerX > 75) {
+                    showOnRight = false;
+                } else {
+                    showOnRight = ballX <= playerX;
+                }
+
+                if (showOnRight) {
+                    popup.style.left = '100%';
+                    popup.style.right = 'auto';
+                    popup.style.marginLeft = '8px';
+                    popup.style.marginRight = '0';
+                } else {
+                    popup.style.left = 'auto';
+                    popup.style.right = '100%';
+                    popup.style.marginLeft = '0';
+                    popup.style.marginRight = '8px';
+                }
+            });
+
+            updateDistanceLines();
+        }
+
+        function updateDistanceLines() {
+            const distCenter = getDistance(centerX, centerY, ballX, ballY) / 10;
+            const distSide = getDistance(sideX, sideY, ballX, ballY) / 10;
+            const distKeeper = getDistance(keeperX, keeperY, ballX, ballY) / 10;
+
+            updateLine('line-center', centerX, centerY, ballX, ballY);
+            updateLine('line-side', sideX, sideY, ballX, ballY);
+            updateLine('line-keeper', keeperX, keeperY, ballX, ballY);
+
+            updateDistanceLabel('label-center-dist', centerX, centerY, ballX, ballY, distCenter);
+            updateDistanceLabel('label-side-dist', sideX, sideY, ballX, ballY, distSide);
+            updateDistanceLabel('label-keeper-dist', keeperX, keeperY, ballX, ballY, distKeeper);
+        }
+
+        function updateLine(lineId, x1, y1, x2, y2) {
+            const line = document.getElementById(lineId);
+            line.setAttribute('x1', `${x1}%`);
+            line.setAttribute('y1', `${y1}%`);
+            line.setAttribute('x2', `${x2}%`);
+            line.setAttribute('y2', `${y2}%`);
+        }
+
+        function updateDistanceLabel(labelId, x1, y1, x2, y2, distance) {
+            let label = document.getElementById(labelId);
+            if (!label) {
+                label = document.createElement('div');
+                label.id = labelId;
+                label.className = 'absolute text-[8px] text-white/40 bg-slate-900/60 px-1.5 py-0.5 rounded pointer-events-none whitespace-nowrap';
+                document.getElementById('distance-labels').appendChild(label);
+            }
+
+            const midX = (x1 + x2) / 2;
+            const midY = (y1 + y2) / 2;
+
+            label.style.left = `${midX}%`;
+            label.style.top = `${midY}%`;
+            label.style.transform = 'translate(-50%, -50%)';
+            label.innerText = `${distance.toFixed(2)}`;
+        }
+
+        function initDragEvents() {
+            const draggables = [soccerBall, playerCenter, playerSide, playerKeeper];
+
+            draggables.forEach(el => {
+                el.addEventListener('mousedown', function(e) {
+                    e.preventDefault();
+                    isDragging = true;
+                    draggedElement = el;
+                });
+                el.addEventListener('touchstart', function(e) {
+                    isDragging = true;
+                    draggedElement = el;
+                });
+            });
+
+            window.addEventListener('mousemove', function(e) {
+                if (!isDragging) return;
+                dragElement(e);
+            });
+            window.addEventListener('touchmove', function(e) {
+                if (!isDragging) return;
+                dragElement(e.touches[0]);
+            });
+            window.addEventListener('mouseup', function() {
+                isDragging = false;
+                draggedElement = null;
+            });
+            window.addEventListener('touchend', function() {
+                isDragging = false;
+                draggedElement = null;
+            });
+        }
+
+        function dragElement(clientPos) {
+            const rect = pitch.getBoundingClientRect();
+            let x = ((clientPos.clientX - rect.left) / rect.width) * 100;
+            let y = ((clientPos.clientY - rect.top) / rect.height) * 100;
+
+            x = Math.max(5, Math.min(x, 95));
+            y = Math.max(10, Math.min(y, 90));
+
+            if (draggedElement === soccerBall) {
+                ballX = x;
+                ballY = y;
+            } else if (draggedElement === playerCenter) {
+                centerX = x;
+                centerY = y;
+            } else if (draggedElement === playerSide) {
+                sideX = x;
+                sideY = y;
+            } else if (draggedElement === playerKeeper) {
+                keeperX = x;
+                keeperY = y;
+            }
+
+            updateUI();
+        }
+
+        window.onload = function() {
+            updateUI();
+            initDragEvents();
+            window.addEventListener('resize', updateUI);
+        };
+    </script>
+</body>
+</html>

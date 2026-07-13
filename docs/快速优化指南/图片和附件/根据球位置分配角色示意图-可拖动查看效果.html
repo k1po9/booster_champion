@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>现代足球空间解耦与区域弹性战位系统</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700;900&display=swap');
+        body {
+            font-family: 'Noto Sans SC', sans-serif;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+        .pitch-grid {
+            background-image: 
+                linear-gradient(rgba(255, 255, 255, 0.08) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.08) 1px, transparent 1px);
+            background-size: 24px 24px;
+        }
+        /* 球员呼吸灯效果 */
+        .shadow-glow-blue {
+            box-shadow: 0 0 15px rgba(59, 130, 246, 0.7);
+        }
+        .shadow-glow-rose {
+            box-shadow: 0 0 15px rgba(244, 63, 94, 0.7);
+        }
+        .shadow-glow-amber {
+            box-shadow: 0 0 15px rgba(245, 158, 11, 0.7);
+        }
+        /* 区域激活背景 */
+        .zone-active-back { border-color: rgba(234, 179, 8, 0.3); background-color: rgba(234, 179, 8, 0.03); }
+        .zone-active-mid { border-color: rgba(59, 130, 246, 0.3); background-color: rgba(59, 130, 246, 0.03); }
+        .zone-active-front { border-color: rgba(244, 63, 94, 0.3); background-color: rgba(244, 63, 94, 0.03); }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-100 h-screen w-screen overflow-hidden flex items-center justify-center">
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 lg:p-6 shadow-2xl relative overflow-hidden" style="width: min(100vw - 4rem, calc((100vh - 4rem) * 16 / 9));">
+        <div class="absolute -top-40 -right-40 w-80 h-80 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none"></div>
+        <div class="absolute -bottom-40 -left-40 w-80 h-80 bg-blue-500/10 rounded-full blur-3xl pointer-events-none"></div>
+        <div id="tactical-pitch" class="relative w-full aspect-[16/9] bg-emerald-950 border-4 border-slate-700 rounded-2xl overflow-hidden shadow-inner flex flex-col cursor-crosshair">
+                    <!-- 自动演示控制按钮 -->
+                    <button id="btn-autoplay" class="absolute top-2 right-2 z-30 px-3 py-1.5 bg-slate-900/80 hover:bg-slate-800 text-white font-semibold rounded-lg text-xs flex items-center gap-1.5 transition-all shadow-lg cursor-pointer">
+                        <i id="autoplay-icon" class="fa-solid fa-play"></i>
+                        <span id="autoplay-text">自动演示</span>
+                    </button>
+                    <!-- 草皮二色条纹 -->
+                    <div class="absolute inset-0 flex pointer-events-none opacity-5">
+                        <div class="flex-1 bg-black"></div><div class="flex-1 bg-transparent"></div>
+                        <div class="flex-1 bg-black"></div><div class="flex-1 bg-transparent"></div>
+                        <div class="flex-1 bg-black"></div><div class="flex-1 bg-transparent"></div>
+                    </div>
+                    <!-- 草皮微细格线 -->
+                    <div class="absolute inset-0 pitch-grid opacity-20 pointer-events-none"></div>
+                    <!-- 中线 -->
+                    <div class="absolute top-0 bottom-0 left-1/2 w-0.5 bg-slate-100/20 -translate-x-1/2 pointer-events-none"></div>
+                    <!-- 中圈 -->
+                    <div class="absolute top-1/2 left-1/2 w-24 h-24 border-2 border-slate-100/20 rounded-full -translate-x-1/2 -translate-y-1/2 pointer-events-none"></div>
+                    <!-- 左侧禁区 -->
+                    <div class="absolute top-1/4 left-0 w-[15%] bottom-1/4 border-2 border-r-2 border-l-0 border-slate-100/20 pointer-events-none"></div>
+                    <!-- 右侧禁区 -->
+                    <div class="absolute top-1/4 right-0 w-[15%] bottom-1/4 border-2 border-l-2 border-r-0 border-slate-100/20 pointer-events-none"></div>
+
+                    <!-- 进攻方向指示 -->
+                    <div class="absolute top-8 left-[10%] right-[10%] flex flex-col items-center pointer-events-none z-10">
+                        <div class="w-full flex items-center">
+                            <div class="h-[2px] bg-gradient-to-r from-slate-100/5 via-slate-100/50 to-slate-100/80 flex-1 relative">
+                                <div class="absolute right-0 top-1/2 -translate-y-1/2 w-0 h-0 border-t-4 border-t-transparent border-b-4 border-b-transparent border-l-[8px] border-l-slate-100"></div>
+                            </div>
+                        </div>
+                        <span class="text-[10px] text-slate-100/70 font-bold tracking-widest mt-1">
+                            进攻方向 (攻向右侧球门)
+                        </span>
+                    </div>
+
+                    <!-- 三等分场地指示线 -->
+                    <div class="absolute inset-0 flex pointer-events-none z-10">
+                        <!-- 后场 1/3 -->
+                        <div id="visual-zone-back" class="flex-1 border-r border-dashed border-yellow-400/25 relative transition-all duration-300">
+                            <div class="absolute inset-x-0 bottom-3 text-center">
+                                <span class="px-2.5 py-1 bg-slate-900/90 text-yellow-400/80 border border-yellow-400/20 text-[10px] font-bold rounded-lg shadow-md">
+                                    场地后 1/3
+                                </span>
+                            </div>
+                        </div>
+                        <!-- 中场 1/3 -->
+                        <div id="visual-zone-mid" class="flex-1 border-r border-dashed border-blue-400/25 relative transition-all duration-300">
+                            <div class="absolute inset-x-0 bottom-3 text-center">
+                                <span class="px-2.5 py-1 bg-slate-900/90 text-blue-400/80 border border-blue-400/20 text-[10px] font-bold rounded-lg shadow-md">
+                                    场地中间 1/3
+                                </span>
+                            </div>
+                        </div>
+                        <!-- 前场 1/3 -->
+                        <div id="visual-zone-front" class="flex-1 relative transition-all duration-300">
+                            <div class="absolute inset-x-0 bottom-3 text-center">
+                                <span class="px-2.5 py-1 bg-slate-900/90 text-rose-400/80 border border-rose-400/20 text-[10px] font-bold rounded-lg shadow-md">
+                                    场地前 1/3
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 动态连接矢量连接线（显示球与球员之间的空间联系） -->
+                    <svg class="absolute inset-0 w-full h-full pointer-events-none z-15" id="tactical-svg">
+                        <line id="line-p2" x1="0" y1="0" x2="0" y2="0" stroke="rgba(59, 130, 246, 0.25)" stroke-width="2" stroke-dasharray="4,4"/>
+                        <line id="line-p3" x1="0" y1="0" x2="0" y2="0" stroke="rgba(244, 63, 94, 0.25)" stroke-width="2" stroke-dasharray="4,4"/>
+                    </svg>
+
+                    <!-- === 动态球员层 === -->
+                    <!-- 守门员 (Orange) -->
+                    <div id="player-gk" class="absolute w-12 h-12 flex flex-col items-center justify-center transition-all duration-500 ease-out z-20" style="left: 6%; top: 50%; transform: translate(-50%, -50%);">
+                        <div class="w-8 h-8 rounded-full bg-amber-500 border-2 border-white shadow-glow-amber flex items-center justify-center text-slate-950 font-black text-xs">
+                            GK
+                        </div>
+                        <span class="text-[9px] font-bold bg-slate-900/90 px-1.5 py-0.5 rounded border border-amber-500/20 text-amber-300 mt-1 whitespace-nowrap">守门员</span>
+                    </div>
+
+                    <!-- 球员 P2 (位置第二靠后的球员) -->
+                    <div id="player-p2" class="absolute w-14 h-14 flex flex-col items-center justify-center transition-all duration-500 ease-out z-20" style="left: 20%; top: 35%; transform: translate(-50%, -50%);">
+                        <div id="p2-marker" class="w-8 h-8 rounded-full bg-blue-500 border-2 border-white shadow-glow-blue flex items-center justify-center text-white font-black text-xs transition-colors duration-300">
+                            P2
+                        </div>
+                        <span id="p2-label" class="text-[9px] font-bold bg-slate-900/90 px-1.5 py-0.5 rounded border border-blue-500/20 text-blue-300 mt-1 whitespace-nowrap">防守角色</span>
+                    </div>
+
+                    <!-- 球员 P3 (位置第三靠后的球员) -->
+                    <div id="player-p3" class="absolute w-14 h-14 flex flex-col items-center justify-center transition-all duration-500 ease-out z-20" style="left: 25%; top: 65%; transform: translate(-50%, -50%);">
+                        <div id="p3-marker" class="w-8 h-8 rounded-full bg-blue-500 border-2 border-white shadow-glow-blue flex items-center justify-center text-white font-black text-xs transition-colors duration-300">
+                            P3
+                        </div>
+                        <span id="p3-label" class="text-[9px] font-bold bg-slate-900/90 px-1.5 py-0.5 rounded border border-blue-500/20 text-blue-300 mt-1 whitespace-nowrap">防守角色</span>
+                    </div>
+
+                    <!-- 足球 -->
+                    <div id="soccer-ball" class="absolute w-12 h-12 flex flex-col items-center justify-center transition-all duration-500 ease-out z-30 cursor-grab active:cursor-grabbing" style="left: 15%; top: 50%; transform: translate(-50%, -50%);">
+                        <div class="relative">
+                            <div class="absolute inset-0 bg-white/40 rounded-full blur-sm scale-150 animate-pulse"></div>
+                            <div class="relative w-8 h-8 bg-white rounded-full shadow-2xl flex items-center justify-center border-2 border-slate-900 hover:scale-110 transition-transform">
+                                <i class="fa-solid fa-soccer-ball text-slate-900 text-base"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+    </div>
+
+    <!-- JavaScript 弹性连续跟随算法 -->
+    <script>
+        // 定义三等分区域静态配置（用于天平和评论）
+        const zoneConfig = {
+            back: {
+                tag: '后场稳健防守',
+                offense: 10,
+                defense: 90,
+                desc: '球在我方危险区域，采取保守防守站位。P2和P3两名球员都回撤至【后场 1/3】担任【防守角色】，扼守后防。',
+                colorClass: 'yellow'
+            },
+            mid: {
+                tag: '中场过渡均衡',
+                offense: 50,
+                defense: 50,
+                desc: '球权在中场。P3 已经作为【进攻角色】前挺参与组织；而 P2 此时为了空间不扎堆并保障防守层次，必须【留在后场】继续执行【防守角色】。',
+                colorClass: 'blue'
+            },
+            front: {
+                tag: '前场压上强攻',
+                offense: 90,
+                defense: 10,
+                desc: '球进入对方危险禁区！防线整体压上。P2 此时挺进中场转化为【进攻角色】，P3 深入最前线形成攻势，除门将外全员处于进攻态势。',
+                colorClass: 'rose'
+            }
+        };
+
+        // 足球全局瞬时渲染坐标 (% 比例)
+        let ballX = 15;
+        let ballY = 50;
+
+        let currentActiveZone = 'back';
+        let autoplayInterval = null;
+        let isDragging = false;
+
+        const pitch = document.getElementById('tactical-pitch');
+        const soccerBall = document.getElementById('soccer-ball');
+
+        // === 核心跑位力学算法：基于足球连续坐标 (bX, bY)，动态计算门将和两名球员的最佳物理坐标与角色 ===
+        function updateTacticalField(bX, bY) {
+            ballX = bX;
+            ballY = bY;
+
+            // 1. 判断足球落入哪个 1/3 区域
+            let activeZone = 'back';
+            if (ballX >= 33.3 && ballX < 66.6) {
+                activeZone = 'mid';
+            } else if (ballX >= 66.6) {
+                activeZone = 'front';
+            }
+            currentActiveZone = activeZone;
+
+            // 2. GK 门将自适应跑位 (限制在 5% ~ 14% 的球门前做滑移)
+            let gkX = 5.0 + (ballX * 0.08);
+            let gkY = 44.0 + (ballY * 0.12);
+
+            // 3. P2 (第二靠后球员) 连续线性分段映射：实现球在中场时它不挤在中场，始终保持保护距离
+            let p2X, p2Role, isP2Attacking;
+            if (ballX < 33.3) {
+                // 球在后场 ➔ P2留在后场 (16% ~ 23%)，防守角色
+                p2X = 16.0 + (ballX * 0.21);
+                p2Role = "防守角色";
+                isP2Attacking = false;
+            } else if (ballX >= 33.3 && ballX < 66.6) {
+                // 球在中场 ➔ P2依旧留在后场 (23% ~ 28%) 避免跟球扎堆，维持防守角色
+                p2X = 23.0 + (ballX - 33.3) * 0.15;
+                p2Role = "防守角色";
+                isP2Attacking = false;
+            } else {
+                // 球在前场 ➔ P2终于可以推入中场区 (30% ~ 50%)，切换为进攻角色
+                p2X = 30.0 + (ballX - 66.6) * 0.6;
+                p2Role = "进攻角色";
+                isP2Attacking = true;
+            }
+            let p2Y = 30.0 + (ballY * 0.12); // 跟随足球纵向位移
+
+            // 4. P3 (第三靠后球员) 连续跑位映射：更灵动的前插接应者
+            let p3X, p3Role, isP3Attacking;
+            if (ballX < 33.3) {
+                // 球在后场 ➔ P3回缩到后场 (21% ~ 27%)，防守角色
+                p3X = 21.0 + (ballX * 0.18);
+                p3Role = "防守角色";
+                isP3Attacking = false;
+            } else if (ballX >= 33.3 && ballX < 66.6) {
+                // 球在中场 ➔ P3顺畅推入中场区 (33% ~ 53%)，转换为进攻角色
+                p3X = 33.0 + (ballX - 33.3) * 0.6;
+                p3Role = "进攻角色";
+                isP3Attacking = true;
+            } else {
+                // 球在前场 ➔ P3高速扎入前场区 (58% ~ 78%)，保持进攻角色
+                p3X = 58.0 + (ballX - 66.6) * 0.6;
+                p3Role = "进攻角色";
+                isP3Attacking = true;
+            }
+            let p3Y = 66.0 + (ballY * 0.12); // 与 P2 错开
+
+            // === 渲染场上元素坐标与状态 ===
+            // 足球
+            soccerBall.style.left = `${ballX}%`;
+            soccerBall.style.top = `${ballY}%`;
+
+            // 门将
+            const gkEl = document.getElementById('player-gk');
+            gkEl.style.left = `${gkX}%`;
+            gkEl.style.top = `${gkY}%`;
+
+            // 球员 P2
+            const p2El = document.getElementById('player-p2');
+            const p2Marker = document.getElementById('p2-marker');
+            const p2Label = document.getElementById('p2-label');
+            p2El.style.left = `${p2X}%`;
+            p2El.style.top = `${p2Y}%`;
+            p2Label.innerText = p2Role;
+            if (isP2Attacking) {
+                p2Marker.className = "w-8 h-8 rounded-full bg-rose-500 border-2 border-white shadow-glow-rose flex items-center justify-center text-white font-black text-xs transition-colors duration-300";
+                p2Label.className = "text-[9px] font-bold bg-slate-900/90 px-1.5 py-0.5 rounded border border-rose-500/30 text-rose-300 mt-1 whitespace-nowrap transition-colors duration-300";
+            } else {
+                p2Marker.className = "w-8 h-8 rounded-full bg-blue-500 border-2 border-white shadow-glow-blue flex items-center justify-center text-white font-black text-xs transition-colors duration-300";
+                p2Label.className = "text-[9px] font-bold bg-slate-900/90 px-1.5 py-0.5 rounded border border-blue-500/30 text-blue-300 mt-1 whitespace-nowrap transition-colors duration-300";
+            }
+
+            // 球员 P3
+            const p3El = document.getElementById('player-p3');
+            const p3Marker = document.getElementById('p3-marker');
+            const p3Label = document.getElementById('p3-label');
+            p3El.style.left = `${p3X}%`;
+            p3El.style.top = `${p3Y}%`;
+            p3Label.innerText = p3Role;
+            if (isP3Attacking) {
+                p3Marker.className = "w-8 h-8 rounded-full bg-rose-500 border-2 border-white shadow-glow-rose flex items-center justify-center text-white font-black text-xs transition-colors duration-300";
+                p3Label.className = "text-[9px] font-bold bg-slate-900/90 px-1.5 py-0.5 rounded border border-rose-500/30 text-rose-300 mt-1 whitespace-nowrap transition-colors duration-300";
+            } else {
+                p3Marker.className = "w-8 h-8 rounded-full bg-blue-500 border-2 border-white shadow-glow-blue flex items-center justify-center text-white font-black text-xs transition-colors duration-300";
+                p3Label.className = "text-[9px] font-bold bg-slate-900/90 px-1.5 py-0.5 rounded border border-blue-500/30 text-blue-300 mt-1 whitespace-nowrap transition-colors duration-300";
+            }
+
+            // === 渲染右侧和高亮面板 ===
+            const data = zoneConfig[activeZone];
+
+            // 1. 同步球场底板格高亮
+            ['back', 'mid', 'front'].forEach(key => {
+                const zoneBg = document.getElementById(`visual-zone-${key}`);
+                if (key === activeZone) {
+                    zoneBg.className = `flex-1 border-r border-dashed border-${data.colorClass}-400/25 relative transition-all duration-300 zone-active-${key}`;
+                } else {
+                    zoneBg.className = `flex-1 border-r border-dashed border-slate-100/10 relative transition-all duration-300`;
+                }
+            });
+
+            // 2. 联动高亮右侧规则对照表（若存在右侧元素则更新）
+            ['back', 'mid', 'front'].forEach(key => {
+                const rowEl = document.getElementById(`row-${key}`);
+                if (!rowEl) return;
+                rowEl.className = "cursor-pointer p-3 rounded-xl border transition-all duration-300 flex flex-col gap-2";
+                if (key === activeZone) {
+                    if (key === 'back') {
+                        rowEl.classList.add('bg-yellow-500/10', 'border-yellow-500/50', 'shadow-lg', 'shadow-yellow-500/5');
+                    } else if (key === 'mid') {
+                        rowEl.classList.add('bg-blue-500/10', 'border-blue-500/50', 'shadow-lg', 'shadow-blue-500/5');
+                    } else if (key === 'front') {
+                        rowEl.classList.add('bg-rose-500/10', 'border-rose-500/50', 'shadow-lg', 'shadow-rose-500/5');
+                    }
+                } else {
+                    rowEl.classList.add('bg-slate-900/40', 'border-slate-800');
+                }
+            });
+
+            // 3. 更新天平和分析数据（若元素存在则更新）
+            const stateTag = document.getElementById('current-state-tag');
+            const offenseVal = document.getElementById('offense-val');
+            const offenseBar = document.getElementById('offense-bar');
+            const defenseVal = document.getElementById('defense-val');
+            const defenseBar = document.getElementById('defense-bar');
+            const tacticDesc = document.getElementById('tactic-desc');
+            const ballZoneText = document.getElementById('ball-zone-text');
+
+            if (stateTag) stateTag.innerText = data.tag;
+            if (stateTag && ballZoneText) {
+                if (activeZone === 'back') {
+                    stateTag.className = "text-xs font-bold bg-yellow-400/10 px-2.5 py-0.5 rounded-full border border-yellow-500/20 text-yellow-400";
+                    ballZoneText.className = "text-yellow-400 font-bold";
+                    ballZoneText.innerText = "后场 1/3";
+                } else if (activeZone === 'mid') {
+                    stateTag.className = "text-xs font-bold bg-blue-400/10 px-2.5 py-0.5 rounded-full border border-blue-400/20 text-blue-400";
+                    ballZoneText.className = "text-blue-400 font-bold";
+                    ballZoneText.innerText = "中场 1/3";
+                } else if (activeZone === 'front') {
+                    stateTag.className = "text-xs font-bold bg-rose-400/10 px-2.5 py-0.5 rounded-full border border-rose-400/20 text-rose-400";
+                    ballZoneText.className = "text-rose-400 font-bold";
+                    ballZoneText.innerText = "前场 1/3";
+                }
+            }
+
+            if (offenseVal) offenseVal.innerText = `${data.offense}%`;
+            if (offenseBar) offenseBar.style.width = `${data.offense}%`;
+            if (defenseVal) defenseVal.innerText = `${data.defense}%`;
+            if (defenseBar) defenseBar.style.width = `${data.defense}%`;
+            if (tacticDesc) tacticDesc.innerText = data.desc;
+
+            // 4. 实时重绘连接虚线 (SVG)
+            updateSvgGrahpics(ballX, ballY, p2X, p2Y, p3X, p3Y);
+        }
+
+        // SVG 指向虚线连线绘制
+        function updateSvgGrahpics(bx, by, p2x, p2y, p3x, p3y) {
+            const rect = pitch.getBoundingClientRect();
+            const pxX = (pctX) => (pctX / 100) * rect.width;
+            const pxY = (pctY) => (pctY / 100) * rect.height;
+
+            const lineP2 = document.getElementById('line-p2');
+            lineP2.setAttribute('x1', pxX(bx));
+            lineP2.setAttribute('y1', pxY(by));
+            lineP2.setAttribute('x2', pxX(p2x));
+            lineP2.setAttribute('y2', pxY(p2y));
+
+            const lineP3 = document.getElementById('line-p3');
+            lineP3.setAttribute('x1', pxX(bx));
+            lineP3.setAttribute('y1', pxY(by));
+            lineP3.setAttribute('x2', pxX(p3x));
+            lineP3.setAttribute('y2', pxY(p3y));
+        }
+
+        // 点击右侧对应表格，足球瞬间传球并重调球员
+        function selectZonePreset(zoneKey) {
+            stopAutoplay();
+            if (zoneKey === 'back') {
+                updateTacticalField(15, 50);
+            } else if (zoneKey === 'mid') {
+                updateTacticalField(50, 50);
+            } else if (zoneKey === 'front') {
+                updateTacticalField(85, 50);
+            }
+        }
+
+        // === 足球拖拽与点击手势检测 ===
+        function initDragEvents() {
+            // 点击场地定位足球
+            pitch.addEventListener('mousedown', function(e) {
+                if (e.target.closest('#soccer-ball') || e.target.closest('#btn-autoplay')) return;
+                moveToPosition(e);
+            });
+            pitch.addEventListener('touchstart', function(e) {
+                if (e.target.closest('#soccer-ball') || e.target.closest('#btn-autoplay')) return;
+                moveToPosition(e.touches[0]);
+            });
+
+            // 足球按下拖拽
+            soccerBall.addEventListener('mousedown', function(e) {
+                e.preventDefault();
+                isDragging = true;
+                stopAutoplay();
+            });
+            window.addEventListener('mousemove', function(e) {
+                if (!isDragging) return;
+                dragBall(e);
+            });
+            window.addEventListener('mouseup', function() {
+                isDragging = false;
+            });
+
+            // 移动端触控拖拽支持
+            soccerBall.addEventListener('touchstart', function(e) {
+                isDragging = true;
+                stopAutoplay();
+            });
+            window.addEventListener('touchmove', function(e) {
+                if (!isDragging) return;
+                dragBall(e.touches[0]);
+            });
+            window.addEventListener('touchend', function() {
+                isDragging = false;
+            });
+
+            // 自适应尺寸刷新连线
+            window.addEventListener('resize', () => {
+                updateTacticalField(ballX, ballY);
+            });
+        }
+
+        function dragBall(clientPos) {
+            const rect = pitch.getBoundingClientRect();
+            let x = ((clientPos.clientX - rect.left) / rect.width) * 100;
+            let y = ((clientPos.clientY - rect.top) / rect.height) * 100;
+
+            // 约束球在草皮内
+            x = Math.max(5, Math.min(x, 95));
+            y = Math.max(10, Math.min(y, 90));
+
+            updateTacticalField(x, y);
+        }
+
+        function moveToPosition(clientPos) {
+            stopAutoplay();
+            const rect = pitch.getBoundingClientRect();
+            let x = ((clientPos.clientX - rect.left) / rect.width) * 100;
+            let y = ((clientPos.clientY - rect.top) / rect.height) * 100;
+
+            x = Math.max(5, Math.min(x, 95));
+            y = Math.max(10, Math.min(y, 90));
+
+            updateTacticalField(x, y);
+        }
+
+        // === 自动演示：使球在场上滑行流动 ===
+        let autoplayDirection = 1; // 1: 向右, -1: 向左
+        function toggleAutoplay() {
+            const btn = document.getElementById('btn-autoplay');
+            const icon = document.getElementById('autoplay-icon');
+            const text = document.getElementById('autoplay-text');
+
+            if (autoplayInterval) {
+                stopAutoplay();
+            } else {
+                icon.className = "fa-solid fa-pause";
+                text.innerText = "暂停";
+                btn.className = "absolute top-2 right-2 z-30 px-3 py-1.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-semibold rounded-lg text-xs flex items-center gap-1.5 transition-all shadow-lg cursor-pointer";
+                
+                autoplayInterval = setInterval(() => {
+                    // 15% 到 85% 之间滑行
+                    if (autoplayDirection === 1) {
+                        ballX += 0.8;
+                        if (ballX >= 85) {
+                            autoplayDirection = -1;
+                        }
+                    } else {
+                        ballX -= 0.8;
+                        if (ballX <= 15) {
+                            autoplayDirection = 1;
+                        }
+                    }
+                    updateTacticalField(ballX, 50);
+                }, 30); // 高频重绘实现丝滑移位
+            }
+        }
+
+        function stopAutoplay() {
+            if (autoplayInterval) {
+                clearInterval(autoplayInterval);
+                autoplayInterval = null;
+            }
+            const btn = document.getElementById('btn-autoplay');
+            const icon = document.getElementById('autoplay-icon');
+            const text = document.getElementById('autoplay-text');
+            icon.className = "fa-solid fa-play";
+            text.innerText = "自动演示";
+            btn.className = "absolute top-2 right-2 z-30 px-3 py-1.5 bg-slate-900/80 hover:bg-slate-800 text-white font-semibold rounded-lg text-xs flex items-center gap-1.5 transition-all shadow-lg cursor-pointer";
+        }
+
+        // 初始化
+        window.onload = function() {
+            updateTacticalField(15, 50); // 默认落球在后场
+            initDragEvents();
+            document.getElementById('btn-autoplay').addEventListener('click', toggleAutoplay);
+        }
+    </script>
+</body>
+</html>
