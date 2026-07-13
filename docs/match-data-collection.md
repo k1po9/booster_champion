@@ -38,7 +38,7 @@ Match dataset path: /tmp/booster_agent/soccer_logs/<run-id>/match_dataset.team<N
 
 ## 一次完整采集怎么跑
 
-1. 使用 `agent/kick-data-recorder` 分支构建并启动 Agent。
+1. 使用 `agent/match-data-recorder` 分支构建并启动 Agent。
 2. 让默认策略完成一场正常 3v3 仿真比赛；不要通过非公开接口移动球或机器人。
 3. 正常停止 Agent，使文件写入 `session_end` 并关闭。
 4. 将终端打印路径下的 `match_dataset.team<N>.jsonl` 整个复制出来。
