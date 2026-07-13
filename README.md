@@ -331,5 +331,5 @@ no need to temporarily rewrite the goalkeeper as `"chaser"` in
   `src/soccer_framework`.
 - [docs/bt_structure.md](docs/bt_structure.md): detailed behavior tree
   structure.
-- [docs/kick-data-collection.md](docs/kick-data-collection.md): development
-  recording of default-strategy kick trajectories for offline ball-roll fitting.
+- [docs/match-data-collection.md](docs/match-data-collection.md): competitive
+  capability map and unified match-data collection for offline model fitting.

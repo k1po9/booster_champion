@@ -220,6 +220,27 @@ class TeamStrategyTree:
     def last_executed_commands(self) -> dict[int, RobotCommand]:
         return dict(self._committer.last_executed)
 
+    @property
+    def last_roles(self) -> dict[int, str]:
+        """Dynamic PLAY role assignment produced by the latest tick."""
+
+        value = self._context_reader.read(BlackboardKeys.ROLES)
+        by_player = getattr(value, "by_player", None)
+        if not isinstance(by_player, Mapping):
+            return {}
+        return {int(player_id): str(role) for player_id, role in by_player.items()}
+
+    @property
+    def last_robot_statuses(self) -> dict[int, RobotRuntimeStatus]:
+        """Per-player hardware status snapshots produced by the latest tick."""
+
+        statuses: dict[int, RobotRuntimeStatus] = {}
+        for player_id in self.kit.config.player_ids:
+            value = self._context_reader.read(robot_status_key(player_id))
+            if isinstance(value, RobotRuntimeStatus):
+                statuses[player_id] = value
+        return statuses
+
     def ascii_tree(self, show_status: bool = False) -> str:
         return py_trees.display.ascii_tree(self.root, show_status=show_status)
 

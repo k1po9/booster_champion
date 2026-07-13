@@ -24,7 +24,7 @@ import time
 from typing import TYPE_CHECKING, Any, Protocol
 
 from .behavior_tree import TeamCommandExecutor, TeamStrategyTree, create_team_tree
-from .kick_data_recorder import KickDataRecorder
+from .match_data_recorder import MatchDataRecorder
 from .soccer_framework import (
     BallState,
     GameControlState,
@@ -265,7 +265,7 @@ class SoccerTeamRuntime(TeamCommandExecutor):
         self._stop_event = threading.Event()
         self._last_command_log_at = 0.0
         self._started = False
-        self.kick_data_recorder = KickDataRecorder(self.config, logger)
+        self.match_data_recorder = MatchDataRecorder(self.config, logger)
 
     def start(self) -> None:
         if self._started:
@@ -293,7 +293,7 @@ class SoccerTeamRuntime(TeamCommandExecutor):
         was_started = self._started
         if not was_started:
             self.ros_adapter.stop()
-            self.kick_data_recorder.close()
+            self.match_data_recorder.close()
             return
         self._started = False
         self._logger.info(
@@ -306,7 +306,7 @@ class SoccerTeamRuntime(TeamCommandExecutor):
             self._control_thread.join(timeout=2.0)
         self.ros_adapter.stop()
         self.robot_manager.close()
-        self.kick_data_recorder.close()
+        self.match_data_recorder.close()
         self._logger.info(
             "SoccerTeamRuntime stopped",
             event="runtime_stopped",
@@ -323,10 +323,12 @@ class SoccerTeamRuntime(TeamCommandExecutor):
                 self._log_commands(
                     started_at, self.tree.last_context, self.tree.last_executed_commands,
                 )
-                self.kick_data_recorder.observe(
+                self.match_data_recorder.observe(
                     started_at,
                     self.tree.last_context,
                     self.tree.last_executed_commands,
+                    roles=self.tree.last_roles,
+                    robot_statuses=self.tree.last_robot_statuses,
                 )
             except Exception as exc:
                 self._logger.warn(
