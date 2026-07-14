@@ -129,6 +129,7 @@ class MotionController:
         context: PlayContext,
         kick_theta: float,
         reason: str,
+        power: float | None = None,
     ) -> RobotCommand:
         """Generate a kick command and mark the player as kicking to trigger kick hysteresis."""
         ball = context.known_ball
@@ -140,7 +141,11 @@ class MotionController:
         return RobotCommand(
             intent=KickIntent(
                 direction=normalize_angle(kick_theta - robot.pose.theta),
-                power=self._config.strategy.soccer_kick_power,
+                power=(
+                    self._config.strategy.soccer_kick_power
+                    if power is None
+                    else max(0.0, power)
+                ),
                 ball_x=rel_ball.x,
                 ball_y=rel_ball.y,
             ),

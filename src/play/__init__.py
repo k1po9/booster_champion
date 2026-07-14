@@ -11,6 +11,12 @@ All roles extend :class:`RoleStrategy`; the required contract is
 """
 
 from ..soccer_framework import PlayContext
+from .champion import (
+    ChampionPerformance,
+    ChampionPlaybook,
+    ChampionSnapshot,
+    ChampionTuning,
+)
 from .default_roles import (
     ChaserRole,
     DefenderRole,
@@ -48,11 +54,16 @@ from .play_subtree import create_play_subtree
 # Built-in Playbook registration is visible and uses the same API as custom Playbooks.
 # ----------------------------------------------------------------------
 PLAYBOOKS.register("default", DefaultPlaybook, default=True)
+PLAYBOOKS.register("champion", ChampionPlaybook)
 
 __all__ = [
     "AssignRoles",
     "AttackSubtreeConfig",
     "ChaserRole",
+    "ChampionPlaybook",
+    "ChampionPerformance",
+    "ChampionSnapshot",
+    "ChampionTuning",
     "DefaultPlaybook",
     "DefenderRole",
     "GoalkeeperRole",

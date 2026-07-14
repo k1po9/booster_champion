@@ -364,6 +364,7 @@ class SoccerTeamRuntime(TeamCommandExecutor):
             stopped=game_state.stopped if game_state else None,
             kicking_team=game_state.kicking_team if game_state else None,
             ball=_ball_record(context.ball, now),
+            strategy=self.playbook.diagnostics(),
             players=[
                 _robot_record(robot, game_state, self.config, commands.get(player_id), now)
                 for player_id, robot in sorted(context.teammates.items())

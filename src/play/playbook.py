@@ -122,6 +122,11 @@ class Playbook:
         slot = self.kit.config.ready_slot_for_player(player_id)
         return RobotCommand.stop(f"{slot.value} waiting for ball")
 
+    def diagnostics(self) -> Mapping[str, object] | None:
+        """Return optional, cheap strategy diagnostics for sampled runtime logs."""
+
+        return None
+
 
 # ----------------------------------------------------------------------
 # Default implementation: fixed ReadySlot starts plus PLAY dynamic roles

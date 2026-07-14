@@ -133,6 +133,7 @@ TargetFn = Callable[[PlayContext], Pose2D]
 WantsKickFn = Callable[[PlayContext], bool]
 ReasonFn = Callable[[], str]
 KickReasonFn = Callable[[Pose2D], str]
+KickPowerFn = Callable[[PlayContext], float | None]
 
 
 def _default_move_reason(player_id: int) -> str:
@@ -152,6 +153,7 @@ class AttackSubtreeConfig:
     wants_kick_fn: WantsKickFn | None = None
     reason_fn: ReasonFn | None = None
     kick_reason_fn: KickReasonFn | None = None
+    kick_power_fn: KickPowerFn | None = None
     hold_vyaw: float = 0.0
 
 
@@ -218,12 +220,14 @@ class KickAction(py_trees.behaviour.Behaviour):
         kick_target_fn: TargetFn,
         *,
         reason_fn: KickReasonFn | None = None,
+        power_fn: KickPowerFn | None = None,
     ):
         super().__init__(f"KickAction({player_id})")
         self._kit = kit
         self._player_id = player_id
         self._kick_target_fn = kick_target_fn
         self._reason_fn = reason_fn
+        self._power_fn = power_fn
         self.blackboard = BlackboardClient(name=self.name)
 
     def update(self) -> py_trees.common.Status:
@@ -249,6 +253,7 @@ class KickAction(py_trees.behaviour.Behaviour):
             context,
             kick_theta,
             reason,
+            power=(None if self._power_fn is None else self._power_fn(context)),
         )
         self.blackboard.write(cmd_key(player_id), command)
         return py_trees.common.Status.SUCCESS
@@ -317,6 +322,7 @@ def build_attack_subtree(
                 player_id,
                 config.kick_target_fn,
                 reason_fn=config.kick_reason_fn,
+                power_fn=config.kick_power_fn,
             ),
         ],
     )

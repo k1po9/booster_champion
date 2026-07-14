@@ -20,6 +20,13 @@ from .ball_prediction import (
     predict_ball_motion,
     predict_ball_stop,
 )
+from .action_selection import (
+    ActionCandidate,
+    ActionKind,
+    ActionSelection,
+    ActionSelectionTuning,
+    BoundedActionSelector,
+)
 from .attack_watchdog import (
     AttackAttemptObservation,
     AttackPhase,
@@ -35,6 +42,16 @@ from .opponent_pressure import (
     OpponentPressureEstimator,
     OpponentPressureReport,
 )
+from .match_strategy import (
+    KickoffPhase,
+    KickoffStatus,
+    KickoffTransaction,
+    MatchRisk,
+    OpponentShape,
+    OpponentShapeTracker,
+    calculate_match_risk,
+    own_restart_target,
+)
 from .kick_hysteresis import KickHysteresis
 from .geometry import TeamFieldFrame
 from .motion import MotionController
@@ -43,6 +60,10 @@ from .ready_stance import ReadyStance
 from .targeting import Targeting
 
 __all__ = [
+    "ActionCandidate",
+    "ActionKind",
+    "ActionSelection",
+    "ActionSelectionTuning",
     "AttackAttemptObservation",
     "AttackPhase",
     "AttackWatchdog",
@@ -52,8 +73,13 @@ __all__ = [
     "BallObservation",
     "BallResistanceModel",
     "BallStopPrediction",
+    "BoundedActionSelector",
     "DEFAULT_BALL_RESISTANCE_MODEL",
     "KickHysteresis",
+    "KickoffPhase",
+    "KickoffStatus",
+    "KickoffTransaction",
+    "MatchRisk",
     "MotionController",
     "Obstacle",
     "ObstacleCollector",
@@ -63,10 +89,14 @@ __all__ = [
     "OpponentPressureEstimate",
     "OpponentPressureEstimator",
     "OpponentPressureReport",
+    "OpponentShape",
+    "OpponentShapeTracker",
     "ReadyStance",
     "SlidingWindowBallPredictor",
     "Targeting",
     "TeamFieldFrame",
+    "calculate_match_risk",
+    "own_restart_target",
     "predict_ball_motion",
     "predict_ball_stop",
 ]
