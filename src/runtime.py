@@ -19,6 +19,7 @@ the adapters in :mod:`soccer_framework` for hardware backend changes.
 
 from __future__ import annotations
 
+import os
 import threading
 import time
 from typing import TYPE_CHECKING, Any, Protocol
@@ -242,7 +243,9 @@ class SoccerTeamRuntime(TeamCommandExecutor):
         from .play import PLAYBOOKS
 
         self.kit = SoccerKit(self.config)
-        self.playbook: Playbook = PLAYBOOKS.create_default(self.kit)
+        playbook_name = os.environ.get("SOCCER_PLAYBOOK", "default").strip()
+        self.playbook: Playbook = PLAYBOOKS.create(playbook_name, self.kit)
+        self._playbook_name = playbook_name
         from .soccer_framework.robot import TeamRobotManager
 
         self.robot_manager = TeamRobotManager(
@@ -279,6 +282,7 @@ class SoccerTeamRuntime(TeamCommandExecutor):
             event="runtime_starting",
             team_id=self.config.team_id,
             control_hz=self.config.control_hz,
+            playbook=self._playbook_name,
         )
         self._log_config()
         self.robot_manager.start()
@@ -380,6 +384,7 @@ class SoccerTeamRuntime(TeamCommandExecutor):
         self._logger.info(
             f"Soccer config team_id={self.config.team_id} "
             f"control_hz={self.config.control_hz} "
+            f"playbook={self._playbook_name} "
             f"gc_topic={self.config.game_controller_topic} robots=[{mapping}]",
         )
         self._logger.info(
