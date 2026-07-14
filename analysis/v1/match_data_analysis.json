@@ -1,0 +1,6153 @@
+{
+  "inputs": [
+    "dataset/v1/match_dataset_1.jsonl",
+    "dataset/v1/match_dataset_2.jsonl",
+    "dataset/v1/match_dataset_3.jsonl",
+    "dataset/v1/match_dataset_4.jsonl",
+    "dataset/v1/match_dataset_5.jsonl"
+  ],
+  "datasets": [
+    {
+      "dataset": "match_dataset_1.jsonl",
+      "bytes": 99201435,
+      "record_counts": {
+        "metadata": 1,
+        "frame": 16997,
+        "kick": 39
+      },
+      "duration_sec": 1729.509598,
+      "frame_gap_median_sec": 0.10122700000006546,
+      "frame_gap_p95_sec": 0.10428700000011304,
+      "frame_gap_max_sec": 1.1514999999999986,
+      "ball_visible_ratio": 1.0,
+      "pose_missing_ratio": 0.0,
+      "top_game_states": [
+        [
+          "FINISHED/NONE",
+          10232
+        ],
+        [
+          "PLAYING/NONE",
+          3250
+        ],
+        [
+          "READY/NONE",
+          2217
+        ],
+        [
+          "PLAYING/GOAL_KICK",
+          473
+        ],
+        [
+          "SET/NONE",
+          361
+        ],
+        [
+          "PLAYING/THROW_IN",
+          239
+        ],
+        [
+          "INITIAL/NONE",
+          123
+        ],
+        [
+          "PLAYING/CORNER_KICK",
+          99
+        ]
+      ],
+      "top_intents": [
+        [
+          "stop",
+          37106
+        ],
+        [
+          "move",
+          9669
+        ],
+        [
+          "kick",
+          3489
+        ],
+        [
+          "noop",
+          727
+        ]
+      ],
+      "top_command_reasons": [
+        [
+          "non playing state",
+          32148
+        ],
+        [
+          "supporter hold",
+          1949
+        ],
+        [
+          "ready keeper: arrived",
+          1685
+        ],
+        [
+          "center kick to target",
+          1406
+        ],
+        [
+          "ready side: arrived",
+          1309
+        ],
+        [
+          "ready center: arrived",
+          1170
+        ],
+        [
+          "goalkeeper guard",
+          1054
+        ],
+        [
+          "supporter hold turn",
+          893
+        ],
+        [
+          "goalkeeper clear",
+          796
+        ],
+        [
+          "game stopped",
+          726
+        ]
+      ],
+      "top_roles": [
+        [
+          "supporter",
+          17889
+        ],
+        [
+          "goalkeeper",
+          16652
+        ],
+        [
+          "chaser",
+          15415
+        ]
+      ],
+      "robot_motion": {
+        "speed_mps_median": 0.0,
+        "speed_mps_p75": 0.07912213751935487,
+        "speed_mps_p95": 0.7164862235285854,
+        "yaw_radps_median": 0.0,
+        "yaw_radps_p75": 0.0465368282322211,
+        "yaw_radps_p95": 0.8809935375269952,
+        "command_speed_mps_median": 0.8
+      }
+    },
+    {
+      "dataset": "match_dataset_2.jsonl",
+      "bytes": 66682823,
+      "record_counts": {
+        "metadata": 1,
+        "frame": 11386,
+        "kick": 35
+      },
+      "duration_sec": 1158.0926570000001,
+      "frame_gap_median_sec": 0.10117600000000948,
+      "frame_gap_p95_sec": 0.10379499999999098,
+      "frame_gap_max_sec": 1.1089939999999956,
+      "ball_visible_ratio": 0.9997365185315299,
+      "pose_missing_ratio": 0.0002634814684700509,
+      "top_game_states": [
+        [
+          "FINISHED/NONE",
+          5103
+        ],
+        [
+          "PLAYING/NONE",
+          3778
+        ],
+        [
+          "READY/NONE",
+          1850
+        ],
+        [
+          "PLAYING/THROW_IN",
+          324
+        ],
+        [
+          "SET/NONE",
+          299
+        ],
+        [
+          "INITIAL/NONE",
+          25
+        ],
+        [
+          "unknown/none",
+          7
+        ]
+      ],
+      "top_intents": [
+        [
+          "stop",
+          19798
+        ],
+        [
+          "move",
+          9765
+        ],
+        [
+          "kick",
+          3773
+        ],
+        [
+          "noop",
+          822
+        ]
+      ],
+      "top_command_reasons": [
+        [
+          "non playing state",
+          16281
+        ],
+        [
+          "supporter hold",
+          2327
+        ],
+        [
+          "center kick to target",
+          1811
+        ],
+        [
+          "ready keeper: arrived",
+          1218
+        ],
+        [
+          "supporter hold turn",
+          1217
+        ],
+        [
+          "ready side: arrived",
+          1079
+        ],
+        [
+          "goalkeeper clear",
+          994
+        ],
+        [
+          "goalkeeper guard",
+          955
+        ],
+        [
+          "ready center: arrived",
+          785
+        ],
+        [
+          "goalkeeper guard turn",
+          745
+        ]
+      ],
+      "top_roles": [
+        [
+          "supporter",
+          12838
+        ],
+        [
+          "goalkeeper",
+          11136
+        ],
+        [
+          "chaser",
+          9434
+        ]
+      ],
+      "robot_motion": {
+        "speed_mps_median": 0.00040842036033574285,
+        "speed_mps_p75": 0.2988747000130589,
+        "speed_mps_p95": 0.796889194002307,
+        "yaw_radps_median": 0.002933462680062025,
+        "yaw_radps_p75": 0.2840301761562172,
+        "yaw_radps_p95": 1.050175951922783,
+        "command_speed_mps_median": 0.8
+      }
+    },
+    {
+      "dataset": "match_dataset_3.jsonl",
+      "bytes": 78026162,
+      "record_counts": {
+        "metadata": 1,
+        "frame": 13279,
+        "kick": 56
+      },
+      "duration_sec": 1349.5480710000002,
+      "frame_gap_median_sec": 0.10122799999999188,
+      "frame_gap_p95_sec": 0.10395200000002092,
+      "frame_gap_max_sec": 0.4178019999999998,
+      "ball_visible_ratio": 0.9999246931244823,
+      "pose_missing_ratio": 7.530687551773477e-05,
+      "top_game_states": [
+        [
+          "FINISHED/NONE",
+          6769
+        ],
+        [
+          "PLAYING/NONE",
+          3789
+        ],
+        [
+          "READY/NONE",
+          1517
+        ],
+        [
+          "PLAYING/THROW_IN",
+          497
+        ],
+        [
+          "SET/NONE",
+          290
+        ],
+        [
+          "PLAYING/CORNER_KICK",
+          229
+        ],
+        [
+          "PLAYING/GOAL_KICK",
+          144
+        ],
+        [
+          "INITIAL/NONE",
+          43
+        ]
+      ],
+      "top_intents": [
+        [
+          "stop",
+          25353
+        ],
+        [
+          "move",
+          10531
+        ],
+        [
+          "kick",
+          3821
+        ],
+        [
+          "noop",
+          132
+        ]
+      ],
+      "top_command_reasons": [
+        [
+          "non playing state",
+          21306
+        ],
+        [
+          "supporter hold",
+          2020
+        ],
+        [
+          "center kick to target",
+          1610
+        ],
+        [
+          "goalkeeper guard",
+          1125
+        ],
+        [
+          "supporter hold turn",
+          1095
+        ],
+        [
+          "ready keeper: arrived",
+          1057
+        ],
+        [
+          "goalkeeper guard turn",
+          864
+        ],
+        [
+          "game stopped",
+          855
+        ],
+        [
+          "avoid opponent restart: clear of ball",
+          851
+        ],
+        [
+          "goalkeeper clear",
+          815
+        ]
+      ],
+      "top_roles": [
+        [
+          "supporter",
+          13772
+        ],
+        [
+          "goalkeeper",
+          13021
+        ],
+        [
+          "chaser",
+          12270
+        ]
+      ],
+      "robot_motion": {
+        "speed_mps_median": 0.00015825687101943085,
+        "speed_mps_p75": 0.2538259323514638,
+        "speed_mps_p95": 0.7953595950734886,
+        "yaw_radps_median": 0.0008823937656816413,
+        "yaw_radps_p75": 0.21029978927426882,
+        "yaw_radps_p95": 1.014260900496601,
+        "command_speed_mps_median": 0.8
+      }
+    },
+    {
+      "dataset": "match_dataset_4.jsonl",
+      "bytes": 46294752,
+      "record_counts": {
+        "metadata": 1,
+        "frame": 7803,
+        "kick": 46
+      },
+      "duration_sec": 794.092185,
+      "frame_gap_median_sec": 0.10119199999996908,
+      "frame_gap_p95_sec": 0.10399999999992815,
+      "frame_gap_max_sec": 1.181791999999973,
+      "ball_visible_ratio": 1.0,
+      "pose_missing_ratio": 0.0,
+      "top_game_states": [
+        [
+          "PLAYING/NONE",
+          4139
+        ],
+        [
+          "READY/NONE",
+          1588
+        ],
+        [
+          "FINISHED/NONE",
+          1547
+        ],
+        [
+          "PLAYING/THROW_IN",
+          273
+        ],
+        [
+          "SET/NONE",
+          240
+        ],
+        [
+          "INITIAL/NONE",
+          15
+        ],
+        [
+          "unknown/none",
+          1
+        ]
+      ],
+      "top_intents": [
+        [
+          "move",
+          10577
+        ],
+        [
+          "stop",
+          8246
+        ],
+        [
+          "kick",
+          4241
+        ],
+        [
+          "noop",
+          345
+        ]
+      ],
+      "top_command_reasons": [
+        [
+          "non playing state",
+          5406
+        ],
+        [
+          "supporter hold",
+          1822
+        ],
+        [
+          "center kick to target",
+          1676
+        ],
+        [
+          "center kick",
+          1260
+        ],
+        [
+          "supporter hold turn",
+          1234
+        ],
+        [
+          "goalkeeper guard turn",
+          1155
+        ],
+        [
+          "goalkeeper guard",
+          1128
+        ],
+        [
+          "ready keeper: arrived",
+          1078
+        ],
+        [
+          "goalkeeper guard align",
+          954
+        ],
+        [
+          "ready side: arrived",
+          835
+        ]
+      ],
+      "top_roles": [
+        [
+          "supporter",
+          8793
+        ],
+        [
+          "goalkeeper",
+          7569
+        ],
+        [
+          "chaser",
+          6345
+        ]
+      ],
+      "robot_motion": {
+        "speed_mps_median": 0.15257081099758404,
+        "speed_mps_p75": 0.4978471082597015,
+        "speed_mps_p95": 0.8501141276830859,
+        "yaw_radps_median": 0.12274353916504971,
+        "yaw_radps_p75": 0.5749764852224156,
+        "yaw_radps_p95": 1.1672207513427295,
+        "command_speed_mps_median": 0.8
+      }
+    },
+    {
+      "dataset": "match_dataset_5.jsonl",
+      "bytes": 42886929,
+      "record_counts": {
+        "metadata": 1,
+        "frame": 7215,
+        "kick": 38
+      },
+      "duration_sec": 732.527827,
+      "frame_gap_median_sec": 0.10113999999998668,
+      "frame_gap_p95_sec": 0.1037820000000238,
+      "frame_gap_max_sec": 0.29737199999999975,
+      "ball_visible_ratio": 0.9998613998613999,
+      "pose_missing_ratio": 2.31000231000231e-05,
+      "top_game_states": [
+        [
+          "PLAYING/NONE",
+          3931
+        ],
+        [
+          "READY/NONE",
+          1548
+        ],
+        [
+          "FINISHED/NONE",
+          813
+        ],
+        [
+          "PLAYING/THROW_IN",
+          429
+        ],
+        [
+          "SET/NONE",
+          244
+        ],
+        [
+          "PLAYING/CORNER_KICK",
+          229
+        ],
+        [
+          "INITIAL/NONE",
+          20
+        ],
+        [
+          "unknown/none",
+          1
+        ]
+      ],
+      "top_intents": [
+        [
+          "move",
+          10383
+        ],
+        [
+          "stop",
+          6949
+        ],
+        [
+          "kick",
+          4250
+        ],
+        [
+          "noop",
+          63
+        ]
+      ],
+      "top_command_reasons": [
+        [
+          "non playing state",
+          3231
+        ],
+        [
+          "supporter hold",
+          2503
+        ],
+        [
+          "center kick to target",
+          1931
+        ],
+        [
+          "ready keeper: arrived",
+          1133
+        ],
+        [
+          "supporter hold turn",
+          1130
+        ],
+        [
+          "goalkeeper guard",
+          1108
+        ],
+        [
+          "goalkeeper guard turn",
+          995
+        ],
+        [
+          "ready side: arrived",
+          891
+        ],
+        [
+          "center kick",
+          891
+        ],
+        [
+          "goalkeeper clear",
+          809
+        ]
+      ],
+      "top_roles": [
+        [
+          "supporter",
+          7685
+        ],
+        [
+          "goalkeeper",
+          6980
+        ],
+        [
+          "chaser",
+          6275
+        ]
+      ],
+      "robot_motion": {
+        "speed_mps_median": 0.2123565965278913,
+        "speed_mps_p75": 0.5808985454006302,
+        "speed_mps_p95": 0.8811221741470446,
+        "yaw_radps_median": 0.17626545933350315,
+        "yaw_radps_p75": 0.6243130707817794,
+        "yaw_radps_p95": 1.184001114025752,
+        "command_speed_mps_median": 0.8
+      }
+    }
+  ],
+  "kick_count": 206,
+  "kick_profile": {
+    "initial_speed_mps_median": 2.442696999990761,
+    "initial_speed_mps_p25": 1.6732202938279737,
+    "initial_speed_mps_p75": 3.051754453800737,
+    "peak_speed_mps_median": 2.5366053121283265,
+    "peak_speed_mps_p75": 3.103084037176648,
+    "straight_distance_m_median": 2.343066339408363,
+    "path_distance_m_median": 2.688899956839503,
+    "end_reasons": {
+      "ball_settled": 123,
+      "timeout": 25,
+      "next_kick": 58
+    }
+  },
+  "ball_model": {
+    "global_median_decel_mps2": 3.599356346976389,
+    "stop_prediction_error_m": {
+      "0.5": {
+        "count": 154,
+        "median": 0.9114259517025376,
+        "p75": 1.9818963234485782,
+        "p90": 3.2442198099280035
+      },
+      "1.0": {
+        "count": 156,
+        "median": 0.6449824579873515,
+        "p75": 1.412058528584789,
+        "p90": 2.456751318245485
+      },
+      "1.5": {
+        "count": 159,
+        "median": 0.4794090628313492,
+        "p75": 1.27290457482831,
+        "p90": 2.3419795230205516
+      },
+      "2.0": {
+        "count": 161,
+        "median": 0.28515703926151564,
+        "p75": 1.0430895481267877,
+        "p90": 2.1214345179859047
+      }
+    },
+    "stop_prediction_error_by_reason_1s": {
+      "center kick to target": {
+        "count": 44,
+        "median": 0.9357444186256509,
+        "p75": 1.789614115683957
+      },
+      "goalkeeper clear": {
+        "count": 40,
+        "median": 0.2677006105209194,
+        "p75": 1.1775942097971461
+      },
+      "side clear": {
+        "count": 33,
+        "median": 0.4794090628313492,
+        "p75": 1.1441790477073528
+      },
+      "center kick": {
+        "count": 17,
+        "median": 0.7959789365478573,
+        "p75": 1.326932484887382
+      },
+      "side clear to target": {
+        "count": 16,
+        "median": 0.8485837595805972,
+        "p75": 1.456816600556908
+      },
+      "goalkeeper clear to target": {
+        "count": 6,
+        "median": 0.8886446293140459,
+        "p75": 1.412058528584789
+      }
+    }
+  },
+  "power_model": {
+    "power_levels": {
+      "1.5": {
+        "count": 206,
+        "initial_speed_mps_median": 2.442696999990761,
+        "initial_speed_mps_p25": 1.6732202938279737,
+        "initial_speed_mps_p75": 3.051754453800737,
+        "peak_speed_mps_median": 2.5366053121283265,
+        "straight_distance_m_median": 2.343066339408363,
+        "path_distance_m_median": 2.688899956839503
+      }
+    },
+    "by_reason": {
+      "center kick to target": {
+        "count": 75,
+        "initial_speed_mps_median": 2.835601531752161,
+        "initial_speed_mps_p25": 2.355418363724344,
+        "initial_speed_mps_p75": 3.2053849647198414
+      },
+      "goalkeeper clear": {
+        "count": 45,
+        "initial_speed_mps_median": 1.747024243801528,
+        "initial_speed_mps_p25": 1.4750852050265102,
+        "initial_speed_mps_p75": 2.2895616278746904
+      },
+      "side clear": {
+        "count": 41,
+        "initial_speed_mps_median": 1.9877333710335134,
+        "initial_speed_mps_p25": 1.214536973464848,
+        "initial_speed_mps_p75": 2.9619222773102383
+      },
+      "side clear to target": {
+        "count": 20,
+        "initial_speed_mps_median": 2.3673162674878307,
+        "initial_speed_mps_p25": 1.9079150121441761,
+        "initial_speed_mps_p75": 3.1643109666768905
+      },
+      "center kick": {
+        "count": 19,
+        "initial_speed_mps_median": 2.2049370351653677,
+        "initial_speed_mps_p25": 1.8374459917997787,
+        "initial_speed_mps_p75": 2.9368864583396923
+      },
+      "goalkeeper clear to target": {
+        "count": 6,
+        "initial_speed_mps_median": 2.6779009115915047,
+        "initial_speed_mps_p25": 2.422177579266524,
+        "initial_speed_mps_p75": 2.8179854768907333
+      }
+    },
+    "can_fit_power_curve": false,
+    "notes": [
+      "A power-to-speed curve needs at least three distinct kick_power levels with several samples each.",
+      "Current data can calibrate the default kick power but cannot yet choose an arbitrary power for target distance."
+    ]
+  },
+  "kicks": [
+    {
+      "dataset": "match_dataset_1.jsonl",
+      "kick_id": 1,
+      "player_id": 1,
+      "ready_slot": "center",
+      "reason": "center kick to target",
+      "end_reason": "ball_settled",
+      "duration_sec": 7.303953,
+      "points": 217,
+      "start": {
+        "x": 0.0,
+        "y": 0.0
+      },
+      "stop": {
+        "x": 4.55302,
+        "y": 1.102461
+      },
+      "path_distance_m": 4.717962432355673,
+      "straight_distance_m": 4.684592978789192,
+      "estimated_initial_speed_mps": 2.9166941588186237,
+      "peak_speed_mps": 2.9166941588186237,
+      "median_decel_mps2": 3.965254047310995,
+      "p75_decel_mps2": 6.794372545367203,
+      "kick_power": 1.5,
+      "kick_direction_rad": 0.059225
+    },
+    {
+      "dataset": "match_dataset_1.jsonl",
+      "kick_id": 2,
+      "player_id": 1,
+      "ready_slot": "center",
+      "reason": "center kick to target",
+      "end_reason": "timeout",
+      "duration_sec": 8.026413,
+      "points": 238,
+      "start": {
+        "x": 6.95,
+        "y": 4.45
+      },
+      "stop": {
+        "x": 6.920143,
+        "y": 1.687
+      },
+      "path_distance_m": 2.7631662850543885,
+      "straight_distance_m": 2.7631613127808876,
+      "estimated_initial_speed_mps": 3.3351373231433836,
+      "peak_speed_mps": 3.3351373231433836,
+      "median_decel_mps2": 5.615117035777258,
+      "p75_decel_mps2": 11.049288505434264,
+      "kick_power": 1.5,
+      "kick_direction_rad": -2.805192
+    },
+    {
+      "dataset": "match_dataset_1.jsonl",
+      "kick_id": 3,
+      "player_id": 1,
+      "ready_slot": "center",
+      "reason": "center kick to target",
+      "end_reason": "next_kick",
+      "duration_sec": 1.721124,
+      "points": 52,
+      "start": {
+        "x": -0.518184,
+        "y": -0.07613
+      },
+      "stop": {
+        "x": -3.220947,
+        "y": -0.824483
+      },
+      "path_distance_m": 2.836960052596874,
+      "straight_distance_m": 2.80445360931109,
+      "estimated_initial_speed_mps": 2.4129238972476537,
+      "peak_speed_mps": 2.4129238972476537,
+      "median_decel_mps2": 6.981411588389851,
+      "p75_decel_mps2": 9.205900564200599,
+      "kick_power": 1.5,
+      "kick_direction_rad": 0.074861
+    },
+    {
+      "dataset": "match_dataset_1.jsonl",
+      "kick_id": 4,
+      "player_id": 3,
+      "ready_slot": "keeper",
+      "reason": "goalkeeper clear",
+      "end_reason": "ball_settled",
+      "duration_sec": 2.884158,
+      "points": 86,
+      "start": {
+        "x": -3.220947,
+        "y": -0.824483
+      },
+      "stop": {
+        "x": -4.431733,
+        "y": -1.819076
+      },
+      "path_distance_m": 1.5719206111154589,
+      "straight_distance_m": 1.5669135181767375,
+      "estimated_initial_speed_mps": 1.3973284173779408,
+      "peak_speed_mps": 1.3973284173779408,
+      "median_decel_mps2": 2.01358762977867,
+      "p75_decel_mps2": 5.547445457033154,
+      "kick_power": 1.5,
+      "kick_direction_rad": 0.612644
+    },
+    {
+      "dataset": "match_dataset_1.jsonl",
+      "kick_id": 5,
+      "player_id": 1,
+      "ready_slot": "center",
+      "reason": "center kick",
+      "end_reason": "ball_settled",
+      "duration_sec": 3.917832,
+      "points": 116,
+      "start": {
+        "x": -2.451951,
+        "y": -1.112974
+      },
+      "stop": {
+        "x": -0.026194,
+        "y": 0.536771
+      },
+      "path_distance_m": 2.9603572443842685,
+      "straight_distance_m": 2.933590903325479,
+      "estimated_initial_speed_mps": 1.8374459917997787,
+      "peak_speed_mps": 1.8374459917997787,
+      "median_decel_mps2": 2.2728790338562006,
+      "p75_decel_mps2": 5.559794063135764,
+      "kick_power": 1.5,
+      "kick_direction_rad": 2.504054
+    },
+    {
+      "dataset": "match_dataset_1.jsonl",
+      "kick_id": 6,
+      "player_id": 3,
+      "ready_slot": "keeper",
+      "reason": "goalkeeper clear",
+      "end_reason": "ball_settled",
+      "duration_sec": 3.954026,
+      "points": 118,
+      "start": {
+        "x": -3.064103,
+        "y": -0.279654
+      },
+      "stop": {
+        "x": -5.163914,
+        "y": -2.348069
+      },
+      "path_distance_m": 2.9475730050846893,
+      "straight_distance_m": 2.9474644778090204,
+      "estimated_initial_speed_mps": 1.7543033301001936,
+      "peak_speed_mps": 1.7543033301001936,
+      "median_decel_mps2": 2.4087651610691627,
+      "p75_decel_mps2": 4.554557445220646,
+      "kick_power": 1.5,
+      "kick_direction_rad": 0.560411
+    },
+    {
+      "dataset": "match_dataset_1.jsonl",
+      "kick_id": 7,
+      "player_id": 1,
+      "ready_slot": "center",
+      "reason": "center kick",
+      "end_reason": "ball_settled",
+      "duration_sec": 4.298733,
+      "points": 128,
+      "start": {
+        "x": -3.618891,
+        "y": -1.954811
+      },
+      "stop": {
+        "x": -0.241681,
+        "y": -0.296792
+      },
+      "path_distance_m": 3.811468700796794,
+      "straight_distance_m": 3.762256555374846,
+      "estimated_initial_speed_mps": 2.509135734693523,
+      "peak_speed_mps": 2.509135734693523,
+      "median_decel_mps2": 3.0430989593608375,
+      "p75_decel_mps2": 6.540870747233981,
+      "kick_power": 1.5,
+      "kick_direction_rad": 1.970668
+    },
+    {
+      "dataset": "match_dataset_1.jsonl",
+      "kick_id": 8,
+      "player_id": 1,
+      "ready_slot": "center",
+      "reason": "center kick to target",
+      "end_reason": "next_kick",
+      "duration_sec": 1.660131,
+      "points": 50,
+      "start": {
+        "x": -0.387569,
+        "y": -0.054891
+      },
+      "stop": {
+        "x": -3.177289,
+        "y": -0.878495
+      },
+      "path_distance_m": 2.9617912287142167,
+      "straight_distance_m": 2.908755958690244,
+      "estimated_initial_speed_mps": 2.7775657010441326,
+      "peak_speed_mps": 2.7775657010441326,
+      "median_decel_mps2": 6.48742497192489,
+      "p75_decel_mps2": 10.2984105809063,
+      "kick_power": 1.5,
+      "kick_direction_rad": -0.005435
+    },
+    {
+      "dataset": "match_dataset_1.jsonl",
+      "kick_id": 9,
+      "player_id": 3,
+      "ready_slot": "keeper",
+      "reason": "goalkeeper clear",
+      "end_reason": "ball_settled",
+      "duration_sec": 3.33089,
+      "points": 98,
+      "start": {
+        "x": -3.177289,
+        "y": -0.878495
+      },
+      "stop": {
+        "x": -4.748239,
+        "y": -2.278312
+      },
+      "path_distance_m": 2.107434153577575,
+      "straight_distance_m": 2.1041320148671754,
+      "estimated_initial_speed_mps": 1.7298008040597865,
+      "peak_speed_mps": 1.7298008040597865,
+      "median_decel_mps2": 2.424413527522023,
+      "p75_decel_mps2": 4.399170847360056,
+      "kick_power": 1.5,
+      "kick_direction_rad": 0.443963
+    },
+    {
+      "dataset": "match_dataset_1.jsonl",
+      "kick_id": 10,
+      "player_id": 1,
+      "ready_slot": "center",
+      "reason": "center kick",
+      "end_reason": "ball_settled",
+      "duration_sec": 4.671922,
+      "points": 139,
+      "start": {
+        "x": -3.400812,
+        "y": -1.839873
+      },
+      "stop": {
+        "x": 0.177739,
+        "y": 0.252677
+      },
+      "path_distance_m": 4.196978666776561,
+      "straight_distance_m": 4.145454469910507,
+      "estimated_initial_speed_mps": 3.052725532471935,
+      "peak_speed_mps": 3.052725532471935,
+      "median_decel_mps2": 2.797378234113267,
+      "p75_decel_mps2": 7.94812825663977,
+      "kick_power": 1.5,
+      "kick_direction_rad": 1.881225
+    },
+    {
+      "dataset": "match_dataset_1.jsonl",
+      "kick_id": 11,
+      "player_id": 3,
+      "ready_slot": "keeper",
+      "reason": "goalkeeper clear",
+      "end_reason": "ball_settled",
+      "duration_sec": 3.431623,
+      "points": 102,
+      "start": {
+        "x": -2.862358,
+        "y": -0.457615
+      },
+      "stop": {
+        "x": -4.997754,
+        "y": -1.459238
+      },
+      "path_distance_m": 2.3878482345473064,
+      "straight_distance_m": 2.3586361972430168,
+      "estimated_initial_speed_mps": 2.6373626245256063,
+      "peak_speed_mps": 2.6373626245256063,
+      "median_decel_mps2": 2.57900631792291,
+      "p75_decel_mps2": 4.103485551813265,
+      "kick_power": 1.5,
+      "kick_direction_rad": -1.44885
+    },
+    {
+      "dataset": "match_dataset_1.jsonl",
+      "kick_id": 12,
+      "player_id": 1,
+      "ready_slot": "center",
+      "reason": "center kick to target",
+      "end_reason": "ball_settled",
+      "duration_sec": 4.583386,
+      "points": 136,
+      "start": {
+        "x": -3.46163,
+        "y": -1.014244
+      },
+      "stop": {
+        "x": -0.017892,
+        "y": 0.847852
+      },
+      "path_distance_m": 3.9666722245158192,
+      "straight_distance_m": 3.914937154777839,
+      "estimated_initial_speed_mps": 2.1544490543389125,
+      "peak_speed_mps": 2.1544490543389125,
+      "median_decel_mps2": 3.3836748641881753,
+      "p75_decel_mps2": 7.545744735064755,
+      "kick_power": 1.5,
+      "kick_direction_rad": 2.908947
+    },
+    {
+      "dataset": "match_dataset_1.jsonl",
+      "kick_id": 13,
+      "player_id": 1,
+      "ready_slot": "center",
+      "reason": "center kick to target",
+      "end_reason": "ball_settled",
+      "duration_sec": 6.838059,
+      "points": 202,
+      "start": {
+        "x": 1.203226,
+        "y": -4.45
+      },
+      "stop": {
+        "x": 2.144753,
+        "y": -1.701169
+      },
+      "path_distance_m": 3.149046035124301,
+      "straight_distance_m": 2.9056057816383145,
+      "estimated_initial_speed_mps": 3.5371927230218576,
+      "peak_speed_mps": 3.5371927230218576,
+      "median_decel_mps2": 2.8910580134680854,
+      "p75_decel_mps2": 8.326602376651035,
+      "kick_power": 1.5,
+      "kick_direction_rad": -3.133923
+    },
+    {
+      "dataset": "match_dataset_1.jsonl",
+      "kick_id": 14,
+      "player_id": 2,
+      "ready_slot": "side",
+      "reason": "side clear to target",
+      "end_reason": "ball_settled",
+      "duration_sec": 5.482053,
+      "points": 158,
+      "start": {
+        "x": 0.462048,
+        "y": -0.745748
+      },
+      "stop": {
+        "x": -2.665962,
+        "y": 2.111483
+      },
+      "path_distance_m": 4.242853088995932,
+      "straight_distance_m": 4.236533435187429,
+      "estimated_initial_speed_mps": 2.159441996970638,
+      "peak_speed_mps": 2.159441996970638,
+      "median_decel_mps2": 3.7509166695333427,
+      "p75_decel_mps2": 5.932653783166849,
+      "kick_power": 1.5,
+      "kick_direction_rad": -2.153375
+    },
+    {
+      "dataset": "match_dataset_1.jsonl",
+      "kick_id": 15,
+      "player_id": 3,
+      "ready_slot": "keeper",
+      "reason": "goalkeeper clear",
+      "end_reason": "timeout",
+      "duration_sec": 8.019262,
+      "points": 238,
+      "start": {
+        "x": -2.672769,
+        "y": 2.118287
+      },
+      "stop": {
+        "x": -6.243834,
+        "y": -2.016986
+      },
+      "path_distance_m": 7.07886876811679,
+      "straight_distance_m": 5.463788797048619,
+      "estimated_initial_speed_mps": 2.9757706728808286,
+      "peak_speed_mps": 2.9757706728808286,
+      "median_decel_mps2": 4.976816413686451,
+      "p75_decel_mps2": 10.472073422582833,
+      "kick_power": 1.5,
+      "kick_direction_rad": -1.039859
+    },
+    {
+      "dataset": "match_dataset_1.jsonl",
+      "kick_id": 18,
+      "player_id": 1,
+      "ready_slot": "center",
+      "reason": "center kick to target",
+      "end_reason": "next_kick",
+      "duration_sec": 0.337808,
+      "points": 11,
+      "start": {
+        "x": -1.879733,
+        "y": -0.418326
+      },
+      "stop": {
+        "x": -2.559239,
+        "y": -0.471621
+      },
+      "path_distance_m": 0.6815929630614819,
+      "straight_distance_m": 0.6815928117732754,
+      "estimated_initial_speed_mps": 2.7724359720862584,
+      "peak_speed_mps": 2.7724359720862584,
+      "median_decel_mps2": 3.558012752684695,
+      "p75_decel_mps2": 12.683011659325956,
+      "kick_power": 1.5,
+      "kick_direction_rad": -0.542893
+    },
+    {
+      "dataset": "match_dataset_1.jsonl",
+      "kick_id": 19,
+      "player_id": 3,
+      "ready_slot": "keeper",
+      "reason": "goalkeeper clear",
+      "end_reason": "ball_settled",
+      "duration_sec": 3.674808,
+      "points": 109,
+      "start": {
+        "x": -2.559239,
+        "y": -0.471621
+      },
+      "stop": {
+        "x": -5.816104,
+        "y": -0.808502
+      },
+      "path_distance_m": 3.2768120490806405,
+      "straight_distance_m": 3.274241658214311,
+      "estimated_initial_speed_mps": 2.285952037986084,
+      "peak_speed_mps": 2.285952037986084,
+      "median_decel_mps2": 3.7614612417007884,
+      "p75_decel_mps2": 8.181460670714968,
+      "kick_power": 1.5,
+      "kick_direction_rad": -2.049246
+    },
+    {
+      "dataset": "match_dataset_1.jsonl",
+      "kick_id": 20,
+      "player_id": 2,
+      "ready_slot": "side",
+      "reason": "side clear to target",
+      "end_reason": "ball_settled",
+      "duration_sec": 2.619579,
+      "points": 78,
+      "start": {
+        "x": -7.30394,
+        "y": 0.26463
+      },
+      "stop": {
+        "x": -7.385599,
+        "y": 0.856501
+      },
+      "path_distance_m": 1.5950301760186534,
+      "straight_distance_m": 0.5974775919831639,
+      "estimated_initial_speed_mps": 1.887458551881634,
+      "peak_speed_mps": 2.1259252562101234,
+      "median_decel_mps2": 3.058327791958884,
+      "p75_decel_mps2": 5.6871423843650275,
+      "kick_power": 1.5,
+      "kick_direction_rad": 2.530222
+    },
+    {
+      "dataset": "match_dataset_1.jsonl",
+      "kick_id": 21,
+      "player_id": 1,
+      "ready_slot": "center",
+      "reason": "center kick to target",
+      "end_reason": "timeout",
+      "duration_sec": 8.021212,
+      "points": 235,
+      "start": {
+        "x": 0.0,
+        "y": 0.0
+      },
+      "stop": {
+        "x": 4.672131,
+        "y": 2.275153
+      },
+      "path_distance_m": 6.1037756078114445,
+      "straight_distance_m": 5.196645962019156,
+      "estimated_initial_speed_mps": 3.0500974772821725,
+      "peak_speed_mps": 3.0500974772821725,
+      "median_decel_mps2": 4.1149099360045245,
+      "p75_decel_mps2": 8.907553346580606,
+      "kick_power": 1.5,
+      "kick_direction_rad": -0.196674
+    },
+    {
+      "dataset": "match_dataset_1.jsonl",
+      "kick_id": 22,
+      "player_id": 1,
+      "ready_slot": "center",
+      "reason": "center kick to target",
+      "end_reason": "timeout",
+      "duration_sec": 8.015528,
+      "points": 236,
+      "start": {
+        "x": 5.449838,
+        "y": 4.45
+      },
+      "stop": {
+        "x": 6.911777,
+        "y": 1.934036
+      },
+      "path_distance_m": 3.3508182025305784,
+      "straight_distance_m": 2.9098694969048013,
+      "estimated_initial_speed_mps": 3.11079411738016,
+      "peak_speed_mps": 3.11079411738016,
+      "median_decel_mps2": 7.793191663252028,
+      "p75_decel_mps2": 12.811828412860617,
+      "kick_power": 1.5,
+      "kick_direction_rad": -2.341349
+    },
+    {
+      "dataset": "match_dataset_1.jsonl",
+      "kick_id": 23,
+      "player_id": 2,
+      "ready_slot": "side",
+      "reason": "side clear",
+      "end_reason": "ball_settled",
+      "duration_sec": 7.333073,
+      "points": 217,
+      "start": {
+        "x": 0.908084,
+        "y": -0.003385
+      },
+      "stop": {
+        "x": -2.162162,
+        "y": -3.725266
+      },
+      "path_distance_m": 5.06017820795111,
+      "straight_distance_m": 4.824811776502478,
+      "estimated_initial_speed_mps": 3.1751039755243458,
+      "peak_speed_mps": 3.1751039755243458,
+      "median_decel_mps2": 3.6858994133041336,
+      "p75_decel_mps2": 9.877025956097771,
+      "kick_power": 1.5,
+      "kick_direction_rad": 1.409115
+    },
+    {
+      "dataset": "match_dataset_1.jsonl",
+      "kick_id": 24,
+      "player_id": 1,
+      "ready_slot": "center",
+      "reason": "center kick to target",
+      "end_reason": "ball_settled",
+      "duration_sec": 5.3725,
+      "points": 159,
+      "start": {
+        "x": 2.151899,
+        "y": 0.059336
+      },
+      "stop": {
+        "x": -0.256324,
+        "y": -2.16719
+      },
+      "path_distance_m": 3.428061853135584,
+      "straight_distance_m": 3.2797798777364617,
+      "estimated_initial_speed_mps": 1.4473574077713622,
+      "peak_speed_mps": 1.4473574077713622,
+      "median_decel_mps2": 1.962853194567319,
+      "p75_decel_mps2": 5.0989784699663785,
+      "kick_power": 1.5,
+      "kick_direction_rad": 0.115413
+    },
+    {
+      "dataset": "match_dataset_1.jsonl",
+      "kick_id": 25,
+      "player_id": 2,
+      "ready_slot": "side",
+      "reason": "side clear to target",
+      "end_reason": "next_kick",
+      "duration_sec": 1.118591,
+      "points": 34,
+      "start": {
+        "x": -1.423231,
+        "y": -1.450158
+      },
+      "stop": {
+        "x": -2.959787,
+        "y": -0.229466
+      },
+      "path_distance_m": 1.964713813940346,
+      "straight_distance_m": 1.9624202658961716,
+      "estimated_initial_speed_mps": 3.7392040633601624,
+      "peak_speed_mps": 3.7392040633601624,
+      "median_decel_mps2": 8.993828544845849,
+      "p75_decel_mps2": 12.854838717480883,
+      "kick_power": 1.5,
+      "kick_direction_rad": 1.607618
+    },
+    {
+      "dataset": "match_dataset_1.jsonl",
+      "kick_id": 26,
+      "player_id": 3,
+      "ready_slot": "keeper",
+      "reason": "goalkeeper clear",
+      "end_reason": "ball_settled",
+      "duration_sec": 4.232845,
+      "points": 125,
+      "start": {
+        "x": -2.959787,
+        "y": -0.229466
+      },
+      "stop": {
+        "x": -5.216659,
+        "y": 1.987986
+      },
+      "path_distance_m": 3.164115561068056,
+      "straight_distance_m": 3.163947628625986,
+      "estimated_initial_speed_mps": 1.8400213304026016,
+      "peak_speed_mps": 1.8400213304026016,
+      "median_decel_mps2": 2.7877185223454117,
+      "p75_decel_mps2": 5.65670860858362,
+      "kick_power": 1.5,
+      "kick_direction_rad": -0.887273
+    },
+    {
+      "dataset": "match_dataset_1.jsonl",
+      "kick_id": 27,
+      "player_id": 1,
+      "ready_slot": "center",
+      "reason": "center kick",
+      "end_reason": "ball_settled",
+      "duration_sec": 2.368504,
+      "points": 71,
+      "start": {
+        "x": -7.064239,
+        "y": -0.037936
+      },
+      "stop": {
+        "x": -7.065116,
+        "y": -1.065519
+      },
+      "path_distance_m": 1.397801347516801,
+      "straight_distance_m": 1.0275833742417206,
+      "estimated_initial_speed_mps": 1.7619259027910672,
+      "peak_speed_mps": 1.7619259027910672,
+      "median_decel_mps2": 2.1099401228102193,
+      "p75_decel_mps2": 4.0873196950686665,
+      "kick_power": 1.5,
+      "kick_direction_rad": 2.927301
+    },
+    {
+      "dataset": "match_dataset_1.jsonl",
+      "kick_id": 28,
+      "player_id": 1,
+      "ready_slot": "center",
+      "reason": "center kick to target",
+      "end_reason": "timeout",
+      "duration_sec": 8.01766,
+      "points": 237,
+      "start": {
+        "x": 0.0,
+        "y": 0.0
+      },
+      "stop": {
+        "x": 4.951599,
+        "y": 1.663846
+      },
+      "path_distance_m": 5.539094745291247,
+      "straight_distance_m": 5.223668841773662,
+      "estimated_initial_speed_mps": 2.5774196547452686,
+      "peak_speed_mps": 2.5774196547452686,
+      "median_decel_mps2": 4.713451627292837,
+      "p75_decel_mps2": 9.880168304717193,
+      "kick_power": 1.5,
+      "kick_direction_rad": -0.241488
+    },
+    {
+      "dataset": "match_dataset_1.jsonl",
+      "kick_id": 29,
+      "player_id": 1,
+      "ready_slot": "center",
+      "reason": "center kick",
+      "end_reason": "ball_settled",
+      "duration_sec": 7.201634,
+      "points": 213,
+      "start": {
+        "x": 5.621165,
+        "y": 2.447467
+      },
+      "stop": {
+        "x": 1.307732,
+        "y": -0.034896
+      },
+      "path_distance_m": 5.035407757095111,
+      "straight_distance_m": 4.97672887640647,
+      "estimated_initial_speed_mps": 2.7751350239031645,
+      "peak_speed_mps": 2.7751350239031645,
+      "median_decel_mps2": 4.111322510295355,
+      "p75_decel_mps2": 7.989792491608444,
+      "kick_power": 1.5,
+      "kick_direction_rad": 1.58676
+    },
+    {
+      "dataset": "match_dataset_1.jsonl",
+      "kick_id": 30,
+      "player_id": 2,
+      "ready_slot": "side",
+      "reason": "side clear",
+      "end_reason": "next_kick",
+      "duration_sec": 4.471719,
+      "points": 132,
+      "start": {
+        "x": 1.305474,
+        "y": -0.037129
+      },
+      "stop": {
+        "x": 3.592314,
+        "y": 0.112858
+      },
+      "path_distance_m": 2.3639570223626247,
+      "straight_distance_m": 2.291753321317327,
+      "estimated_initial_speed_mps": 2.6012189965561223,
+      "peak_speed_mps": 2.6012189965561223,
+      "median_decel_mps2": 5.661050531946903,
+      "p75_decel_mps2": 8.32545113884493,
+      "kick_power": 1.5,
+      "kick_direction_rad": 1.14793
+    },
+    {
+      "dataset": "match_dataset_1.jsonl",
+      "kick_id": 31,
+      "player_id": 1,
+      "ready_slot": "center",
+      "reason": "center kick to target",
+      "end_reason": "ball_settled",
+      "duration_sec": 2.791884,
+      "points": 83,
+      "start": {
+        "x": 3.592314,
+        "y": 0.112858
+      },
+      "stop": {
+        "x": 5.303688,
+        "y": 0.383281
+      },
+      "path_distance_m": 1.735996081614117,
+      "straight_distance_m": 1.7326077359878664,
+      "estimated_initial_speed_mps": 1.742948018335748,
+      "peak_speed_mps": 1.742948018335748,
+      "median_decel_mps2": 1.534821952010521,
+      "p75_decel_mps2": 3.900907673692885,
+      "kick_power": 1.5,
+      "kick_direction_rad": 1.839163
+    },
+    {
+      "dataset": "match_dataset_1.jsonl",
+      "kick_id": 32,
+      "player_id": 1,
+      "ready_slot": "center",
+      "reason": "center kick to target",
+      "end_reason": "next_kick",
+      "duration_sec": 1.625149,
+      "points": 49,
+      "start": {
+        "x": -0.290147,
+        "y": -0.040424
+      },
+      "stop": {
+        "x": -3.105169,
+        "y": -0.471514
+      },
+      "path_distance_m": 2.8480710793014343,
+      "straight_distance_m": 2.8478390840396863,
+      "estimated_initial_speed_mps": 2.8005683055153927,
+      "peak_speed_mps": 2.8005683055153927,
+      "median_decel_mps2": 7.60385079902245,
+      "p75_decel_mps2": 10.771198511714388,
+      "kick_power": 1.5,
+      "kick_direction_rad": 0.057918
+    },
+    {
+      "dataset": "match_dataset_1.jsonl",
+      "kick_id": 33,
+      "player_id": 3,
+      "ready_slot": "keeper",
+      "reason": "goalkeeper clear",
+      "end_reason": "ball_settled",
+      "duration_sec": 2.821691,
+      "points": 84,
+      "start": {
+        "x": -3.105169,
+        "y": -0.471514
+      },
+      "stop": {
+        "x": -4.628139,
+        "y": -0.942566
+      },
+      "path_distance_m": 1.6072923197591553,
+      "straight_distance_m": 1.5941541981891212,
+      "estimated_initial_speed_mps": 1.920411934259485,
+      "peak_speed_mps": 1.920411934259485,
+      "median_decel_mps2": 2.4264274379762485,
+      "p75_decel_mps2": 4.122775403354406,
+      "kick_power": 1.5,
+      "kick_direction_rad": 0.218145
+    },
+    {
+      "dataset": "match_dataset_1.jsonl",
+      "kick_id": 34,
+      "player_id": 1,
+      "ready_slot": "center",
+      "reason": "center kick to target",
+      "end_reason": "next_kick",
+      "duration_sec": 2.608667,
+      "points": 78,
+      "start": {
+        "x": -3.442532,
+        "y": -0.28994
+      },
+      "stop": {
+        "x": -4.461822,
+        "y": 1.039491
+      },
+      "path_distance_m": 2.3448791699090497,
+      "straight_distance_m": 1.675213087299941,
+      "estimated_initial_speed_mps": 1.671932389765828,
+      "peak_speed_mps": 2.215455972986912,
+      "median_decel_mps2": 4.067217063069906,
+      "p75_decel_mps2": 9.12972054157606,
+      "kick_power": 1.5,
+      "kick_direction_rad": 3.004076
+    },
+    {
+      "dataset": "match_dataset_1.jsonl",
+      "kick_id": 35,
+      "player_id": 2,
+      "ready_slot": "side",
+      "reason": "side clear to target",
+      "end_reason": "ball_settled",
+      "duration_sec": 4.500675,
+      "points": 130,
+      "start": {
+        "x": -4.461822,
+        "y": 1.039491
+      },
+      "stop": {
+        "x": -6.272117,
+        "y": 3.128083
+      },
+      "path_distance_m": 2.7711530101106767,
+      "straight_distance_m": 2.763943655266692,
+      "estimated_initial_speed_mps": 1.879630089957729,
+      "peak_speed_mps": 1.879630089957729,
+      "median_decel_mps2": 2.2688357319407917,
+      "p75_decel_mps2": 6.02442786558704,
+      "kick_power": 1.5,
+      "kick_direction_rad": 1.311807
+    },
+    {
+      "dataset": "match_dataset_1.jsonl",
+      "kick_id": 36,
+      "player_id": 1,
+      "ready_slot": "center",
+      "reason": "center kick to target",
+      "end_reason": "timeout",
+      "duration_sec": 8.020825,
+      "points": 237,
+      "start": {
+        "x": 0.0,
+        "y": 0.0
+      },
+      "stop": {
+        "x": 3.766068,
+        "y": 2.490608
+      },
+      "path_distance_m": 6.38563843580351,
+      "straight_distance_m": 4.515129720206054,
+      "estimated_initial_speed_mps": 2.835601531752161,
+      "peak_speed_mps": 2.835601531752161,
+      "median_decel_mps2": 3.037681701759838,
+      "p75_decel_mps2": 7.9645341971133785,
+      "kick_power": 1.5,
+      "kick_direction_rad": -0.231764
+    },
+    {
+      "dataset": "match_dataset_1.jsonl",
+      "kick_id": 37,
+      "player_id": 1,
+      "ready_slot": "center",
+      "reason": "center kick to target",
+      "end_reason": "timeout",
+      "duration_sec": 8.019372,
+      "points": 237,
+      "start": {
+        "x": 1.968071,
+        "y": 4.45
+      },
+      "stop": {
+        "x": 2.286499,
+        "y": -0.375233
+      },
+      "path_distance_m": 4.931215179218102,
+      "straight_distance_m": 4.835728476193943,
+      "estimated_initial_speed_mps": 3.945749210222578,
+      "peak_speed_mps": 3.945749210222578,
+      "median_decel_mps2": 7.340020979106213,
+      "p75_decel_mps2": 10.516591684299735,
+      "kick_power": 1.5,
+      "kick_direction_rad": -2.837083
+    },
+    {
+      "dataset": "match_dataset_1.jsonl",
+      "kick_id": 38,
+      "player_id": 1,
+      "ready_slot": "center",
+      "reason": "center kick to target",
+      "end_reason": "ball_settled",
+      "duration_sec": 5.70707,
+      "points": 169,
+      "start": {
+        "x": 5.714022,
+        "y": 1.905061
+      },
+      "stop": {
+        "x": 0.677023,
+        "y": -0.959199
+      },
+      "path_distance_m": 5.869904473719072,
+      "straight_distance_m": 5.794423549724424,
+      "estimated_initial_speed_mps": 3.347008537599567,
+      "peak_speed_mps": 3.347008537599567,
+      "median_decel_mps2": 4.776282622736559,
+      "p75_decel_mps2": 8.864481023829427,
+      "kick_power": 1.5,
+      "kick_direction_rad": 1.274582
+    },
+    {
+      "dataset": "match_dataset_1.jsonl",
+      "kick_id": 39,
+      "player_id": 2,
+      "ready_slot": "side",
+      "reason": "side clear",
+      "end_reason": "ball_settled",
+      "duration_sec": 4.783793,
+      "points": 142,
+      "start": {
+        "x": 0.671755,
+        "y": -0.964436
+      },
+      "stop": {
+        "x": 0.821538,
+        "y": -1.001609
+      },
+      "path_distance_m": 0.1546826635589602,
+      "straight_distance_m": 0.15432685773383711,
+      "estimated_initial_speed_mps": 0.5884391215191679,
+      "peak_speed_mps": 0.5884391215191679,
+      "median_decel_mps2": 1.3546157405989971,
+      "p75_decel_mps2": 1.6097099588447894,
+      "kick_power": 1.5,
+      "kick_direction_rad": 1.555047
+    },
+    {
+      "dataset": "match_dataset_2.jsonl",
+      "kick_id": 1,
+      "player_id": 1,
+      "ready_slot": "center",
+      "reason": "center kick to target",
+      "end_reason": "timeout",
+      "duration_sec": 8.024412,
+      "points": 238,
+      "start": {
+        "x": 0.0,
+        "y": 0.0
+      },
+      "stop": {
+        "x": 2.168126,
+        "y": 2.327525
+      },
+      "path_distance_m": 7.158166778884014,
+      "straight_distance_m": 3.1809028557158108,
+      "estimated_initial_speed_mps": 3.18423129938814,
+      "peak_speed_mps": 3.2266560354419482,
+      "median_decel_mps2": 5.656832643509796,
+      "p75_decel_mps2": 9.464764733054729,
+      "kick_power": 1.5,
+      "kick_direction_rad": 0.045762
+    },
+    {
+      "dataset": "match_dataset_2.jsonl",
+      "kick_id": 2,
+      "player_id": 2,
+      "ready_slot": "side",
+      "reason": "side clear",
+      "end_reason": "ball_settled",
+      "duration_sec": 2.931515,
+      "points": 88,
+      "start": {
+        "x": 1.45245,
+        "y": 2.915359
+      },
+      "stop": {
+        "x": -0.194598,
+        "y": 4.626549
+      },
+      "path_distance_m": 2.494961812254944,
+      "straight_distance_m": 2.3750659633795435,
+      "estimated_initial_speed_mps": 1.5053644422886556,
+      "peak_speed_mps": 1.5569161616942262,
+      "median_decel_mps2": 2.8082583844313955,
+      "p75_decel_mps2": 5.070958625649611,
+      "kick_power": 1.5,
+      "kick_direction_rad": -2.11244
+    },
+    {
+      "dataset": "match_dataset_2.jsonl",
+      "kick_id": 3,
+      "player_id": 2,
+      "ready_slot": "side",
+      "reason": "side clear to target",
+      "end_reason": "next_kick",
+      "duration_sec": 2.953715,
+      "points": 88,
+      "start": {
+        "x": -0.211243,
+        "y": 4.488936
+      },
+      "stop": {
+        "x": -3.117181,
+        "y": 0.416249
+      },
+      "path_distance_m": 5.0359470087744125,
+      "straight_distance_m": 5.003124529712707,
+      "estimated_initial_speed_mps": 3.2502274475314636,
+      "peak_speed_mps": 3.2502274475314636,
+      "median_decel_mps2": 8.057263778343337,
+      "p75_decel_mps2": 14.99941753472711,
+      "kick_power": 1.5,
+      "kick_direction_rad": 0.792212
+    },
+    {
+      "dataset": "match_dataset_2.jsonl",
+      "kick_id": 4,
+      "player_id": 3,
+      "ready_slot": "keeper",
+      "reason": "goalkeeper clear",
+      "end_reason": "ball_settled",
+      "duration_sec": 2.843932,
+      "points": 85,
+      "start": {
+        "x": -3.117181,
+        "y": 0.416249
+      },
+      "stop": {
+        "x": -4.171329,
+        "y": -0.643402
+      },
+      "path_distance_m": 1.4946905364994219,
+      "straight_distance_m": 1.4946866720838186,
+      "estimated_initial_speed_mps": 1.5355373268200239,
+      "peak_speed_mps": 1.5355373268200239,
+      "median_decel_mps2": 2.1704274410462823,
+      "p75_decel_mps2": 4.1784307009510835,
+      "kick_power": 1.5,
+      "kick_direction_rad": 0.777209
+    },
+    {
+      "dataset": "match_dataset_2.jsonl",
+      "kick_id": 5,
+      "player_id": 3,
+      "ready_slot": "keeper",
+      "reason": "goalkeeper clear",
+      "end_reason": "next_kick",
+      "duration_sec": 1.42424,
+      "points": 43,
+      "start": {
+        "x": -2.54431,
+        "y": 0.070645
+      },
+      "stop": {
+        "x": -4.7979,
+        "y": -0.298447
+      },
+      "path_distance_m": 2.283918550083924,
+      "straight_distance_m": 2.2836148520632813,
+      "estimated_initial_speed_mps": 2.786440233546643,
+      "peak_speed_mps": 2.786440233546643,
+      "median_decel_mps2": 11.763353010860232,
+      "p75_decel_mps2": 20.871514188400273,
+      "kick_power": 1.5,
+      "kick_direction_rad": -1.600177
+    },
+    {
+      "dataset": "match_dataset_2.jsonl",
+      "kick_id": 6,
+      "player_id": 2,
+      "ready_slot": "side",
+      "reason": "side clear to target",
+      "end_reason": "ball_settled",
+      "duration_sec": 0.40382,
+      "points": 13,
+      "start": {
+        "x": -4.7979,
+        "y": -0.298447
+      },
+      "stop": {
+        "x": -4.857516,
+        "y": -0.287504
+      },
+      "path_distance_m": 0.06907959502395779,
+      "straight_distance_m": 0.0606120178265005,
+      "estimated_initial_speed_mps": 1.283579189500887,
+      "peak_speed_mps": 1.283579189500887,
+      "median_decel_mps2": 0.21350879941030934,
+      "p75_decel_mps2": 0.30568660678767545,
+      "kick_power": 1.5,
+      "kick_direction_rad": -0.998772
+    },
+    {
+      "dataset": "match_dataset_2.jsonl",
+      "kick_id": 7,
+      "player_id": 1,
+      "ready_slot": "center",
+      "reason": "center kick to target",
+      "end_reason": "next_kick",
+      "duration_sec": 2.024037,
+      "points": 61,
+      "start": {
+        "x": -1.746736,
+        "y": 0.310249
+      },
+      "stop": {
+        "x": -2.959951,
+        "y": 0.161835
+      },
+      "path_distance_m": 1.2510777955090737,
+      "straight_distance_m": 1.2222591180355336,
+      "estimated_initial_speed_mps": 3.3037507429598003,
+      "peak_speed_mps": 3.3037507429598003,
+      "median_decel_mps2": 11.931348058328407,
+      "p75_decel_mps2": 18.28991138994889,
+      "kick_power": 1.5,
+      "kick_direction_rad": -0.728343
+    },
+    {
+      "dataset": "match_dataset_2.jsonl",
+      "kick_id": 8,
+      "player_id": 3,
+      "ready_slot": "keeper",
+      "reason": "goalkeeper clear",
+      "end_reason": "ball_settled",
+      "duration_sec": 2.439326,
+      "points": 73,
+      "start": {
+        "x": -2.959951,
+        "y": 0.161835
+      },
+      "stop": {
+        "x": -3.978887,
+        "y": 0.685747
+      },
+      "path_distance_m": 1.1568131532435317,
+      "straight_distance_m": 1.1457374724778793,
+      "estimated_initial_speed_mps": 1.2884142405862644,
+      "peak_speed_mps": 1.2884142405862644,
+      "median_decel_mps2": 2.176404371192728,
+      "p75_decel_mps2": 3.6841805217328267,
+      "kick_power": 1.5,
+      "kick_direction_rad": -2.271368
+    },
+    {
+      "dataset": "match_dataset_2.jsonl",
+      "kick_id": 9,
+      "player_id": 1,
+      "ready_slot": "center",
+      "reason": "center kick to target",
+      "end_reason": "ball_settled",
+      "duration_sec": 2.783602,
+      "points": 82,
+      "start": {
+        "x": -3.055358,
+        "y": 1.610705
+      },
+      "stop": {
+        "x": -2.098092,
+        "y": 2.588524
+      },
+      "path_distance_m": 1.3684449817905213,
+      "straight_distance_m": 1.3683889036078158,
+      "estimated_initial_speed_mps": 1.5010682361214374,
+      "peak_speed_mps": 1.5010682361214374,
+      "median_decel_mps2": 4.062690589469078,
+      "p75_decel_mps2": 6.609211649172804,
+      "kick_power": 1.5,
+      "kick_direction_rad": 1.489887
+    },
+    {
+      "dataset": "match_dataset_2.jsonl",
+      "kick_id": 10,
+      "player_id": 3,
+      "ready_slot": "keeper",
+      "reason": "goalkeeper clear",
+      "end_reason": "ball_settled",
+      "duration_sec": 1.908709,
+      "points": 57,
+      "start": {
+        "x": -3.261103,
+        "y": 2.531089
+      },
+      "stop": {
+        "x": -3.891887,
+        "y": 2.23436
+      },
+      "path_distance_m": 0.7021035754222799,
+      "straight_distance_m": 0.697091496216243,
+      "estimated_initial_speed_mps": 1.043185267824798,
+      "peak_speed_mps": 1.043185267824798,
+      "median_decel_mps2": 1.8664245472114045,
+      "p75_decel_mps2": 2.8432100141379295,
+      "kick_power": 1.5,
+      "kick_direction_rad": 3.132659
+    },
+    {
+      "dataset": "match_dataset_2.jsonl",
+      "kick_id": 11,
+      "player_id": 1,
+      "ready_slot": "center",
+      "reason": "center kick to target",
+      "end_reason": "ball_settled",
+      "duration_sec": 7.728093,
+      "points": 229,
+      "start": {
+        "x": 0.0,
+        "y": 0.0
+      },
+      "stop": {
+        "x": 4.761589,
+        "y": 1.5644
+      },
+      "path_distance_m": 5.110561615866214,
+      "straight_distance_m": 5.011993332489679,
+      "estimated_initial_speed_mps": 3.296078374686465,
+      "peak_speed_mps": 3.296078374686465,
+      "median_decel_mps2": 3.5520381637533687,
+      "p75_decel_mps2": 8.672712982259121,
+      "kick_power": 1.5,
+      "kick_direction_rad": 0.022992
+    },
+    {
+      "dataset": "match_dataset_2.jsonl",
+      "kick_id": 12,
+      "player_id": 1,
+      "ready_slot": "center",
+      "reason": "center kick to target",
+      "end_reason": "timeout",
+      "duration_sec": 8.015942,
+      "points": 238,
+      "start": {
+        "x": -1.815053,
+        "y": -4.45
+      },
+      "stop": {
+        "x": -0.460544,
+        "y": -1.033363
+      },
+      "path_distance_m": 3.6919834070252517,
+      "straight_distance_m": 3.6753371302303686,
+      "estimated_initial_speed_mps": 2.806249178375767,
+      "peak_speed_mps": 2.806249178375767,
+      "median_decel_mps2": 4.533018317416557,
+      "p75_decel_mps2": 7.198839376648018,
+      "kick_power": 1.5,
+      "kick_direction_rad": -2.980293
+    },
+    {
+      "dataset": "match_dataset_2.jsonl",
+      "kick_id": 13,
+      "player_id": 2,
+      "ready_slot": "side",
+      "reason": "side clear",
+      "end_reason": "ball_settled",
+      "duration_sec": 2.328589,
+      "points": 70,
+      "start": {
+        "x": -0.143181,
+        "y": 2.230809
+      },
+      "stop": {
+        "x": -0.538181,
+        "y": 3.272414
+      },
+      "path_distance_m": 1.1239451592683773,
+      "straight_distance_m": 1.1139865241666975,
+      "estimated_initial_speed_mps": 1.1247746902256883,
+      "peak_speed_mps": 1.1247746902256883,
+      "median_decel_mps2": 1.2609980831721834,
+      "p75_decel_mps2": 2.16931567913398,
+      "kick_power": 1.5,
+      "kick_direction_rad": -0.481532
+    },
+    {
+      "dataset": "match_dataset_2.jsonl",
+      "kick_id": 14,
+      "player_id": 1,
+      "ready_slot": "center",
+      "reason": "center kick to target",
+      "end_reason": "next_kick",
+      "duration_sec": 1.582713,
+      "points": 48,
+      "start": {
+        "x": -0.912996,
+        "y": 2.451128
+      },
+      "stop": {
+        "x": -2.992394,
+        "y": 0.595275
+      },
+      "path_distance_m": 2.7894647911176045,
+      "straight_distance_m": 2.7871287017310484,
+      "estimated_initial_speed_mps": 2.870355271056692,
+      "peak_speed_mps": 2.870355271056692,
+      "median_decel_mps2": 5.633186702750766,
+      "p75_decel_mps2": 10.374560452126016,
+      "kick_power": 1.5,
+      "kick_direction_rad": 0.995561
+    },
+    {
+      "dataset": "match_dataset_2.jsonl",
+      "kick_id": 15,
+      "player_id": 3,
+      "ready_slot": "keeper",
+      "reason": "goalkeeper clear",
+      "end_reason": "ball_settled",
+      "duration_sec": 3.684378,
+      "points": 110,
+      "start": {
+        "x": -2.992394,
+        "y": 0.595275
+      },
+      "stop": {
+        "x": -4.754302,
+        "y": -1.159528
+      },
+      "path_distance_m": 2.4867012340376458,
+      "straight_distance_m": 2.4866952706901984,
+      "estimated_initial_speed_mps": 1.747024243801528,
+      "peak_speed_mps": 1.747024243801528,
+      "median_decel_mps2": 2.4376445720549826,
+      "p75_decel_mps2": 5.382080439062965,
+      "kick_power": 1.5,
+      "kick_direction_rad": 1.410374
+    },
+    {
+      "dataset": "match_dataset_2.jsonl",
+      "kick_id": 16,
+      "player_id": 1,
+      "ready_slot": "center",
+      "reason": "center kick to target",
+      "end_reason": "ball_settled",
+      "duration_sec": 3.606291,
+      "points": 108,
+      "start": {
+        "x": -3.404051,
+        "y": -1.061673
+      },
+      "stop": {
+        "x": -0.58631,
+        "y": -0.396863
+      },
+      "path_distance_m": 2.929837231516666,
+      "straight_distance_m": 2.895105642145205,
+      "estimated_initial_speed_mps": 2.2722182129145505,
+      "peak_speed_mps": 2.2722182129145505,
+      "median_decel_mps2": 3.444939208062593,
+      "p75_decel_mps2": 8.673607040663391,
+      "kick_power": 1.5,
+      "kick_direction_rad": 2.325356
+    },
+    {
+      "dataset": "match_dataset_2.jsonl",
+      "kick_id": 17,
+      "player_id": 2,
+      "ready_slot": "side",
+      "reason": "side clear",
+      "end_reason": "ball_settled",
+      "duration_sec": 3.899913,
+      "points": 116,
+      "start": {
+        "x": 1.103893,
+        "y": 1.771409
+      },
+      "stop": {
+        "x": -1.589135,
+        "y": 0.33337
+      },
+      "path_distance_m": 3.0903360902090826,
+      "straight_distance_m": 3.052925805568324,
+      "estimated_initial_speed_mps": 2.161433786149558,
+      "peak_speed_mps": 2.161433786149558,
+      "median_decel_mps2": 2.3580198577250315,
+      "p75_decel_mps2": 5.123596849575874,
+      "kick_power": 1.5,
+      "kick_direction_rad": -2.544404
+    },
+    {
+      "dataset": "match_dataset_2.jsonl",
+      "kick_id": 18,
+      "player_id": 3,
+      "ready_slot": "keeper",
+      "reason": "goalkeeper clear",
+      "end_reason": "ball_settled",
+      "duration_sec": 4.653618,
+      "points": 139,
+      "start": {
+        "x": -3.022614,
+        "y": 1.188392
+      },
+      "stop": {
+        "x": -6.184312,
+        "y": -1.534227
+      },
+      "path_distance_m": 4.185550633654083,
+      "straight_distance_m": 4.172407993277384,
+      "estimated_initial_speed_mps": 2.2509015765100044,
+      "peak_speed_mps": 2.2509015765100044,
+      "median_decel_mps2": 3.2021951051831374,
+      "p75_decel_mps2": 6.930757172334948,
+      "kick_power": 1.5,
+      "kick_direction_rad": -0.55569
+    },
+    {
+      "dataset": "match_dataset_2.jsonl",
+      "kick_id": 19,
+      "player_id": 1,
+      "ready_slot": "center",
+      "reason": "center kick to target",
+      "end_reason": "timeout",
+      "duration_sec": 8.007967,
+      "points": 236,
+      "start": {
+        "x": 0.0,
+        "y": 0.0
+      },
+      "stop": {
+        "x": 4.996853,
+        "y": 1.6995
+      },
+      "path_distance_m": 5.5833509610351495,
+      "straight_distance_m": 5.277957952997447,
+      "estimated_initial_speed_mps": 3.086223685810024,
+      "peak_speed_mps": 3.086223685810024,
+      "median_decel_mps2": 5.3218771837167225,
+      "p75_decel_mps2": 8.808427728281197,
+      "kick_power": 1.5,
+      "kick_direction_rad": 0.078047
+    },
+    {
+      "dataset": "match_dataset_2.jsonl",
+      "kick_id": 20,
+      "player_id": 1,
+      "ready_slot": "center",
+      "reason": "center kick to target",
+      "end_reason": "next_kick",
+      "duration_sec": 1.588864,
+      "points": 48,
+      "start": {
+        "x": -0.375759,
+        "y": -0.056492
+      },
+      "stop": {
+        "x": -3.117901,
+        "y": -0.51906
+      },
+      "path_distance_m": 2.781229684841614,
+      "straight_distance_m": 2.7808832954275515,
+      "estimated_initial_speed_mps": 2.701297546242918,
+      "peak_speed_mps": 2.701297546242918,
+      "median_decel_mps2": 5.7976142681707845,
+      "p75_decel_mps2": 9.266019884150795,
+      "kick_power": 1.5,
+      "kick_direction_rad": 0.067964
+    },
+    {
+      "dataset": "match_dataset_2.jsonl",
+      "kick_id": 21,
+      "player_id": 3,
+      "ready_slot": "keeper",
+      "reason": "goalkeeper clear",
+      "end_reason": "ball_settled",
+      "duration_sec": 5.780138,
+      "points": 172,
+      "start": {
+        "x": -3.117901,
+        "y": -0.51906
+      },
+      "stop": {
+        "x": -3.307288,
+        "y": -3.320615
+      },
+      "path_distance_m": 4.140028605487571,
+      "straight_distance_m": 2.807949047577965,
+      "estimated_initial_speed_mps": 1.6845703744227094,
+      "peak_speed_mps": 2.124162138626403,
+      "median_decel_mps2": 2.6332138343308475,
+      "p75_decel_mps2": 5.661387564309754,
+      "kick_power": 1.5,
+      "kick_direction_rad": 0.224993
+    },
+    {
+      "dataset": "match_dataset_2.jsonl",
+      "kick_id": 22,
+      "player_id": 1,
+      "ready_slot": "center",
+      "reason": "center kick to target",
+      "end_reason": "ball_settled",
+      "duration_sec": 1.282552,
+      "points": 39,
+      "start": {
+        "x": -2.824509,
+        "y": -3.761969
+      },
+      "stop": {
+        "x": -2.55659,
+        "y": -4.590467
+      },
+      "path_distance_m": 1.7609914959922772,
+      "straight_distance_m": 0.870740791834746,
+      "estimated_initial_speed_mps": 14.487401769357959,
+      "peak_speed_mps": 14.487401769357959,
+      "median_decel_mps2": 5.00879130149087,
+      "p75_decel_mps2": 14.130334847007987,
+      "kick_power": 1.5,
+      "kick_direction_rad": 2.809137
+    },
+    {
+      "dataset": "match_dataset_2.jsonl",
+      "kick_id": 24,
+      "player_id": 3,
+      "ready_slot": "keeper",
+      "reason": "goalkeeper clear to target",
+      "end_reason": "next_kick",
+      "duration_sec": 2.090224,
+      "points": 63,
+      "start": {
+        "x": -3.039002,
+        "y": -3.665773
+      },
+      "stop": {
+        "x": -3.733675,
+        "y": -2.329713
+      },
+      "path_distance_m": 2.5072827507839315,
+      "straight_distance_m": 1.50586417067709,
+      "estimated_initial_speed_mps": 2.7323875970634814,
+      "peak_speed_mps": 3.262817235859658,
+      "median_decel_mps2": 2.085883391127267,
+      "p75_decel_mps2": 7.459262870132453,
+      "kick_power": 1.5,
+      "kick_direction_rad": -1.401789
+    },
+    {
+      "dataset": "match_dataset_2.jsonl",
+      "kick_id": 25,
+      "player_id": 2,
+      "ready_slot": "side",
+      "reason": "side clear",
+      "end_reason": "ball_settled",
+      "duration_sec": 4.802904,
+      "points": 143,
+      "start": {
+        "x": -3.733675,
+        "y": -2.329713
+      },
+      "stop": {
+        "x": -6.868627,
+        "y": 0.853202
+      },
+      "path_distance_m": 4.467752311098311,
+      "straight_distance_m": 4.467535331648649,
+      "estimated_initial_speed_mps": 2.508559986874983,
+      "peak_speed_mps": 2.508559986874983,
+      "median_decel_mps2": 4.0898188718293,
+      "p75_decel_mps2": 6.817853834306175,
+      "kick_power": 1.5,
+      "kick_direction_rad": -0.257651
+    },
+    {
+      "dataset": "match_dataset_2.jsonl",
+      "kick_id": 26,
+      "player_id": 2,
+      "ready_slot": "side",
+      "reason": "side clear to target",
+      "end_reason": "ball_settled",
+      "duration_sec": 3.064633,
+      "points": 92,
+      "start": {
+        "x": -6.87432,
+        "y": 0.858896
+      },
+      "stop": {
+        "x": -6.858203,
+        "y": 0.583817
+      },
+      "path_distance_m": 0.9383354399348468,
+      "straight_distance_m": 0.27555074656041123,
+      "estimated_initial_speed_mps": 0.7802723845645193,
+      "peak_speed_mps": 0.9528888655531162,
+      "median_decel_mps2": 1.4360468503125565,
+      "p75_decel_mps2": 2.639644603033258,
+      "kick_power": 1.5,
+      "kick_direction_rad": -2.254716
+    },
+    {
+      "dataset": "match_dataset_2.jsonl",
+      "kick_id": 27,
+      "player_id": 1,
+      "ready_slot": "center",
+      "reason": "center kick to target",
+      "end_reason": "ball_settled",
+      "duration_sec": 2.231219,
+      "points": 67,
+      "start": {
+        "x": -6.859796,
+        "y": 0.577515
+      },
+      "stop": {
+        "x": -7.217251,
+        "y": 0.050635
+      },
+      "path_distance_m": 1.4113265846544716,
+      "straight_distance_m": 0.6366919281921202,
+      "estimated_initial_speed_mps": 3.1463660466582994,
+      "peak_speed_mps": 3.1463660466582994,
+      "median_decel_mps2": 1.9896707489692647,
+      "p75_decel_mps2": 9.369615754547475,
+      "kick_power": 1.5,
+      "kick_direction_rad": -2.834037
+    },
+    {
+      "dataset": "match_dataset_2.jsonl",
+      "kick_id": 28,
+      "player_id": 1,
+      "ready_slot": "center",
+      "reason": "center kick to target",
+      "end_reason": "timeout",
+      "duration_sec": 8.023506,
+      "points": 238,
+      "start": {
+        "x": 0.0,
+        "y": 0.0
+      },
+      "stop": {
+        "x": 3.634363,
+        "y": 2.618612
+      },
+      "path_distance_m": 6.721355782099834,
+      "straight_distance_m": 4.479478007794324,
+      "estimated_initial_speed_mps": 3.2053849647198414,
+      "peak_speed_mps": 3.2053849647198414,
+      "median_decel_mps2": 4.200696575874086,
+      "p75_decel_mps2": 9.345408414738998,
+      "kick_power": 1.5,
+      "kick_direction_rad": -0.180408
+    },
+    {
+      "dataset": "match_dataset_2.jsonl",
+      "kick_id": 29,
+      "player_id": 1,
+      "ready_slot": "center",
+      "reason": "center kick to target",
+      "end_reason": "next_kick",
+      "duration_sec": 1.599869,
+      "points": 48,
+      "start": {
+        "x": -0.459589,
+        "y": -0.065489
+      },
+      "stop": {
+        "x": -3.070159,
+        "y": -0.733132
+      },
+      "path_distance_m": 2.7237477848129727,
+      "straight_distance_m": 2.6945914162167517,
+      "estimated_initial_speed_mps": 2.3976670913314266,
+      "peak_speed_mps": 2.3976670913314266,
+      "median_decel_mps2": 5.974310931589647,
+      "p75_decel_mps2": 8.18180501714724,
+      "kick_power": 1.5,
+      "kick_direction_rad": 0.077792
+    },
+    {
+      "dataset": "match_dataset_2.jsonl",
+      "kick_id": 30,
+      "player_id": 3,
+      "ready_slot": "keeper",
+      "reason": "goalkeeper clear",
+      "end_reason": "ball_settled",
+      "duration_sec": 3.009301,
+      "points": 90,
+      "start": {
+        "x": -3.070159,
+        "y": -0.733132
+      },
+      "stop": {
+        "x": -4.402963,
+        "y": -1.787816
+      },
+      "path_distance_m": 1.7068960383547138,
+      "straight_distance_m": 1.6996249122297542,
+      "estimated_initial_speed_mps": 1.3249370708113555,
+      "peak_speed_mps": 1.3249370708113555,
+      "median_decel_mps2": 1.6925460484504902,
+      "p75_decel_mps2": 3.9627046219695745,
+      "kick_power": 1.5,
+      "kick_direction_rad": 0.656331
+    },
+    {
+      "dataset": "match_dataset_2.jsonl",
+      "kick_id": 31,
+      "player_id": 1,
+      "ready_slot": "center",
+      "reason": "center kick to target",
+      "end_reason": "ball_settled",
+      "duration_sec": 3.522282,
+      "points": 105,
+      "start": {
+        "x": -2.515878,
+        "y": -1.3647
+      },
+      "stop": {
+        "x": -0.366912,
+        "y": -0.267793
+      },
+      "path_distance_m": 2.4459483718711956,
+      "straight_distance_m": 2.412728711605389,
+      "estimated_initial_speed_mps": 1.861479299586071,
+      "peak_speed_mps": 1.861479299586071,
+      "median_decel_mps2": 3.23266299854963,
+      "p75_decel_mps2": 7.397129309915523,
+      "kick_power": 1.5,
+      "kick_direction_rad": 2.710001
+    },
+    {
+      "dataset": "match_dataset_2.jsonl",
+      "kick_id": 32,
+      "player_id": 3,
+      "ready_slot": "keeper",
+      "reason": "goalkeeper clear",
+      "end_reason": "ball_settled",
+      "duration_sec": 3.534595,
+      "points": 105,
+      "start": {
+        "x": -3.072529,
+        "y": -0.105776
+      },
+      "stop": {
+        "x": -4.726112,
+        "y": -1.743733
+      },
+      "path_distance_m": 2.3275246362115087,
+      "straight_distance_m": 2.32749648157371,
+      "estimated_initial_speed_mps": 1.6297087289766783,
+      "peak_speed_mps": 1.6297087289766783,
+      "median_decel_mps2": 2.6906346185987533,
+      "p75_decel_mps2": 5.841280180433263,
+      "kick_power": 1.5,
+      "kick_direction_rad": 0.676382
+    },
+    {
+      "dataset": "match_dataset_2.jsonl",
+      "kick_id": 33,
+      "player_id": 1,
+      "ready_slot": "center",
+      "reason": "center kick to target",
+      "end_reason": "ball_settled",
+      "duration_sec": 4.226657,
+      "points": 126,
+      "start": {
+        "x": -2.794632,
+        "y": -1.160555
+      },
+      "stop": {
+        "x": 0.19521,
+        "y": 0.568612
+      },
+      "path_distance_m": 3.496393863176231,
+      "straight_distance_m": 3.453863590076047,
+      "estimated_initial_speed_mps": 2.355418363724344,
+      "peak_speed_mps": 2.355418363724344,
+      "median_decel_mps2": 2.600131173224476,
+      "p75_decel_mps2": 5.703614951605737,
+      "kick_power": 1.5,
+      "kick_direction_rad": 2.096406
+    },
+    {
+      "dataset": "match_dataset_2.jsonl",
+      "kick_id": 34,
+      "player_id": 3,
+      "ready_slot": "keeper",
+      "reason": "goalkeeper clear",
+      "end_reason": "ball_settled",
+      "duration_sec": 3.219096,
+      "points": 96,
+      "start": {
+        "x": -3.000386,
+        "y": -0.680876
+      },
+      "stop": {
+        "x": -4.562577,
+        "y": -1.874584
+      },
+      "path_distance_m": 1.9772528921250836,
+      "straight_distance_m": 1.9660568429587684,
+      "estimated_initial_speed_mps": 1.5129962715335254,
+      "peak_speed_mps": 1.5129962715335254,
+      "median_decel_mps2": 2.360763661275871,
+      "p75_decel_mps2": 4.3042917014850035,
+      "kick_power": 1.5,
+      "kick_direction_rad": -2.192778
+    },
+    {
+      "dataset": "match_dataset_2.jsonl",
+      "kick_id": 35,
+      "player_id": 1,
+      "ready_slot": "center",
+      "reason": "center kick",
+      "end_reason": "ball_settled",
+      "duration_sec": 3.31279,
+      "points": 98,
+      "start": {
+        "x": -2.518222,
+        "y": -0.943469
+      },
+      "stop": {
+        "x": -0.773357,
+        "y": 0.27407
+      },
+      "path_distance_m": 2.1441239672575647,
+      "straight_distance_m": 2.1276642321442547,
+      "estimated_initial_speed_mps": 1.6735144126683459,
+      "peak_speed_mps": 1.6735144126683459,
+      "median_decel_mps2": 2.4151887873062146,
+      "p75_decel_mps2": 6.928897379406991,
+      "kick_power": 1.5,
+      "kick_direction_rad": 2.374792
+    },
+    {
+      "dataset": "match_dataset_3.jsonl",
+      "kick_id": 1,
+      "player_id": 1,
+      "ready_slot": "center",
+      "reason": "center kick to target",
+      "end_reason": "timeout",
+      "duration_sec": 8.001481,
+      "points": 237,
+      "start": {
+        "x": 0.0,
+        "y": 0.0
+      },
+      "stop": {
+        "x": 2.476796,
+        "y": 2.638623
+      },
+      "path_distance_m": 7.224373755486013,
+      "straight_distance_m": 3.618956999156663,
+      "estimated_initial_speed_mps": 2.912270852697581,
+      "peak_speed_mps": 3.0414040374320557,
+      "median_decel_mps2": 4.690527260772363,
+      "p75_decel_mps2": 9.473668645312355,
+      "kick_power": 1.5,
+      "kick_direction_rad": 0.057497
+    },
+    {
+      "dataset": "match_dataset_3.jsonl",
+      "kick_id": 2,
+      "player_id": 2,
+      "ready_slot": "side",
+      "reason": "side clear",
+      "end_reason": "ball_settled",
+      "duration_sec": 1.999022,
+      "points": 60,
+      "start": {
+        "x": 1.558123,
+        "y": 3.525806
+      },
+      "stop": {
+        "x": 0.440949,
+        "y": 4.626086
+      },
+      "path_distance_m": 1.736856984512826,
+      "straight_distance_m": 1.568022265363601,
+      "estimated_initial_speed_mps": 1.484400630141134,
+      "peak_speed_mps": 2.243617656512923,
+      "median_decel_mps2": 4.7400587790696775,
+      "p75_decel_mps2": 6.325924044761177,
+      "kick_power": 1.5,
+      "kick_direction_rad": -2.176892
+    },
+    {
+      "dataset": "match_dataset_3.jsonl",
+      "kick_id": 3,
+      "player_id": 2,
+      "ready_slot": "side",
+      "reason": "side clear to target",
+      "end_reason": "next_kick",
+      "duration_sec": 4.367596,
+      "points": 130,
+      "start": {
+        "x": 0.440949,
+        "y": 4.45
+      },
+      "stop": {
+        "x": 0.649551,
+        "y": 4.102055
+      },
+      "path_distance_m": 0.40568699617959,
+      "straight_distance_m": 0.4056852442830527,
+      "estimated_initial_speed_mps": 3.5658593271584476,
+      "peak_speed_mps": 3.5658593271584476,
+      "median_decel_mps2": 9.227361179619042,
+      "p75_decel_mps2": 11.049939043045024,
+      "kick_power": 1.5,
+      "kick_direction_rad": -2.941864
+    },
+    {
+      "dataset": "match_dataset_3.jsonl",
+      "kick_id": 4,
+      "player_id": 1,
+      "ready_slot": "center",
+      "reason": "center kick to target",
+      "end_reason": "ball_settled",
+      "duration_sec": 3.642233,
+      "points": 109,
+      "start": {
+        "x": 0.649551,
+        "y": 4.102055
+      },
+      "stop": {
+        "x": 2.714262,
+        "y": 0.983465
+      },
+      "path_distance_m": 4.226326167865618,
+      "straight_distance_m": 3.7401383800096224,
+      "estimated_initial_speed_mps": 2.802269479112556,
+      "peak_speed_mps": 2.802269479112556,
+      "median_decel_mps2": 4.052119602871565,
+      "p75_decel_mps2": 8.580818552242171,
+      "kick_power": 1.5,
+      "kick_direction_rad": 1.789198
+    },
+    {
+      "dataset": "match_dataset_3.jsonl",
+      "kick_id": 5,
+      "player_id": 1,
+      "ready_slot": "center",
+      "reason": "center kick",
+      "end_reason": "ball_settled",
+      "duration_sec": 3.986446,
+      "points": 119,
+      "start": {
+        "x": 0.571443,
+        "y": 2.057525
+      },
+      "stop": {
+        "x": -1.249276,
+        "y": -0.380861
+      },
+      "path_distance_m": 3.0643966259721136,
+      "straight_distance_m": 3.043147049019649,
+      "estimated_initial_speed_mps": 1.8797089959945459,
+      "peak_speed_mps": 1.8797089959945459,
+      "median_decel_mps2": 1.953591707989634,
+      "p75_decel_mps2": 5.308691529252721,
+      "kick_power": 1.5,
+      "kick_direction_rad": -1.032995
+    },
+    {
+      "dataset": "match_dataset_3.jsonl",
+      "kick_id": 6,
+      "player_id": 3,
+      "ready_slot": "keeper",
+      "reason": "goalkeeper clear",
+      "end_reason": "next_kick",
+      "duration_sec": 3.413833,
+      "points": 102,
+      "start": {
+        "x": -2.994961,
+        "y": -1.98386
+      },
+      "stop": {
+        "x": -3.480327,
+        "y": -0.681284
+      },
+      "path_distance_m": 1.5727438949972858,
+      "straight_distance_m": 1.390066325659319,
+      "estimated_initial_speed_mps": 4.183519570039788,
+      "peak_speed_mps": 4.183519570039788,
+      "median_decel_mps2": 26.430762481769108,
+      "p75_decel_mps2": 34.418977797728395,
+      "kick_power": 1.5,
+      "kick_direction_rad": 0.806436
+    },
+    {
+      "dataset": "match_dataset_3.jsonl",
+      "kick_id": 7,
+      "player_id": 2,
+      "ready_slot": "side",
+      "reason": "side clear",
+      "end_reason": "ball_settled",
+      "duration_sec": 4.025379,
+      "points": 120,
+      "start": {
+        "x": -3.480327,
+        "y": -0.681284
+      },
+      "stop": {
+        "x": -4.800116,
+        "y": 4.620146
+      },
+      "path_distance_m": 5.5678712651238005,
+      "straight_distance_m": 5.463241075535748,
+      "estimated_initial_speed_mps": 3.0600333712844194,
+      "peak_speed_mps": 3.0600333712844194,
+      "median_decel_mps2": 5.4147771645386715,
+      "p75_decel_mps2": 10.318961123719262,
+      "kick_power": 1.5,
+      "kick_direction_rad": 2.452073
+    },
+    {
+      "dataset": "match_dataset_3.jsonl",
+      "kick_id": 8,
+      "player_id": 2,
+      "ready_slot": "side",
+      "reason": "side clear to target",
+      "end_reason": "next_kick",
+      "duration_sec": 1.054041,
+      "points": 32,
+      "start": {
+        "x": -5.00169,
+        "y": 3.8019
+      },
+      "stop": {
+        "x": -5.756733,
+        "y": 1.98347
+      },
+      "path_distance_m": 1.9702683414651077,
+      "straight_distance_m": 1.9689534267597593,
+      "estimated_initial_speed_mps": 2.406253244157102,
+      "peak_speed_mps": 2.406253244157102,
+      "median_decel_mps2": 5.053975197622791,
+      "p75_decel_mps2": 9.374208146815965,
+      "kick_power": 1.5,
+      "kick_direction_rad": 1.318673
+    },
+    {
+      "dataset": "match_dataset_3.jsonl",
+      "kick_id": 9,
+      "player_id": 3,
+      "ready_slot": "keeper",
+      "reason": "goalkeeper clear",
+      "end_reason": "next_kick",
+      "duration_sec": 1.684341,
+      "points": 51,
+      "start": {
+        "x": -5.756733,
+        "y": 1.98347
+      },
+      "stop": {
+        "x": -6.873004,
+        "y": 0.363362
+      },
+      "path_distance_m": 1.9762504734850088,
+      "straight_distance_m": 1.967437642494674,
+      "estimated_initial_speed_mps": 2.081279453165525,
+      "peak_speed_mps": 2.081279453165525,
+      "median_decel_mps2": 4.6730398063192755,
+      "p75_decel_mps2": 7.65401990434173,
+      "kick_power": 1.5,
+      "kick_direction_rad": -2.826867
+    },
+    {
+      "dataset": "match_dataset_3.jsonl",
+      "kick_id": 10,
+      "player_id": 1,
+      "ready_slot": "center",
+      "reason": "center kick",
+      "end_reason": "ball_settled",
+      "duration_sec": 0.814818,
+      "points": 25,
+      "start": {
+        "x": -6.873004,
+        "y": 0.363362
+      },
+      "stop": {
+        "x": -7.115591,
+        "y": 0.119695
+      },
+      "path_distance_m": 0.6052564491051791,
+      "straight_distance_m": 0.34383434886293746,
+      "estimated_initial_speed_mps": 3.14536156762335,
+      "peak_speed_mps": 3.14536156762335,
+      "median_decel_mps2": 3.9070490966282114,
+      "p75_decel_mps2": 4.268872476056975,
+      "kick_power": 1.5,
+      "kick_direction_rad": 3.118689
+    },
+    {
+      "dataset": "match_dataset_3.jsonl",
+      "kick_id": 12,
+      "player_id": 2,
+      "ready_slot": "side",
+      "reason": "side clear",
+      "end_reason": "ball_settled",
+      "duration_sec": 5.867543,
+      "points": 167,
+      "start": {
+        "x": -5.994846,
+        "y": 1.727132
+      },
+      "stop": {
+        "x": -5.947277,
+        "y": 1.709978
+      },
+      "path_distance_m": 0.08740104587885177,
+      "straight_distance_m": 0.05056747449695322,
+      "estimated_initial_speed_mps": 0.6987128111734242,
+      "peak_speed_mps": 0.6987128111734242,
+      "median_decel_mps2": 11.767356166875157,
+      "p75_decel_mps2": 11.767356166875157,
+      "kick_power": 1.5,
+      "kick_direction_rad": -1.914866
+    },
+    {
+      "dataset": "match_dataset_3.jsonl",
+      "kick_id": 13,
+      "player_id": 3,
+      "ready_slot": "keeper",
+      "reason": "goalkeeper clear",
+      "end_reason": "ball_settled",
+      "duration_sec": 6.340236,
+      "points": 188,
+      "start": {
+        "x": -5.923083,
+        "y": 1.700668
+      },
+      "stop": {
+        "x": -1.090634,
+        "y": 1.988397
+      },
+      "path_distance_m": 4.906523917659913,
+      "straight_distance_m": 4.841007262444666,
+      "estimated_initial_speed_mps": 3.3921239761582505,
+      "peak_speed_mps": 3.3921239761582505,
+      "median_decel_mps2": 3.6841827448051254,
+      "p75_decel_mps2": 9.258429742917295,
+      "kick_power": 1.5,
+      "kick_direction_rad": 0.754173
+    },
+    {
+      "dataset": "match_dataset_3.jsonl",
+      "kick_id": 14,
+      "player_id": 1,
+      "ready_slot": "center",
+      "reason": "center kick to target",
+      "end_reason": "next_kick",
+      "duration_sec": 0.169764,
+      "points": 6,
+      "start": {
+        "x": -2.274082,
+        "y": 2.114623
+      },
+      "stop": {
+        "x": -2.534939,
+        "y": 2.162713
+      },
+      "path_distance_m": 0.26525574813568376,
+      "straight_distance_m": 0.2652527521987285,
+      "estimated_initial_speed_mps": 1.7633266605703244,
+      "peak_speed_mps": 1.7633266605703244,
+      "median_decel_mps2": 6.556174125353847,
+      "p75_decel_mps2": 11.152769067759559,
+      "kick_power": 1.5,
+      "kick_direction_rad": -1.032279
+    },
+    {
+      "dataset": "match_dataset_3.jsonl",
+      "kick_id": 15,
+      "player_id": 3,
+      "ready_slot": "keeper",
+      "reason": "goalkeeper clear",
+      "end_reason": "next_kick",
+      "duration_sec": 0.406237,
+      "points": 13,
+      "start": {
+        "x": -2.534939,
+        "y": 2.162713
+      },
+      "stop": {
+        "x": -3.046166,
+        "y": 2.272536
+      },
+      "path_distance_m": 0.5229340377709899,
+      "straight_distance_m": 0.5228901766700154,
+      "estimated_initial_speed_mps": 1.6233066166563443,
+      "peak_speed_mps": 1.6233066166563443,
+      "median_decel_mps2": 8.477437131821345,
+      "p75_decel_mps2": 11.602528324953607,
+      "kick_power": 1.5,
+      "kick_direction_rad": 2.156425
+    },
+    {
+      "dataset": "match_dataset_3.jsonl",
+      "kick_id": 16,
+      "player_id": 2,
+      "ready_slot": "side",
+      "reason": "side clear",
+      "end_reason": "next_kick",
+      "duration_sec": 0.170317,
+      "points": 6,
+      "start": {
+        "x": -3.046166,
+        "y": 2.272536
+      },
+      "stop": {
+        "x": -3.234889,
+        "y": 2.320288
+      },
+      "path_distance_m": 0.19467512226209888,
+      "straight_distance_m": 0.19467055307107953,
+      "estimated_initial_speed_mps": 1.414342437928305,
+      "peak_speed_mps": 1.414342437928305,
+      "median_decel_mps2": 2.4080387833680494,
+      "p75_decel_mps2": 9.873077150232406,
+      "kick_power": 1.5,
+      "kick_direction_rad": -0.890928
+    },
+    {
+      "dataset": "match_dataset_3.jsonl",
+      "kick_id": 17,
+      "player_id": 1,
+      "ready_slot": "center",
+      "reason": "center kick to target",
+      "end_reason": "next_kick",
+      "duration_sec": 0.337106,
+      "points": 11,
+      "start": {
+        "x": -3.234889,
+        "y": 2.320288
+      },
+      "stop": {
+        "x": -3.560583,
+        "y": 2.417083
+      },
+      "path_distance_m": 0.33982659656766245,
+      "straight_distance_m": 0.3397732385886209,
+      "estimated_initial_speed_mps": 1.6615077702766217,
+      "peak_speed_mps": 1.6615077702766217,
+      "median_decel_mps2": 7.223397565594196,
+      "p75_decel_mps2": 8.302978759179032,
+      "kick_power": 1.5,
+      "kick_direction_rad": -1.405496
+    },
+    {
+      "dataset": "match_dataset_3.jsonl",
+      "kick_id": 18,
+      "player_id": 2,
+      "ready_slot": "side",
+      "reason": "side clear",
+      "end_reason": "ball_settled",
+      "duration_sec": 2.336426,
+      "points": 70,
+      "start": {
+        "x": -3.560583,
+        "y": 2.417083
+      },
+      "stop": {
+        "x": -4.425741,
+        "y": 2.92864
+      },
+      "path_distance_m": 1.015033820149178,
+      "straight_distance_m": 1.0050815535134456,
+      "estimated_initial_speed_mps": 1.214536973464848,
+      "peak_speed_mps": 1.214536973464848,
+      "median_decel_mps2": 1.6372449038295793,
+      "p75_decel_mps2": 2.4754521088338786,
+      "kick_power": 1.5,
+      "kick_direction_rad": -0.679761
+    },
+    {
+      "dataset": "match_dataset_3.jsonl",
+      "kick_id": 19,
+      "player_id": 1,
+      "ready_slot": "center",
+      "reason": "center kick",
+      "end_reason": "ball_settled",
+      "duration_sec": 2.775237,
+      "points": 83,
+      "start": {
+        "x": -4.754393,
+        "y": 1.225179
+      },
+      "stop": {
+        "x": -4.692979,
+        "y": -0.473481
+      },
+      "path_distance_m": 1.6998738752346325,
+      "straight_distance_m": 1.6997698300052275,
+      "estimated_initial_speed_mps": 1.641019636169432,
+      "peak_speed_mps": 1.641019636169432,
+      "median_decel_mps2": 2.2077412446448355,
+      "p75_decel_mps2": 4.000681230150406,
+      "kick_power": 1.5,
+      "kick_direction_rad": 2.3661
+    },
+    {
+      "dataset": "match_dataset_3.jsonl",
+      "kick_id": 20,
+      "player_id": 1,
+      "ready_slot": "center",
+      "reason": "center kick to target",
+      "end_reason": "ball_settled",
+      "duration_sec": 7.662517,
+      "points": 228,
+      "start": {
+        "x": -0.444218,
+        "y": -0.266444
+      },
+      "stop": {
+        "x": 2.741401,
+        "y": 3.439518
+      },
+      "path_distance_m": 5.977141174448342,
+      "straight_distance_m": 4.886954343822438,
+      "estimated_initial_speed_mps": 4.078799166103355,
+      "peak_speed_mps": 4.078799166103355,
+      "median_decel_mps2": 4.177999421617094,
+      "p75_decel_mps2": 8.481094454373498,
+      "kick_power": 1.5,
+      "kick_direction_rad": -0.432438
+    },
+    {
+      "dataset": "match_dataset_3.jsonl",
+      "kick_id": 21,
+      "player_id": 2,
+      "ready_slot": "side",
+      "reason": "side clear",
+      "end_reason": "ball_settled",
+      "duration_sec": 4.531024,
+      "points": 135,
+      "start": {
+        "x": 0.832967,
+        "y": 2.810988
+      },
+      "stop": {
+        "x": -2.565065,
+        "y": 0.586746
+      },
+      "path_distance_m": 4.103625077333507,
+      "straight_distance_m": 4.06126506738824,
+      "estimated_initial_speed_mps": 2.4632164207149976,
+      "peak_speed_mps": 2.4632164207149976,
+      "median_decel_mps2": 2.663574726835661,
+      "p75_decel_mps2": 6.342960361437376,
+      "kick_power": 1.5,
+      "kick_direction_rad": -0.060321
+    },
+    {
+      "dataset": "match_dataset_3.jsonl",
+      "kick_id": 22,
+      "player_id": 3,
+      "ready_slot": "keeper",
+      "reason": "goalkeeper clear",
+      "end_reason": "ball_settled",
+      "duration_sec": 5.8183,
+      "points": 173,
+      "start": {
+        "x": -2.571173,
+        "y": 0.580682
+      },
+      "stop": {
+        "x": -6.01869,
+        "y": -4.084421
+      },
+      "path_distance_m": 5.8813889005879325,
+      "straight_distance_m": 5.800737838059741,
+      "estimated_initial_speed_mps": 3.0488561895031343,
+      "peak_speed_mps": 3.0488561895031343,
+      "median_decel_mps2": 3.6370519096596015,
+      "p75_decel_mps2": 7.6215424183006375,
+      "kick_power": 1.5,
+      "kick_direction_rad": 0.142777
+    },
+    {
+      "dataset": "match_dataset_3.jsonl",
+      "kick_id": 23,
+      "player_id": 2,
+      "ready_slot": "side",
+      "reason": "side clear to target",
+      "end_reason": "next_kick",
+      "duration_sec": 2.272319,
+      "points": 68,
+      "start": {
+        "x": -6.023881,
+        "y": -4.089618
+      },
+      "stop": {
+        "x": -6.25641,
+        "y": -3.640302
+      },
+      "path_distance_m": 0.5059234275956708,
+      "straight_distance_m": 0.5059195624770794,
+      "estimated_initial_speed_mps": 2.8318317711908603,
+      "peak_speed_mps": 2.8318317711908603,
+      "median_decel_mps2": 9.647750517153135,
+      "p75_decel_mps2": 10.742975655145953,
+      "kick_power": 1.5,
+      "kick_direction_rad": -2.893699
+    },
+    {
+      "dataset": "match_dataset_3.jsonl",
+      "kick_id": 24,
+      "player_id": 3,
+      "ready_slot": "keeper",
+      "reason": "goalkeeper clear to target",
+      "end_reason": "ball_settled",
+      "duration_sec": 1.081189,
+      "points": 33,
+      "start": {
+        "x": -6.25641,
+        "y": -3.640302
+      },
+      "stop": {
+        "x": -7.125032,
+        "y": -4.152922
+      },
+      "path_distance_m": 1.9313048968848558,
+      "straight_distance_m": 1.0086047012006243,
+      "estimated_initial_speed_mps": 3.1667253366874406,
+      "peak_speed_mps": 8.946677488890812,
+      "median_decel_mps2": 7.779688878854656,
+      "p75_decel_mps2": 16.32900698423455,
+      "kick_power": 1.5,
+      "kick_direction_rad": -2.809835
+    },
+    {
+      "dataset": "match_dataset_3.jsonl",
+      "kick_id": 25,
+      "player_id": 2,
+      "ready_slot": "side",
+      "reason": "side clear to target",
+      "end_reason": "next_kick",
+      "duration_sec": 0.370397,
+      "points": 12,
+      "start": {
+        "x": -6.933114,
+        "y": -4.453282
+      },
+      "stop": {
+        "x": -6.866492,
+        "y": -3.649865
+      },
+      "path_distance_m": 0.8094419216419126,
+      "straight_distance_m": 0.8061745262491239,
+      "estimated_initial_speed_mps": 3.187717757865825,
+      "peak_speed_mps": 3.187717757865825,
+      "median_decel_mps2": 14.344138667779246,
+      "p75_decel_mps2": 18.014056403954697,
+      "kick_power": 1.5,
+      "kick_direction_rad": -0.19131
+    },
+    {
+      "dataset": "match_dataset_3.jsonl",
+      "kick_id": 26,
+      "player_id": 3,
+      "ready_slot": "keeper",
+      "reason": "goalkeeper clear to target",
+      "end_reason": "ball_settled",
+      "duration_sec": 4.084128,
+      "points": 122,
+      "start": {
+        "x": -6.866492,
+        "y": -3.649865
+      },
+      "stop": {
+        "x": -6.95,
+        "y": -4.45
+      },
+      "path_distance_m": 2.7902785119170916,
+      "straight_distance_m": 0.8044809533413455,
+      "estimated_initial_speed_mps": 2.623414226119528,
+      "peak_speed_mps": 2.623414226119528,
+      "median_decel_mps2": 4.311810282850742,
+      "p75_decel_mps2": 7.051881998742181,
+      "kick_power": 1.5,
+      "kick_direction_rad": 2.904755
+    },
+    {
+      "dataset": "match_dataset_3.jsonl",
+      "kick_id": 27,
+      "player_id": 1,
+      "ready_slot": "center",
+      "reason": "center kick to target",
+      "end_reason": "next_kick",
+      "duration_sec": 0.406293,
+      "points": 13,
+      "start": {
+        "x": -6.911428,
+        "y": -4.462098
+      },
+      "stop": {
+        "x": -6.752043,
+        "y": -3.663679
+      },
+      "path_distance_m": 0.8278850767406336,
+      "straight_distance_m": 0.8141722654242161,
+      "estimated_initial_speed_mps": 3.7156350073280735,
+      "peak_speed_mps": 3.7156350073280735,
+      "median_decel_mps2": 12.716580972547884,
+      "p75_decel_mps2": 13.616450295198527,
+      "kick_power": 1.5,
+      "kick_direction_rad": 3.130198
+    },
+    {
+      "dataset": "match_dataset_3.jsonl",
+      "kick_id": 28,
+      "player_id": 3,
+      "ready_slot": "keeper",
+      "reason": "goalkeeper clear to target",
+      "end_reason": "ball_settled",
+      "duration_sec": 4.652099,
+      "points": 138,
+      "start": {
+        "x": -6.752043,
+        "y": -3.663679
+      },
+      "stop": {
+        "x": -5.080042,
+        "y": 0.547308
+      },
+      "path_distance_m": 4.60083843828419,
+      "straight_distance_m": 4.530783470678112,
+      "estimated_initial_speed_mps": 2.422177579266524,
+      "peak_speed_mps": 2.422177579266524,
+      "median_decel_mps2": 3.2570025734230086,
+      "p75_decel_mps2": 7.354008652052294,
+      "kick_power": 1.5,
+      "kick_direction_rad": -3.009413
+    },
+    {
+      "dataset": "match_dataset_3.jsonl",
+      "kick_id": 29,
+      "player_id": 2,
+      "ready_slot": "side",
+      "reason": "side clear",
+      "end_reason": "next_kick",
+      "duration_sec": 0.9763,
+      "points": 30,
+      "start": {
+        "x": -6.20444,
+        "y": -0.06499
+      },
+      "stop": {
+        "x": -7.301324,
+        "y": -1.014421
+      },
+      "path_distance_m": 1.451620037779016,
+      "straight_distance_m": 1.4507149041824174,
+      "estimated_initial_speed_mps": 1.9877333710335134,
+      "peak_speed_mps": 1.9877333710335134,
+      "median_decel_mps2": 5.594660609465153,
+      "p75_decel_mps2": 7.7693833697575165,
+      "kick_power": 1.5,
+      "kick_direction_rad": -1.521103
+    },
+    {
+      "dataset": "match_dataset_3.jsonl",
+      "kick_id": 30,
+      "player_id": 1,
+      "ready_slot": "center",
+      "reason": "center kick to target",
+      "end_reason": "ball_settled",
+      "duration_sec": 1.358774,
+      "points": 41,
+      "start": {
+        "x": -7.301324,
+        "y": -1.014421
+      },
+      "stop": {
+        "x": -7.29844,
+        "y": -0.90697
+      },
+      "path_distance_m": 0.4504049734547794,
+      "straight_distance_m": 0.1074896965155265,
+      "estimated_initial_speed_mps": 1.655139650908579,
+      "peak_speed_mps": 1.655139650908579,
+      "median_decel_mps2": 1.504961701800637,
+      "p75_decel_mps2": 2.7383401556006715,
+      "kick_power": 1.5,
+      "kick_direction_rad": -1.595619
+    },
+    {
+      "dataset": "match_dataset_3.jsonl",
+      "kick_id": 31,
+      "player_id": 1,
+      "ready_slot": "center",
+      "reason": "center kick to target",
+      "end_reason": "ball_settled",
+      "duration_sec": 7.333272,
+      "points": 217,
+      "start": {
+        "x": 0.0,
+        "y": 0.0
+      },
+      "stop": {
+        "x": 4.608649,
+        "y": 1.026532
+      },
+      "path_distance_m": 4.751129818168304,
+      "straight_distance_m": 4.721590150809894,
+      "estimated_initial_speed_mps": 3.32586415375794,
+      "peak_speed_mps": 3.32586415375794,
+      "median_decel_mps2": 3.481752289985147,
+      "p75_decel_mps2": 7.235065493645853,
+      "kick_power": 1.5,
+      "kick_direction_rad": -0.238464
+    },
+    {
+      "dataset": "match_dataset_3.jsonl",
+      "kick_id": 32,
+      "player_id": 2,
+      "ready_slot": "side",
+      "reason": "side clear",
+      "end_reason": "ball_settled",
+      "duration_sec": 2.446459,
+      "points": 73,
+      "start": {
+        "x": 1.659205,
+        "y": 2.275022
+      },
+      "stop": {
+        "x": 0.812861,
+        "y": 1.609862
+      },
+      "path_distance_m": 1.0801501860750753,
+      "straight_distance_m": 1.0764460004737815,
+      "estimated_initial_speed_mps": 1.104434471507075,
+      "peak_speed_mps": 1.104434471507075,
+      "median_decel_mps2": 1.582569945314455,
+      "p75_decel_mps2": 3.855891239132681,
+      "kick_power": 1.5,
+      "kick_direction_rad": -0.97781
+    },
+    {
+      "dataset": "match_dataset_3.jsonl",
+      "kick_id": 33,
+      "player_id": 1,
+      "ready_slot": "center",
+      "reason": "center kick to target",
+      "end_reason": "ball_settled",
+      "duration_sec": 4.838907,
+      "points": 144,
+      "start": {
+        "x": 0.957335,
+        "y": 1.667876
+      },
+      "stop": {
+        "x": 5.22336,
+        "y": 4.631255
+      },
+      "path_distance_m": 5.310228088471892,
+      "straight_distance_m": 5.194283819571857,
+      "estimated_initial_speed_mps": 2.77142947506258,
+      "peak_speed_mps": 2.77142947506258,
+      "median_decel_mps2": 4.264760177387262,
+      "p75_decel_mps2": 9.2315865789936,
+      "kick_power": 1.5,
+      "kick_direction_rad": 1.391882
+    },
+    {
+      "dataset": "match_dataset_3.jsonl",
+      "kick_id": 34,
+      "player_id": 1,
+      "ready_slot": "center",
+      "reason": "center kick to target",
+      "end_reason": "ball_settled",
+      "duration_sec": 5.003786,
+      "points": 149,
+      "start": {
+        "x": 5.184905,
+        "y": 4.323348
+      },
+      "stop": {
+        "x": 2.72117,
+        "y": -0.142008
+      },
+      "path_distance_m": 5.1710392843462705,
+      "straight_distance_m": 5.0999406228858195,
+      "estimated_initial_speed_mps": 3.103084037176648,
+      "peak_speed_mps": 3.103084037176648,
+      "median_decel_mps2": 3.5276141077356638,
+      "p75_decel_mps2": 7.857462444195677,
+      "kick_power": 1.5,
+      "kick_direction_rad": 1.635393
+    },
+    {
+      "dataset": "match_dataset_3.jsonl",
+      "kick_id": 35,
+      "player_id": 1,
+      "ready_slot": "center",
+      "reason": "center kick to target",
+      "end_reason": "timeout",
+      "duration_sec": 8.027295,
+      "points": 238,
+      "start": {
+        "x": 3.204444,
+        "y": 4.45
+      },
+      "stop": {
+        "x": 3.893752,
+        "y": 2.768986
+      },
+      "path_distance_m": 1.9168636836070514,
+      "straight_distance_m": 1.8168526597002854,
+      "estimated_initial_speed_mps": 2.9967278349105584,
+      "peak_speed_mps": 2.9967278349105584,
+      "median_decel_mps2": 4.944472992306455,
+      "p75_decel_mps2": 8.805360985366155,
+      "kick_power": 1.5,
+      "kick_direction_rad": -2.577438
+    },
+    {
+      "dataset": "match_dataset_3.jsonl",
+      "kick_id": 36,
+      "player_id": 1,
+      "ready_slot": "center",
+      "reason": "center kick to target",
+      "end_reason": "next_kick",
+      "duration_sec": 2.435694,
+      "points": 73,
+      "start": {
+        "x": -0.289608,
+        "y": -0.033593
+      },
+      "stop": {
+        "x": -3.257855,
+        "y": -1.452972
+      },
+      "path_distance_m": 3.5036510818099638,
+      "straight_distance_m": 3.2901560751201457,
+      "estimated_initial_speed_mps": 2.854382729473966,
+      "peak_speed_mps": 2.854382729473966,
+      "median_decel_mps2": 4.794888129569858,
+      "p75_decel_mps2": 8.128707885623184,
+      "kick_power": 1.5,
+      "kick_direction_rad": 0.073853
+    },
+    {
+      "dataset": "match_dataset_3.jsonl",
+      "kick_id": 37,
+      "player_id": 3,
+      "ready_slot": "keeper",
+      "reason": "goalkeeper clear",
+      "end_reason": "ball_settled",
+      "duration_sec": 2.043692,
+      "points": 61,
+      "start": {
+        "x": -3.257855,
+        "y": -1.452972
+      },
+      "stop": {
+        "x": -3.798748,
+        "y": -1.994765
+      },
+      "path_distance_m": 0.765574978495789,
+      "straight_distance_m": 0.7655748770028962,
+      "estimated_initial_speed_mps": 0.8284246564004556,
+      "peak_speed_mps": 0.8284246564004556,
+      "median_decel_mps2": 2.0231489129177813,
+      "p75_decel_mps2": 2.4124911459440317,
+      "kick_power": 1.5,
+      "kick_direction_rad": 0.587114
+    },
+    {
+      "dataset": "match_dataset_3.jsonl",
+      "kick_id": 38,
+      "player_id": 1,
+      "ready_slot": "center",
+      "reason": "center kick",
+      "end_reason": "ball_settled",
+      "duration_sec": 4.668894,
+      "points": 139,
+      "start": {
+        "x": -2.44653,
+        "y": -1.133154
+      },
+      "stop": {
+        "x": 1.530798,
+        "y": 0.78332
+      },
+      "path_distance_m": 4.475564365248965,
+      "straight_distance_m": 4.414975720460986,
+      "estimated_initial_speed_mps": 3.108345051292985,
+      "peak_speed_mps": 3.108345051292985,
+      "median_decel_mps2": 3.368620186871055,
+      "p75_decel_mps2": 9.895740053600857,
+      "kick_power": 1.5,
+      "kick_direction_rad": 2.823417
+    },
+    {
+      "dataset": "match_dataset_3.jsonl",
+      "kick_id": 39,
+      "player_id": 2,
+      "ready_slot": "side",
+      "reason": "side clear",
+      "end_reason": "next_kick",
+      "duration_sec": 3.084676,
+      "points": 91,
+      "start": {
+        "x": 1.536482,
+        "y": 0.788849
+      },
+      "stop": {
+        "x": -0.850294,
+        "y": -1.210728
+      },
+      "path_distance_m": 3.2510864697904127,
+      "straight_distance_m": 3.113680756452883,
+      "estimated_initial_speed_mps": 3.4329750158161545,
+      "peak_speed_mps": 3.4329750158161545,
+      "median_decel_mps2": 4.259798788105395,
+      "p75_decel_mps2": 6.887906504032979,
+      "kick_power": 1.5,
+      "kick_direction_rad": -0.246692
+    },
+    {
+      "dataset": "match_dataset_3.jsonl",
+      "kick_id": 40,
+      "player_id": 1,
+      "ready_slot": "center",
+      "reason": "center kick to target",
+      "end_reason": "ball_settled",
+      "duration_sec": 2.910781,
+      "points": 87,
+      "start": {
+        "x": -0.850294,
+        "y": -1.210728
+      },
+      "stop": {
+        "x": -1.931324,
+        "y": -2.291752
+      },
+      "path_distance_m": 1.528803045992529,
+      "straight_distance_m": 1.5288030446973868,
+      "estimated_initial_speed_mps": 1.6397707003976816,
+      "peak_speed_mps": 1.6397707003976816,
+      "median_decel_mps2": 2.4588921674106734,
+      "p75_decel_mps2": 7.294919633665017,
+      "kick_power": 1.5,
+      "kick_direction_rad": 1.95865
+    },
+    {
+      "dataset": "match_dataset_3.jsonl",
+      "kick_id": 41,
+      "player_id": 3,
+      "ready_slot": "keeper",
+      "reason": "goalkeeper clear",
+      "end_reason": "ball_settled",
+      "duration_sec": 0.749415,
+      "points": 23,
+      "start": {
+        "x": -3.414332,
+        "y": -2.117163
+      },
+      "stop": {
+        "x": -3.482813,
+        "y": -2.185482
+      },
+      "path_distance_m": 0.09673227604323063,
+      "straight_distance_m": 0.09673227549272272,
+      "estimated_initial_speed_mps": 0.2921447794111514,
+      "peak_speed_mps": 0.2921447794111514,
+      "median_decel_mps2": 1.196296022344398,
+      "p75_decel_mps2": 1.7717319699107767,
+      "kick_power": 1.5,
+      "kick_direction_rad": 0.962201
+    },
+    {
+      "dataset": "match_dataset_3.jsonl",
+      "kick_id": 42,
+      "player_id": 1,
+      "ready_slot": "center",
+      "reason": "center kick",
+      "end_reason": "ball_settled",
+      "duration_sec": 4.725552,
+      "points": 140,
+      "start": {
+        "x": -2.508273,
+        "y": -1.832798
+      },
+      "stop": {
+        "x": 1.238436,
+        "y": 0.437987
+      },
+      "path_distance_m": 4.432577556666297,
+      "straight_distance_m": 4.381129174871018,
+      "estimated_initial_speed_mps": 2.9368864583396923,
+      "peak_speed_mps": 2.9368864583396923,
+      "median_decel_mps2": 3.307691649406607,
+      "p75_decel_mps2": 6.892311779600696,
+      "kick_power": 1.5,
+      "kick_direction_rad": 1.674634
+    },
+    {
+      "dataset": "match_dataset_3.jsonl",
+      "kick_id": 43,
+      "player_id": 2,
+      "ready_slot": "side",
+      "reason": "side clear",
+      "end_reason": "ball_settled",
+      "duration_sec": 3.437705,
+      "points": 102,
+      "start": {
+        "x": 1.180961,
+        "y": -2.421905
+      },
+      "stop": {
+        "x": 0.961269,
+        "y": -1.525754
+      },
+      "path_distance_m": 2.389737802129556,
+      "straight_distance_m": 0.9226869402267489,
+      "estimated_initial_speed_mps": 5.26916467933216,
+      "peak_speed_mps": 5.26916467933216,
+      "median_decel_mps2": 2.155131136662029,
+      "p75_decel_mps2": 5.4732572984331,
+      "kick_power": 1.5,
+      "kick_direction_rad": 1.429332
+    },
+    {
+      "dataset": "match_dataset_3.jsonl",
+      "kick_id": 44,
+      "player_id": 1,
+      "ready_slot": "center",
+      "reason": "center kick to target",
+      "end_reason": "next_kick",
+      "duration_sec": 1.734943,
+      "points": 52,
+      "start": {
+        "x": -0.507122,
+        "y": -0.075144
+      },
+      "stop": {
+        "x": -3.130516,
+        "y": -0.504966
+      },
+      "path_distance_m": 2.658643085602751,
+      "straight_distance_m": 2.6583722521347535,
+      "estimated_initial_speed_mps": 2.53414561550297,
+      "peak_speed_mps": 2.53414561550297,
+      "median_decel_mps2": 4.83903261635686,
+      "p75_decel_mps2": 10.90817749939733,
+      "kick_power": 1.5,
+      "kick_direction_rad": 0.004038
+    },
+    {
+      "dataset": "match_dataset_3.jsonl",
+      "kick_id": 45,
+      "player_id": 3,
+      "ready_slot": "keeper",
+      "reason": "goalkeeper clear",
+      "end_reason": "ball_settled",
+      "duration_sec": 5.798056,
+      "points": 172,
+      "start": {
+        "x": -3.130516,
+        "y": -0.504966
+      },
+      "stop": {
+        "x": -3.813802,
+        "y": -3.542441
+      },
+      "path_distance_m": 4.280306932099089,
+      "straight_distance_m": 3.113379856911296,
+      "estimated_initial_speed_mps": 1.6288597254912855,
+      "peak_speed_mps": 2.1804569632285595,
+      "median_decel_mps2": 2.4733557635111496,
+      "p75_decel_mps2": 5.915062741009711,
+      "kick_power": 1.5,
+      "kick_direction_rad": 0.265341
+    },
+    {
+      "dataset": "match_dataset_3.jsonl",
+      "kick_id": 46,
+      "player_id": 2,
+      "ready_slot": "side",
+      "reason": "side clear",
+      "end_reason": "next_kick",
+      "duration_sec": 2.904002,
+      "points": 87,
+      "start": {
+        "x": 0.216756,
+        "y": -0.365959
+      },
+      "stop": {
+        "x": -0.141362,
+        "y": -1.528706
+      },
+      "path_distance_m": 3.1896891517821206,
+      "straight_distance_m": 1.2166466569768726,
+      "estimated_initial_speed_mps": 3.1321350843167632,
+      "peak_speed_mps": 3.1321350843167632,
+      "median_decel_mps2": 3.356607539607663,
+      "p75_decel_mps2": 5.6085184163824255,
+      "kick_power": 1.5,
+      "kick_direction_rad": -0.052221
+    },
+    {
+      "dataset": "match_dataset_3.jsonl",
+      "kick_id": 47,
+      "player_id": 1,
+      "ready_slot": "center",
+      "reason": "center kick to target",
+      "end_reason": "ball_settled",
+      "duration_sec": 0.877822,
+      "points": 27,
+      "start": {
+        "x": -0.141362,
+        "y": -1.528706
+      },
+      "stop": {
+        "x": -0.054654,
+        "y": -1.628609
+      },
+      "path_distance_m": 0.13228691695684447,
+      "straight_distance_m": 0.13228335750577247,
+      "estimated_initial_speed_mps": 0.3588527626710307,
+      "peak_speed_mps": 0.3588527626710307,
+      "median_decel_mps2": 0.717809030414738,
+      "p75_decel_mps2": 1.6757167062776788,
+      "kick_power": 1.5,
+      "kick_direction_rad": -2.378056
+    },
+    {
+      "dataset": "match_dataset_3.jsonl",
+      "kick_id": 48,
+      "player_id": 2,
+      "ready_slot": "side",
+      "reason": "side clear",
+      "end_reason": "ball_settled",
+      "duration_sec": 2.707972,
+      "points": 81,
+      "start": {
+        "x": 1.238214,
+        "y": 1.692392
+      },
+      "stop": {
+        "x": -0.279178,
+        "y": 1.195372
+      },
+      "path_distance_m": 1.609724525734008,
+      "straight_distance_m": 1.5967176838953088,
+      "estimated_initial_speed_mps": 1.4698294214505065,
+      "peak_speed_mps": 1.4698294214505065,
+      "median_decel_mps2": 1.680395805706822,
+      "p75_decel_mps2": 4.572575487780398,
+      "kick_power": 1.5,
+      "kick_direction_rad": -0.976023
+    },
+    {
+      "dataset": "match_dataset_3.jsonl",
+      "kick_id": 49,
+      "player_id": 3,
+      "ready_slot": "keeper",
+      "reason": "goalkeeper clear",
+      "end_reason": "ball_settled",
+      "duration_sec": 4.008508,
+      "points": 119,
+      "start": {
+        "x": -3.119921,
+        "y": -0.452844
+      },
+      "stop": {
+        "x": -5.295394,
+        "y": -2.493767
+      },
+      "path_distance_m": 2.984901351116438,
+      "straight_distance_m": 2.982959849823326,
+      "estimated_initial_speed_mps": 2.0040105326945112,
+      "peak_speed_mps": 2.0040105326945112,
+      "median_decel_mps2": 2.2803380472214907,
+      "p75_decel_mps2": 4.410476327736892,
+      "kick_power": 1.5,
+      "kick_direction_rad": 1.110307
+    },
+    {
+      "dataset": "match_dataset_3.jsonl",
+      "kick_id": 50,
+      "player_id": 2,
+      "ready_slot": "side",
+      "reason": "side clear",
+      "end_reason": "next_kick",
+      "duration_sec": 6.087871,
+      "points": 181,
+      "start": {
+        "x": -0.421245,
+        "y": -1.06029
+      },
+      "stop": {
+        "x": -3.765313,
+        "y": 1.394874
+      },
+      "path_distance_m": 4.811452980962198,
+      "straight_distance_m": 4.148568554998218,
+      "estimated_initial_speed_mps": 2.9619222773102383,
+      "peak_speed_mps": 2.9619222773102383,
+      "median_decel_mps2": 4.446440917879338,
+      "p75_decel_mps2": 8.719543173442052,
+      "kick_power": 1.5,
+      "kick_direction_rad": 0.275122
+    },
+    {
+      "dataset": "match_dataset_3.jsonl",
+      "kick_id": 51,
+      "player_id": 3,
+      "ready_slot": "keeper",
+      "reason": "goalkeeper clear",
+      "end_reason": "ball_settled",
+      "duration_sec": 1.288178,
+      "points": 39,
+      "start": {
+        "x": -3.765313,
+        "y": 1.394874
+      },
+      "stop": {
+        "x": -3.979325,
+        "y": 1.60855
+      },
+      "path_distance_m": 0.3024211879185769,
+      "straight_distance_m": 0.3024211783589237,
+      "estimated_initial_speed_mps": 0.6347012616626799,
+      "peak_speed_mps": 0.6347012616626799,
+      "median_decel_mps2": 2.7979727333993325,
+      "p75_decel_mps2": 3.514510066322998,
+      "kick_power": 1.5,
+      "kick_direction_rad": -1.25238
+    },
+    {
+      "dataset": "match_dataset_3.jsonl",
+      "kick_id": 52,
+      "player_id": 2,
+      "ready_slot": "side",
+      "reason": "side clear",
+      "end_reason": "next_kick",
+      "duration_sec": 2.292341,
+      "points": 69,
+      "start": {
+        "x": -3.985483,
+        "y": 1.6147
+      },
+      "stop": {
+        "x": -5.077267,
+        "y": 0.855955
+      },
+      "path_distance_m": 1.329612362038906,
+      "straight_distance_m": 1.3295436351173286,
+      "estimated_initial_speed_mps": 3.1102931100321527,
+      "peak_speed_mps": 3.1102931100321527,
+      "median_decel_mps2": 12.444456182357829,
+      "p75_decel_mps2": 14.60583532352303,
+      "kick_power": 1.5,
+      "kick_direction_rad": -2.612653
+    },
+    {
+      "dataset": "match_dataset_3.jsonl",
+      "kick_id": 53,
+      "player_id": 1,
+      "ready_slot": "center",
+      "reason": "center kick to target",
+      "end_reason": "ball_settled",
+      "duration_sec": 3.278042,
+      "points": 98,
+      "start": {
+        "x": -5.077267,
+        "y": 0.855955
+      },
+      "stop": {
+        "x": -7.288846,
+        "y": -0.860841
+      },
+      "path_distance_m": 3.3979224395553747,
+      "straight_distance_m": 2.799726804325201,
+      "estimated_initial_speed_mps": 2.711283493489995,
+      "peak_speed_mps": 2.711283493489995,
+      "median_decel_mps2": 4.185408164639277,
+      "p75_decel_mps2": 10.375031067118652,
+      "kick_power": 1.5,
+      "kick_direction_rad": -3.067915
+    },
+    {
+      "dataset": "match_dataset_3.jsonl",
+      "kick_id": 54,
+      "player_id": 1,
+      "ready_slot": "center",
+      "reason": "center kick to target",
+      "end_reason": "timeout",
+      "duration_sec": 8.027595,
+      "points": 238,
+      "start": {
+        "x": 0.0,
+        "y": 0.0
+      },
+      "stop": {
+        "x": 3.41541,
+        "y": 2.683582
+      },
+      "path_distance_m": 6.80504114154822,
+      "straight_distance_m": 4.343574313721822,
+      "estimated_initial_speed_mps": 3.0642123865824207,
+      "peak_speed_mps": 3.0642123865824207,
+      "median_decel_mps2": 4.542691746351094,
+      "p75_decel_mps2": 9.988933335705678,
+      "kick_power": 1.5,
+      "kick_direction_rad": -0.229031
+    },
+    {
+      "dataset": "match_dataset_3.jsonl",
+      "kick_id": 55,
+      "player_id": 1,
+      "ready_slot": "center",
+      "reason": "center kick to target",
+      "end_reason": "ball_settled",
+      "duration_sec": 7.393944,
+      "points": 219,
+      "start": {
+        "x": 1.547606,
+        "y": 4.45
+      },
+      "stop": {
+        "x": 0.47322,
+        "y": 1.798954
+      },
+      "path_distance_m": 2.9159861839213472,
+      "straight_distance_m": 2.860480758738293,
+      "estimated_initial_speed_mps": 2.0152858756195364,
+      "peak_speed_mps": 2.0152858756195364,
+      "median_decel_mps2": 2.786412438693017,
+      "p75_decel_mps2": 4.984382292877191,
+      "kick_power": 1.5,
+      "kick_direction_rad": 3.090544
+    },
+    {
+      "dataset": "match_dataset_3.jsonl",
+      "kick_id": 56,
+      "player_id": 1,
+      "ready_slot": "center",
+      "reason": "center kick to target",
+      "end_reason": "ball_settled",
+      "duration_sec": 4.784139,
+      "points": 142,
+      "start": {
+        "x": -0.474387,
+        "y": -0.071065
+      },
+      "stop": {
+        "x": -4.562116,
+        "y": -2.113178
+      },
+      "path_distance_m": 4.726511300418158,
+      "straight_distance_m": 4.569436932731428,
+      "estimated_initial_speed_mps": 2.765074909991997,
+      "peak_speed_mps": 2.765074909991997,
+      "median_decel_mps2": 1.9131541587189347,
+      "p75_decel_mps2": 5.391209739454625,
+      "kick_power": 1.5,
+      "kick_direction_rad": 0.086357
+    },
+    {
+      "dataset": "match_dataset_4.jsonl",
+      "kick_id": 1,
+      "player_id": 1,
+      "ready_slot": "center",
+      "reason": "center kick to target",
+      "end_reason": "timeout",
+      "duration_sec": 8.031241,
+      "points": 238,
+      "start": {
+        "x": 0.0,
+        "y": 0.0
+      },
+      "stop": {
+        "x": 2.463554,
+        "y": 2.281394
+      },
+      "path_distance_m": 6.94400710259273,
+      "straight_distance_m": 3.357656458625867,
+      "estimated_initial_speed_mps": 3.300535591664966,
+      "peak_speed_mps": 3.300535591664966,
+      "median_decel_mps2": 5.037114124181925,
+      "p75_decel_mps2": 9.071616425324446,
+      "kick_power": 1.5,
+      "kick_direction_rad": 0.075254
+    },
+    {
+      "dataset": "match_dataset_4.jsonl",
+      "kick_id": 2,
+      "player_id": 2,
+      "ready_slot": "side",
+      "reason": "side clear",
+      "end_reason": "ball_settled",
+      "duration_sec": 2.699393,
+      "points": 81,
+      "start": {
+        "x": 1.403599,
+        "y": 3.25391
+      },
+      "stop": {
+        "x": 0.41419,
+        "y": 4.235844
+      },
+      "path_distance_m": 1.3939671759185353,
+      "straight_distance_m": 1.3939600244042154,
+      "estimated_initial_speed_mps": 1.2760134058610866,
+      "peak_speed_mps": 1.2760134058610866,
+      "median_decel_mps2": 1.5765081218011168,
+      "p75_decel_mps2": 3.907717267046989,
+      "kick_power": 1.5,
+      "kick_direction_rad": -2.163745
+    },
+    {
+      "dataset": "match_dataset_4.jsonl",
+      "kick_id": 3,
+      "player_id": 1,
+      "ready_slot": "center",
+      "reason": "center kick to target",
+      "end_reason": "ball_settled",
+      "duration_sec": 4.825465,
+      "points": 144,
+      "start": {
+        "x": 0.797082,
+        "y": 3.611726
+      },
+      "stop": {
+        "x": -1.753123,
+        "y": 0.578698
+      },
+      "path_distance_m": 4.354400195335747,
+      "straight_distance_m": 3.9626764176259712,
+      "estimated_initial_speed_mps": 2.346818402579589,
+      "peak_speed_mps": 2.346818402579589,
+      "median_decel_mps2": 3.767241823388704,
+      "p75_decel_mps2": 6.839966950841449,
+      "kick_power": 1.5,
+      "kick_direction_rad": 2.000447
+    },
+    {
+      "dataset": "match_dataset_4.jsonl",
+      "kick_id": 4,
+      "player_id": 2,
+      "ready_slot": "side",
+      "reason": "side clear to target",
+      "end_reason": "ball_settled",
+      "duration_sec": 3.4492,
+      "points": 103,
+      "start": {
+        "x": -0.945317,
+        "y": 2.189485
+      },
+      "stop": {
+        "x": -2.829649,
+        "y": 3.460491
+      },
+      "path_distance_m": 2.2936093518820933,
+      "straight_distance_m": 2.2729195626462455,
+      "estimated_initial_speed_mps": 2.2325348490392254,
+      "peak_speed_mps": 2.2325348490392254,
+      "median_decel_mps2": 2.490317467099591,
+      "p75_decel_mps2": 5.589042499094176,
+      "kick_power": 1.5,
+      "kick_direction_rad": -2.798894
+    },
+    {
+      "dataset": "match_dataset_4.jsonl",
+      "kick_id": 6,
+      "player_id": 3,
+      "ready_slot": "keeper",
+      "reason": "goalkeeper clear",
+      "end_reason": "next_kick",
+      "duration_sec": 2.035976,
+      "points": 61,
+      "start": {
+        "x": -3.050356,
+        "y": 3.1491
+      },
+      "stop": {
+        "x": -3.933288,
+        "y": 3.680566
+      },
+      "path_distance_m": 3.149784941021075,
+      "straight_distance_m": 1.0305459843112292,
+      "estimated_initial_speed_mps": 2.3642980113195637,
+      "peak_speed_mps": 2.7236510816319,
+      "median_decel_mps2": 8.58840276885913,
+      "p75_decel_mps2": 14.402001092512599,
+      "kick_power": 1.5,
+      "kick_direction_rad": -1.118349
+    },
+    {
+      "dataset": "match_dataset_4.jsonl",
+      "kick_id": 7,
+      "player_id": 2,
+      "ready_slot": "side",
+      "reason": "side clear to target",
+      "end_reason": "ball_settled",
+      "duration_sec": 1.179477,
+      "points": 36,
+      "start": {
+        "x": -3.933288,
+        "y": 3.680566
+      },
+      "stop": {
+        "x": -3.877471,
+        "y": 4.626324
+      },
+      "path_distance_m": 1.6603799656238132,
+      "straight_distance_m": 0.9474036795648416,
+      "estimated_initial_speed_mps": 1.9079150121441761,
+      "peak_speed_mps": 8.969062339874954,
+      "median_decel_mps2": 8.248977072542882,
+      "p75_decel_mps2": 11.83317532335217,
+      "kick_power": 1.5,
+      "kick_direction_rad": 1.967768
+    },
+    {
+      "dataset": "match_dataset_4.jsonl",
+      "kick_id": 8,
+      "player_id": 2,
+      "ready_slot": "side",
+      "reason": "side clear to target",
+      "end_reason": "next_kick",
+      "duration_sec": 1.052213,
+      "points": 32,
+      "start": {
+        "x": -4.092087,
+        "y": 4.458979
+      },
+      "stop": {
+        "x": -5.299515,
+        "y": 3.688627
+      },
+      "path_distance_m": 1.4453140839535445,
+      "straight_distance_m": 1.4322445947141853,
+      "estimated_initial_speed_mps": 1.9107361543468966,
+      "peak_speed_mps": 1.9107361543468966,
+      "median_decel_mps2": 6.327809031390987,
+      "p75_decel_mps2": 8.216995475668979,
+      "kick_power": 1.5,
+      "kick_direction_rad": 1.234642
+    },
+    {
+      "dataset": "match_dataset_4.jsonl",
+      "kick_id": 9,
+      "player_id": 3,
+      "ready_slot": "keeper",
+      "reason": "goalkeeper clear to target",
+      "end_reason": "ball_settled",
+      "duration_sec": 3.272883,
+      "points": 98,
+      "start": {
+        "x": -5.299515,
+        "y": 3.688627
+      },
+      "stop": {
+        "x": -6.701353,
+        "y": 2.361721
+      },
+      "path_distance_m": 1.9309400224498792,
+      "straight_distance_m": 1.9302407391514662,
+      "estimated_initial_speed_mps": 1.3794614414828652,
+      "peak_speed_mps": 1.3794614414828652,
+      "median_decel_mps2": 2.5177095433286287,
+      "p75_decel_mps2": 3.714332497510249,
+      "kick_power": 1.5,
+      "kick_direction_rad": 0.893041
+    },
+    {
+      "dataset": "match_dataset_4.jsonl",
+      "kick_id": 10,
+      "player_id": 1,
+      "ready_slot": "center",
+      "reason": "center kick",
+      "end_reason": "ball_settled",
+      "duration_sec": 2.400727,
+      "points": 72,
+      "start": {
+        "x": -6.56213,
+        "y": 1.317086
+      },
+      "stop": {
+        "x": -7.428304,
+        "y": 0.722641
+      },
+      "path_distance_m": 1.2870878100258767,
+      "straight_distance_m": 1.0505342718355266,
+      "estimated_initial_speed_mps": 2.0979443715830164,
+      "peak_speed_mps": 2.0979443715830164,
+      "median_decel_mps2": 1.8025221056875815,
+      "p75_decel_mps2": 4.6461921827945165,
+      "kick_power": 1.5,
+      "kick_direction_rad": 2.761629
+    },
+    {
+      "dataset": "match_dataset_4.jsonl",
+      "kick_id": 11,
+      "player_id": 1,
+      "ready_slot": "center",
+      "reason": "center kick to target",
+      "end_reason": "timeout",
+      "duration_sec": 8.024552,
+      "points": 238,
+      "start": {
+        "x": 0.0,
+        "y": 0.0
+      },
+      "stop": {
+        "x": 2.93124,
+        "y": 2.64578
+      },
+      "path_distance_m": 6.879102586652744,
+      "straight_distance_m": 3.948711149982991,
+      "estimated_initial_speed_mps": 3.521240680273809,
+      "peak_speed_mps": 3.521240680273809,
+      "median_decel_mps2": 4.215647448924406,
+      "p75_decel_mps2": 8.971597169533005,
+      "kick_power": 1.5,
+      "kick_direction_rad": -0.642925
+    },
+    {
+      "dataset": "match_dataset_4.jsonl",
+      "kick_id": 12,
+      "player_id": 2,
+      "ready_slot": "side",
+      "reason": "side clear to target",
+      "end_reason": "ball_settled",
+      "duration_sec": 0.946749,
+      "points": 29,
+      "start": {
+        "x": 1.38098,
+        "y": 4.209471
+      },
+      "stop": {
+        "x": 0.952258,
+        "y": 4.626823
+      },
+      "path_distance_m": 0.8438440818620094,
+      "straight_distance_m": 0.5983186819647204,
+      "estimated_initial_speed_mps": 3.655540487648791,
+      "peak_speed_mps": 3.655540487648791,
+      "median_decel_mps2": 2.852492190466507,
+      "p75_decel_mps2": 6.113021794230556,
+      "kick_power": 1.5,
+      "kick_direction_rad": -2.751133
+    },
+    {
+      "dataset": "match_dataset_4.jsonl",
+      "kick_id": 15,
+      "player_id": 1,
+      "ready_slot": "center",
+      "reason": "center kick to target",
+      "end_reason": "next_kick",
+      "duration_sec": 1.593742,
+      "points": 48,
+      "start": {
+        "x": -0.562834,
+        "y": -0.082347
+      },
+      "stop": {
+        "x": -3.174755,
+        "y": -0.597897
+      },
+      "path_distance_m": 2.66678316871136,
+      "straight_distance_m": 2.662315366882932,
+      "estimated_initial_speed_mps": 2.5411537944565104,
+      "peak_speed_mps": 2.5411537944565104,
+      "median_decel_mps2": 3.8117287909198816,
+      "p75_decel_mps2": 7.000735393291157,
+      "kick_power": 1.5,
+      "kick_direction_rad": 0.05492
+    },
+    {
+      "dataset": "match_dataset_4.jsonl",
+      "kick_id": 16,
+      "player_id": 3,
+      "ready_slot": "keeper",
+      "reason": "goalkeeper clear",
+      "end_reason": "ball_settled",
+      "duration_sec": 6.357711,
+      "points": 189,
+      "start": {
+        "x": -3.174755,
+        "y": -0.597897
+      },
+      "stop": {
+        "x": -2.604887,
+        "y": -3.929294
+      },
+      "path_distance_m": 4.685251041319999,
+      "straight_distance_m": 3.3797863111494193,
+      "estimated_initial_speed_mps": 1.3463016750414605,
+      "peak_speed_mps": 2.284334435781965,
+      "median_decel_mps2": 2.6666006363738335,
+      "p75_decel_mps2": 5.243429301033696,
+      "kick_power": 1.5,
+      "kick_direction_rad": 0.544244
+    },
+    {
+      "dataset": "match_dataset_4.jsonl",
+      "kick_id": 17,
+      "player_id": 1,
+      "ready_slot": "center",
+      "reason": "center kick to target",
+      "end_reason": "timeout",
+      "duration_sec": 8.003367,
+      "points": 238,
+      "start": {
+        "x": -2.600009,
+        "y": -3.934227
+      },
+      "stop": {
+        "x": -0.823647,
+        "y": -1.768138
+      },
+      "path_distance_m": 2.813118117703504,
+      "straight_distance_m": 2.8013217435640985,
+      "estimated_initial_speed_mps": 2.3459701864137648,
+      "peak_speed_mps": 2.3459701864137648,
+      "median_decel_mps2": 5.2389154290377515,
+      "p75_decel_mps2": 7.458119855580454,
+      "kick_power": 1.5,
+      "kick_direction_rad": 2.88711
+    },
+    {
+      "dataset": "match_dataset_4.jsonl",
+      "kick_id": 18,
+      "player_id": 2,
+      "ready_slot": "side",
+      "reason": "side clear",
+      "end_reason": "next_kick",
+      "duration_sec": 3.008198,
+      "points": 90,
+      "start": {
+        "x": -1.05037,
+        "y": -0.544474
+      },
+      "stop": {
+        "x": -2.984897,
+        "y": -0.422303
+      },
+      "path_distance_m": 1.9387804572104046,
+      "straight_distance_m": 1.9383808880016333,
+      "estimated_initial_speed_mps": 3.3408652331315642,
+      "peak_speed_mps": 3.3408652331315642,
+      "median_decel_mps2": 9.316267280412617,
+      "p75_decel_mps2": 11.275413456460232,
+      "kick_power": 1.5,
+      "kick_direction_rad": 1.939788
+    },
+    {
+      "dataset": "match_dataset_4.jsonl",
+      "kick_id": 19,
+      "player_id": 3,
+      "ready_slot": "keeper",
+      "reason": "goalkeeper clear",
+      "end_reason": "next_kick",
+      "duration_sec": 1.689189,
+      "points": 51,
+      "start": {
+        "x": -2.984897,
+        "y": -0.422303
+      },
+      "stop": {
+        "x": -3.359547,
+        "y": 0.209228
+      },
+      "path_distance_m": 3.029644907246251,
+      "straight_distance_m": 0.7342983225236184,
+      "estimated_initial_speed_mps": 2.1448282029765267,
+      "peak_speed_mps": 4.032960426654611,
+      "median_decel_mps2": 7.44313377424104,
+      "p75_decel_mps2": 11.350597813265667,
+      "kick_power": 1.5,
+      "kick_direction_rad": 0.130464
+    },
+    {
+      "dataset": "match_dataset_4.jsonl",
+      "kick_id": 20,
+      "player_id": 2,
+      "ready_slot": "side",
+      "reason": "side clear to target",
+      "end_reason": "next_kick",
+      "duration_sec": 0.272914,
+      "points": 9,
+      "start": {
+        "x": -3.359547,
+        "y": 0.209228
+      },
+      "stop": {
+        "x": -2.791212,
+        "y": 0.409848
+      },
+      "path_distance_m": 0.6027726979567898,
+      "straight_distance_m": 0.6027047839738792,
+      "estimated_initial_speed_mps": 3.0382915297976028,
+      "peak_speed_mps": 3.0382915297976028,
+      "median_decel_mps2": 20.712991177783202,
+      "p75_decel_mps2": 25.1375235719676,
+      "kick_power": 1.5,
+      "kick_direction_rad": -3.038889
+    },
+    {
+      "dataset": "match_dataset_4.jsonl",
+      "kick_id": 21,
+      "player_id": 1,
+      "ready_slot": "center",
+      "reason": "center kick to target",
+      "end_reason": "ball_settled",
+      "duration_sec": 4.234428,
+      "points": 126,
+      "start": {
+        "x": -2.791212,
+        "y": 0.409848
+      },
+      "stop": {
+        "x": 0.613595,
+        "y": 0.237019
+      },
+      "path_distance_m": 3.602377008772209,
+      "straight_distance_m": 3.4091906034262736,
+      "estimated_initial_speed_mps": 2.243905521667965,
+      "peak_speed_mps": 2.243905521667965,
+      "median_decel_mps2": 2.3894927388048783,
+      "p75_decel_mps2": 6.268606935201894,
+      "kick_power": 1.5,
+      "kick_direction_rad": 2.971188
+    },
+    {
+      "dataset": "match_dataset_4.jsonl",
+      "kick_id": 22,
+      "player_id": 2,
+      "ready_slot": "side",
+      "reason": "side clear",
+      "end_reason": "ball_settled",
+      "duration_sec": 1.996458,
+      "points": 60,
+      "start": {
+        "x": 0.31086,
+        "y": 1.398105
+      },
+      "stop": {
+        "x": -0.120197,
+        "y": 1.91417
+      },
+      "path_distance_m": 0.7742613194053651,
+      "straight_distance_m": 0.6724085227553261,
+      "estimated_initial_speed_mps": 1.0684308802314666,
+      "peak_speed_mps": 1.0684308802314666,
+      "median_decel_mps2": 2.741403360022397,
+      "p75_decel_mps2": 3.412431080717808,
+      "kick_power": 1.5,
+      "kick_direction_rad": -1.390952
+    },
+    {
+      "dataset": "match_dataset_4.jsonl",
+      "kick_id": 23,
+      "player_id": 1,
+      "ready_slot": "center",
+      "reason": "center kick to target",
+      "end_reason": "ball_settled",
+      "duration_sec": 4.754046,
+      "points": 142,
+      "start": {
+        "x": 0.821774,
+        "y": 1.617154
+      },
+      "stop": {
+        "x": 4.071089,
+        "y": -1.494121
+      },
+      "path_distance_m": 4.500438204044601,
+      "straight_distance_m": 4.498675371134263,
+      "estimated_initial_speed_mps": 3.2091734996931813,
+      "peak_speed_mps": 3.2091734996931813,
+      "median_decel_mps2": 3.2761526939188474,
+      "p75_decel_mps2": 6.047031370861754,
+      "kick_power": 1.5,
+      "kick_direction_rad": 2.835549
+    },
+    {
+      "dataset": "match_dataset_4.jsonl",
+      "kick_id": 24,
+      "player_id": 1,
+      "ready_slot": "center",
+      "reason": "center kick to target",
+      "end_reason": "next_kick",
+      "duration_sec": 1.963867,
+      "points": 59,
+      "start": {
+        "x": -0.419993,
+        "y": -0.054028
+      },
+      "stop": {
+        "x": -3.226247,
+        "y": -1.350046
+      },
+      "path_distance_m": 3.30004331597388,
+      "straight_distance_m": 3.09107168613735,
+      "estimated_initial_speed_mps": 2.9299972460307626,
+      "peak_speed_mps": 2.9299972460307626,
+      "median_decel_mps2": 6.68817405919252,
+      "p75_decel_mps2": 11.625110967742907,
+      "kick_power": 1.5,
+      "kick_direction_rad": 0.068225
+    },
+    {
+      "dataset": "match_dataset_4.jsonl",
+      "kick_id": 25,
+      "player_id": 3,
+      "ready_slot": "keeper",
+      "reason": "goalkeeper clear",
+      "end_reason": "ball_settled",
+      "duration_sec": 3.077203,
+      "points": 92,
+      "start": {
+        "x": -3.226247,
+        "y": -1.350046
+      },
+      "stop": {
+        "x": -4.476906,
+        "y": -2.610622
+      },
+      "path_distance_m": 1.775737246150693,
+      "straight_distance_m": 1.7757251437249515,
+      "estimated_initial_speed_mps": 1.3683025473816472,
+      "peak_speed_mps": 1.3683025473816472,
+      "median_decel_mps2": 2.0015219485631173,
+      "p75_decel_mps2": 5.041641169946913,
+      "kick_power": 1.5,
+      "kick_direction_rad": 0.660638
+    },
+    {
+      "dataset": "match_dataset_4.jsonl",
+      "kick_id": 26,
+      "player_id": 1,
+      "ready_slot": "center",
+      "reason": "center kick",
+      "end_reason": "next_kick",
+      "duration_sec": 0.575737,
+      "points": 18,
+      "start": {
+        "x": -3.782377,
+        "y": -2.509539
+      },
+      "stop": {
+        "x": -2.612705,
+        "y": -2.248087
+      },
+      "path_distance_m": 1.198557943495579,
+      "straight_distance_m": 1.1985364975202046,
+      "estimated_initial_speed_mps": 3.225882074456352,
+      "peak_speed_mps": 3.225882074456352,
+      "median_decel_mps2": 12.487973399408796,
+      "p75_decel_mps2": 18.539400436093835,
+      "kick_power": 1.5,
+      "kick_direction_rad": 1.883367
+    },
+    {
+      "dataset": "match_dataset_4.jsonl",
+      "kick_id": 27,
+      "player_id": 1,
+      "ready_slot": "center",
+      "reason": "center kick",
+      "end_reason": "ball_settled",
+      "duration_sec": 3.879281,
+      "points": 116,
+      "start": {
+        "x": -2.612705,
+        "y": -2.248087
+      },
+      "stop": {
+        "x": 0.313924,
+        "y": -1.071919
+      },
+      "path_distance_m": 3.191808728076166,
+      "straight_distance_m": 3.1541287969683482,
+      "estimated_initial_speed_mps": 2.128611014642986,
+      "peak_speed_mps": 2.128611014642986,
+      "median_decel_mps2": 3.6255292847160794,
+      "p75_decel_mps2": 5.66211978268295,
+      "kick_power": 1.5,
+      "kick_direction_rad": 0.984396
+    },
+    {
+      "dataset": "match_dataset_4.jsonl",
+      "kick_id": 28,
+      "player_id": 2,
+      "ready_slot": "side",
+      "reason": "side clear",
+      "end_reason": "ball_settled",
+      "duration_sec": 1.157331,
+      "points": 35,
+      "start": {
+        "x": 2.066634,
+        "y": 0.43191
+      },
+      "stop": {
+        "x": 1.830633,
+        "y": 0.528375
+      },
+      "path_distance_m": 0.25591168554686905,
+      "straight_distance_m": 0.25495483565918114,
+      "estimated_initial_speed_mps": 0.5709248794895713,
+      "peak_speed_mps": 0.5709248794895713,
+      "median_decel_mps2": 0.8998100848117428,
+      "p75_decel_mps2": 1.4985841502922344,
+      "kick_power": 1.5,
+      "kick_direction_rad": -1.420455
+    },
+    {
+      "dataset": "match_dataset_4.jsonl",
+      "kick_id": 29,
+      "player_id": 1,
+      "ready_slot": "center",
+      "reason": "center kick to target",
+      "end_reason": "ball_settled",
+      "duration_sec": 4.789704,
+      "points": 142,
+      "start": {
+        "x": 2.269441,
+        "y": 2.042223
+      },
+      "stop": {
+        "x": 6.748395,
+        "y": 3.318556
+      },
+      "path_distance_m": 4.902794865835423,
+      "straight_distance_m": 4.657258298720933,
+      "estimated_initial_speed_mps": 3.417113408709353,
+      "peak_speed_mps": 3.417113408709353,
+      "median_decel_mps2": 3.3853293143629126,
+      "p75_decel_mps2": 8.841528887256636,
+      "kick_power": 1.5,
+      "kick_direction_rad": 2.709493
+    },
+    {
+      "dataset": "match_dataset_4.jsonl",
+      "kick_id": 30,
+      "player_id": 2,
+      "ready_slot": "side",
+      "reason": "side clear",
+      "end_reason": "ball_settled",
+      "duration_sec": 7.195471,
+      "points": 176,
+      "start": {
+        "x": 1.780783,
+        "y": 1.941621
+      },
+      "stop": {
+        "x": -2.638148,
+        "y": -0.413886
+      },
+      "path_distance_m": 5.059636407208395,
+      "straight_distance_m": 5.0075307697317255,
+      "estimated_initial_speed_mps": 2.982590712596281,
+      "peak_speed_mps": 2.982590712596281,
+      "median_decel_mps2": 5.665403988097637,
+      "p75_decel_mps2": 11.6055485544844,
+      "kick_power": 1.5,
+      "kick_direction_rad": 0.555968
+    },
+    {
+      "dataset": "match_dataset_4.jsonl",
+      "kick_id": 31,
+      "player_id": 2,
+      "ready_slot": "side",
+      "reason": "side clear",
+      "end_reason": "next_kick",
+      "duration_sec": 0.476521,
+      "points": 14,
+      "start": {
+        "x": -2.716386,
+        "y": -0.490633
+      },
+      "stop": {
+        "x": -2.809508,
+        "y": -0.582617
+      },
+      "path_distance_m": 0.13089223725127946,
+      "straight_distance_m": 0.13089218135549593,
+      "estimated_initial_speed_mps": 0.45723953567881603,
+      "peak_speed_mps": 0.45723953567881603,
+      "median_decel_mps2": 2.2625115058101137,
+      "p75_decel_mps2": 4.056340087609103,
+      "kick_power": 1.5,
+      "kick_direction_rad": 2.846968
+    },
+    {
+      "dataset": "match_dataset_4.jsonl",
+      "kick_id": 32,
+      "player_id": 2,
+      "ready_slot": "side",
+      "reason": "side clear",
+      "end_reason": "ball_settled",
+      "duration_sec": 0.776574,
+      "points": 24,
+      "start": {
+        "x": -2.809508,
+        "y": -0.582617
+      },
+      "stop": {
+        "x": -2.88424,
+        "y": -0.656741
+      },
+      "path_distance_m": 0.1052579707934318,
+      "straight_distance_m": 0.10525796501928013,
+      "estimated_initial_speed_mps": 0.2738225317992131,
+      "peak_speed_mps": 0.2738225317992131,
+      "median_decel_mps2": 1.069655953233828,
+      "p75_decel_mps2": 1.2072316768688565,
+      "kick_power": 1.5,
+      "kick_direction_rad": 2.638958
+    },
+    {
+      "dataset": "match_dataset_4.jsonl",
+      "kick_id": 33,
+      "player_id": 3,
+      "ready_slot": "keeper",
+      "reason": "goalkeeper clear",
+      "end_reason": "ball_settled",
+      "duration_sec": 5.161158,
+      "points": 153,
+      "start": {
+        "x": -2.88955,
+        "y": -0.661998
+      },
+      "stop": {
+        "x": -4.024009,
+        "y": -2.431031
+      },
+      "path_distance_m": 2.9342681202424163,
+      "straight_distance_m": 2.101541095903195,
+      "estimated_initial_speed_mps": 3.3065118635000705,
+      "peak_speed_mps": 3.3065118635000705,
+      "median_decel_mps2": 3.456466392756817,
+      "p75_decel_mps2": 7.586302662395743,
+      "kick_power": 1.5,
+      "kick_direction_rad": 0.434543
+    },
+    {
+      "dataset": "match_dataset_4.jsonl",
+      "kick_id": 34,
+      "player_id": 2,
+      "ready_slot": "side",
+      "reason": "side clear",
+      "end_reason": "next_kick",
+      "duration_sec": 3.433918,
+      "points": 102,
+      "start": {
+        "x": -2.492548,
+        "y": -2.106809
+      },
+      "stop": {
+        "x": -2.132006,
+        "y": -2.474444
+      },
+      "path_distance_m": 4.761792085515835,
+      "straight_distance_m": 0.5149233214654392,
+      "estimated_initial_speed_mps": 3.132521109240277,
+      "peak_speed_mps": 3.132521109240277,
+      "median_decel_mps2": 8.16322109830685,
+      "p75_decel_mps2": 10.882123414612929,
+      "kick_power": 1.5,
+      "kick_direction_rad": 2.368002
+    },
+    {
+      "dataset": "match_dataset_4.jsonl",
+      "kick_id": 35,
+      "player_id": 2,
+      "ready_slot": "side",
+      "reason": "side clear",
+      "end_reason": "ball_settled",
+      "duration_sec": 1.119162,
+      "points": 34,
+      "start": {
+        "x": -2.132006,
+        "y": -2.474444
+      },
+      "stop": {
+        "x": -2.471784,
+        "y": -2.676782
+      },
+      "path_distance_m": 0.5271075534359284,
+      "straight_distance_m": 0.39546144632315294,
+      "estimated_initial_speed_mps": 1.2660378675358797,
+      "peak_speed_mps": 1.2660378675358797,
+      "median_decel_mps2": 1.2209900354522598,
+      "p75_decel_mps2": 4.315400662451533,
+      "kick_power": 1.5,
+      "kick_direction_rad": -0.760853
+    },
+    {
+      "dataset": "match_dataset_4.jsonl",
+      "kick_id": 36,
+      "player_id": 3,
+      "ready_slot": "keeper",
+      "reason": "goalkeeper clear",
+      "end_reason": "ball_settled",
+      "duration_sec": 2.147335,
+      "points": 64,
+      "start": {
+        "x": -2.597987,
+        "y": -2.644198
+      },
+      "stop": {
+        "x": -4.055109,
+        "y": -1.973913
+      },
+      "path_distance_m": 1.8444760503213704,
+      "straight_distance_m": 1.603897286022082,
+      "estimated_initial_speed_mps": 2.7094687562801636,
+      "peak_speed_mps": 2.7094687562801636,
+      "median_decel_mps2": 2.95875190504755,
+      "p75_decel_mps2": 12.75373903328179,
+      "kick_power": 1.5,
+      "kick_direction_rad": -2.338277
+    },
+    {
+      "dataset": "match_dataset_4.jsonl",
+      "kick_id": 37,
+      "player_id": 2,
+      "ready_slot": "side",
+      "reason": "side clear",
+      "end_reason": "ball_settled",
+      "duration_sec": 3.588363,
+      "points": 107,
+      "start": {
+        "x": -4.22856,
+        "y": -0.45128
+      },
+      "stop": {
+        "x": -5.901385,
+        "y": -1.034693
+      },
+      "path_distance_m": 1.7977800123181376,
+      "straight_distance_m": 1.7716416706529572,
+      "estimated_initial_speed_mps": 1.745080219630711,
+      "peak_speed_mps": 1.745080219630711,
+      "median_decel_mps2": 3.13674371150379,
+      "p75_decel_mps2": 5.224015302712946,
+      "kick_power": 1.5,
+      "kick_direction_rad": -2.32997
+    },
+    {
+      "dataset": "match_dataset_4.jsonl",
+      "kick_id": 38,
+      "player_id": 1,
+      "ready_slot": "center",
+      "reason": "center kick to target",
+      "end_reason": "timeout",
+      "duration_sec": 8.006504,
+      "points": 237,
+      "start": {
+        "x": 0.0,
+        "y": 0.0
+      },
+      "stop": {
+        "x": 3.401362,
+        "y": 2.078642
+      },
+      "path_distance_m": 6.175622077501077,
+      "straight_distance_m": 3.9862282949183934,
+      "estimated_initial_speed_mps": 3.4808850880229243,
+      "peak_speed_mps": 3.4808850880229243,
+      "median_decel_mps2": 3.202510516342622,
+      "p75_decel_mps2": 7.431091170582002,
+      "kick_power": 1.5,
+      "kick_direction_rad": 0.021095
+    },
+    {
+      "dataset": "match_dataset_4.jsonl",
+      "kick_id": 39,
+      "player_id": 2,
+      "ready_slot": "side",
+      "reason": "side clear to target",
+      "end_reason": "next_kick",
+      "duration_sec": 0.959028,
+      "points": 29,
+      "start": {
+        "x": -1.491965,
+        "y": -1.661113
+      },
+      "stop": {
+        "x": -2.875565,
+        "y": -1.184281
+      },
+      "path_distance_m": 1.4640910932461388,
+      "straight_distance_m": 1.4634608693859907,
+      "estimated_initial_speed_mps": 2.32837929081856,
+      "peak_speed_mps": 2.32837929081856,
+      "median_decel_mps2": 9.075100377737993,
+      "p75_decel_mps2": 15.179273534995133,
+      "kick_power": 1.5,
+      "kick_direction_rad": 2.615796
+    },
+    {
+      "dataset": "match_dataset_4.jsonl",
+      "kick_id": 40,
+      "player_id": 3,
+      "ready_slot": "keeper",
+      "reason": "goalkeeper clear",
+      "end_reason": "next_kick",
+      "duration_sec": 2.397419,
+      "points": 71,
+      "start": {
+        "x": -2.875565,
+        "y": -1.184281
+      },
+      "stop": {
+        "x": -3.034961,
+        "y": -0.684938
+      },
+      "path_distance_m": 2.711016744967646,
+      "straight_distance_m": 0.5241664968929242,
+      "estimated_initial_speed_mps": 1.4750852050265102,
+      "peak_speed_mps": 2.941147408629246,
+      "median_decel_mps2": 5.274865488947109,
+      "p75_decel_mps2": 9.101049174765325,
+      "kick_power": 1.5,
+      "kick_direction_rad": -0.597816
+    },
+    {
+      "dataset": "match_dataset_4.jsonl",
+      "kick_id": 41,
+      "player_id": 2,
+      "ready_slot": "side",
+      "reason": "side clear",
+      "end_reason": "next_kick",
+      "duration_sec": 1.390359,
+      "points": 42,
+      "start": {
+        "x": -3.034961,
+        "y": -0.684938
+      },
+      "stop": {
+        "x": -1.348299,
+        "y": -0.051041
+      },
+      "path_distance_m": 1.885687971924947,
+      "straight_distance_m": 1.8018474155302386,
+      "estimated_initial_speed_mps": 2.847304143916451,
+      "peak_speed_mps": 2.847304143916451,
+      "median_decel_mps2": 7.217104303020366,
+      "p75_decel_mps2": 19.858198018154376,
+      "kick_power": 1.5,
+      "kick_direction_rad": -2.610115
+    },
+    {
+      "dataset": "match_dataset_4.jsonl",
+      "kick_id": 42,
+      "player_id": 1,
+      "ready_slot": "center",
+      "reason": "center kick to target",
+      "end_reason": "next_kick",
+      "duration_sec": 3.283474,
+      "points": 98,
+      "start": {
+        "x": -1.348299,
+        "y": -0.051041
+      },
+      "stop": {
+        "x": -2.378287,
+        "y": 0.687712
+      },
+      "path_distance_m": 3.2967829334295997,
+      "straight_distance_m": 1.2675295953755872,
+      "estimated_initial_speed_mps": 1.294594607689029,
+      "peak_speed_mps": 2.9196678412186885,
+      "median_decel_mps2": 4.376559301830918,
+      "p75_decel_mps2": 10.304335846596821,
+      "kick_power": 1.5,
+      "kick_direction_rad": -2.797828
+    },
+    {
+      "dataset": "match_dataset_4.jsonl",
+      "kick_id": 43,
+      "player_id": 2,
+      "ready_slot": "side",
+      "reason": "side clear",
+      "end_reason": "next_kick",
+      "duration_sec": 0.135305,
+      "points": 5,
+      "start": {
+        "x": -2.378287,
+        "y": 0.687712
+      },
+      "stop": {
+        "x": -2.552456,
+        "y": 0.668385
+      },
+      "path_distance_m": 0.17523815219812944,
+      "straight_distance_m": 0.17523804806605214,
+      "estimated_initial_speed_mps": 1.559569573600346,
+      "peak_speed_mps": 1.559569573600346,
+      "median_decel_mps2": 12.546993049970752,
+      "p75_decel_mps2": 17.700302786475525,
+      "kick_power": 1.5,
+      "kick_direction_rad": -1.393021
+    },
+    {
+      "dataset": "match_dataset_4.jsonl",
+      "kick_id": 44,
+      "player_id": 3,
+      "ready_slot": "keeper",
+      "reason": "goalkeeper clear",
+      "end_reason": "ball_settled",
+      "duration_sec": 2.403705,
+      "points": 72,
+      "start": {
+        "x": -2.552456,
+        "y": 0.668385
+      },
+      "stop": {
+        "x": -3.789683,
+        "y": 0.456342
+      },
+      "path_distance_m": 1.2582895311502855,
+      "straight_distance_m": 1.2552660607926913,
+      "estimated_initial_speed_mps": 1.230462732075196,
+      "peak_speed_mps": 1.230462732075196,
+      "median_decel_mps2": 2.84680593566535,
+      "p75_decel_mps2": 4.681362799924061,
+      "kick_power": 1.5,
+      "kick_direction_rad": -2.871764
+    },
+    {
+      "dataset": "match_dataset_4.jsonl",
+      "kick_id": 45,
+      "player_id": 1,
+      "ready_slot": "center",
+      "reason": "center kick to target",
+      "end_reason": "ball_settled",
+      "duration_sec": 3.419059,
+      "points": 102,
+      "start": {
+        "x": -2.488888,
+        "y": 0.039372
+      },
+      "stop": {
+        "x": -0.537493,
+        "y": -1.05758
+      },
+      "path_distance_m": 2.264837506061877,
+      "straight_distance_m": 2.238581277579396,
+      "estimated_initial_speed_mps": 2.0109661432930355,
+      "peak_speed_mps": 2.0109661432930355,
+      "median_decel_mps2": 4.06479023067593,
+      "p75_decel_mps2": 6.18807690134372,
+      "kick_power": 1.5,
+      "kick_direction_rad": 2.797067
+    },
+    {
+      "dataset": "match_dataset_4.jsonl",
+      "kick_id": 46,
+      "player_id": 2,
+      "ready_slot": "side",
+      "reason": "side clear",
+      "end_reason": "ball_settled",
+      "duration_sec": 1.48455,
+      "points": 45,
+      "start": {
+        "x": -0.293853,
+        "y": 1.069565
+      },
+      "stop": {
+        "x": -0.163674,
+        "y": 1.459386
+      },
+      "path_distance_m": 0.4124826485830983,
+      "straight_distance_m": 0.41098294865115753,
+      "estimated_initial_speed_mps": 0.7651004066699486,
+      "peak_speed_mps": 0.7651004066699486,
+      "median_decel_mps2": 1.5243953022456587,
+      "p75_decel_mps2": 2.5503713792394667,
+      "kick_power": 1.5,
+      "kick_direction_rad": 2.275345
+    },
+    {
+      "dataset": "match_dataset_5.jsonl",
+      "kick_id": 1,
+      "player_id": 1,
+      "ready_slot": "center",
+      "reason": "center kick to target",
+      "end_reason": "timeout",
+      "duration_sec": 8.019796,
+      "points": 238,
+      "start": {
+        "x": 0.0,
+        "y": 0.0
+      },
+      "stop": {
+        "x": 4.735157,
+        "y": 1.583568
+      },
+      "path_distance_m": 5.281305901102742,
+      "straight_distance_m": 4.992934951035613,
+      "estimated_initial_speed_mps": 2.8319478869771433,
+      "peak_speed_mps": 2.8319478869771433,
+      "median_decel_mps2": 3.5731834092366985,
+      "p75_decel_mps2": 6.4829418870562066,
+      "kick_power": 1.5,
+      "kick_direction_rad": 0.05505
+    },
+    {
+      "dataset": "match_dataset_5.jsonl",
+      "kick_id": 2,
+      "player_id": 1,
+      "ready_slot": "center",
+      "reason": "center kick to target",
+      "end_reason": "next_kick",
+      "duration_sec": 1.769373,
+      "points": 52,
+      "start": {
+        "x": -0.286662,
+        "y": -0.040087
+      },
+      "stop": {
+        "x": -3.182656,
+        "y": -0.62249
+      },
+      "path_distance_m": 2.9617017100655043,
+      "straight_distance_m": 2.9539760497412635,
+      "estimated_initial_speed_mps": 2.850957755866822,
+      "peak_speed_mps": 2.850957755866822,
+      "median_decel_mps2": 5.259039591027181,
+      "p75_decel_mps2": 13.79120747987396,
+      "kick_power": 1.5,
+      "kick_direction_rad": 0.07213
+    },
+    {
+      "dataset": "match_dataset_5.jsonl",
+      "kick_id": 3,
+      "player_id": 3,
+      "ready_slot": "keeper",
+      "reason": "goalkeeper clear",
+      "end_reason": "ball_settled",
+      "duration_sec": 2.681434,
+      "points": 80,
+      "start": {
+        "x": -3.182656,
+        "y": -0.62249
+      },
+      "stop": {
+        "x": -4.402021,
+        "y": -1.325522
+      },
+      "path_distance_m": 1.4206519382467688,
+      "straight_distance_m": 1.4075173165005825,
+      "estimated_initial_speed_mps": 1.6078216049764371,
+      "peak_speed_mps": 1.6078216049764371,
+      "median_decel_mps2": 2.948344546177414,
+      "p75_decel_mps2": 5.026837350874143,
+      "kick_power": 1.5,
+      "kick_direction_rad": 0.240477
+    },
+    {
+      "dataset": "match_dataset_5.jsonl",
+      "kick_id": 4,
+      "player_id": 1,
+      "ready_slot": "center",
+      "reason": "center kick to target",
+      "end_reason": "ball_settled",
+      "duration_sec": 4.356503,
+      "points": 129,
+      "start": {
+        "x": -3.082086,
+        "y": -0.906859
+      },
+      "stop": {
+        "x": 0.137437,
+        "y": 0.967568
+      },
+      "path_distance_m": 3.770512030145326,
+      "straight_distance_m": 3.7254268112335795,
+      "estimated_initial_speed_mps": 2.539065008753683,
+      "peak_speed_mps": 2.539065008753683,
+      "median_decel_mps2": 3.2966329332535644,
+      "p75_decel_mps2": 7.619343370146337,
+      "kick_power": 1.5,
+      "kick_direction_rad": 3.095842
+    },
+    {
+      "dataset": "match_dataset_5.jsonl",
+      "kick_id": 5,
+      "player_id": 1,
+      "ready_slot": "center",
+      "reason": "center kick to target",
+      "end_reason": "timeout",
+      "duration_sec": 8.022361,
+      "points": 238,
+      "start": {
+        "x": -0.249299,
+        "y": -4.45
+      },
+      "stop": {
+        "x": 2.774149,
+        "y": -0.216314
+      },
+      "path_distance_m": 5.3225225913827705,
+      "straight_distance_m": 5.202435483050222,
+      "estimated_initial_speed_mps": 3.161744009711154,
+      "peak_speed_mps": 3.161744009711154,
+      "median_decel_mps2": 5.1262752846159,
+      "p75_decel_mps2": 9.341206365678374,
+      "kick_power": 1.5,
+      "kick_direction_rad": 2.81084
+    },
+    {
+      "dataset": "match_dataset_5.jsonl",
+      "kick_id": 6,
+      "player_id": 1,
+      "ready_slot": "center",
+      "reason": "center kick to target",
+      "end_reason": "next_kick",
+      "duration_sec": 1.456833,
+      "points": 44,
+      "start": {
+        "x": -0.483878,
+        "y": -0.078261
+      },
+      "stop": {
+        "x": -3.0369,
+        "y": -0.534519
+      },
+      "path_distance_m": 2.593770201918908,
+      "straight_distance_m": 2.5934711671904127,
+      "estimated_initial_speed_mps": 2.4752699066874877,
+      "peak_speed_mps": 2.4752699066874877,
+      "median_decel_mps2": 7.10344381319795,
+      "p75_decel_mps2": 9.642105214890824,
+      "kick_power": 1.5,
+      "kick_direction_rad": 0.036852
+    },
+    {
+      "dataset": "match_dataset_5.jsonl",
+      "kick_id": 7,
+      "player_id": 3,
+      "ready_slot": "keeper",
+      "reason": "goalkeeper clear",
+      "end_reason": "ball_settled",
+      "duration_sec": 2.87052,
+      "points": 86,
+      "start": {
+        "x": -3.0369,
+        "y": -0.534519
+      },
+      "stop": {
+        "x": -4.67564,
+        "y": -1.128524
+      },
+      "path_distance_m": 1.7603731334717547,
+      "straight_distance_m": 1.7430750780230317,
+      "estimated_initial_speed_mps": 1.5590980159069718,
+      "peak_speed_mps": 1.5590980159069718,
+      "median_decel_mps2": 1.7091011775298606,
+      "p75_decel_mps2": 4.2789885180303315,
+      "kick_power": 1.5,
+      "kick_direction_rad": 0.56011
+    },
+    {
+      "dataset": "match_dataset_5.jsonl",
+      "kick_id": 8,
+      "player_id": 3,
+      "ready_slot": "keeper",
+      "reason": "goalkeeper clear",
+      "end_reason": "ball_settled",
+      "duration_sec": 4.264011,
+      "points": 127,
+      "start": {
+        "x": -6.918348,
+        "y": -3.50903
+      },
+      "stop": {
+        "x": -6.95,
+        "y": -4.45
+      },
+      "path_distance_m": 4.062601367523678,
+      "straight_distance_m": 0.9415021986187818,
+      "estimated_initial_speed_mps": 2.916661652494204,
+      "peak_speed_mps": 3.5517484018705656,
+      "median_decel_mps2": 5.867791605591615,
+      "p75_decel_mps2": 10.320704904861389,
+      "kick_power": 1.5,
+      "kick_direction_rad": 2.252404
+    },
+    {
+      "dataset": "match_dataset_5.jsonl",
+      "kick_id": 10,
+      "player_id": 3,
+      "ready_slot": "keeper",
+      "reason": "goalkeeper clear to target",
+      "end_reason": "next_kick",
+      "duration_sec": 0.642837,
+      "points": 20,
+      "start": {
+        "x": -6.569215,
+        "y": -3.670205
+      },
+      "stop": {
+        "x": -6.147618,
+        "y": -2.427202
+      },
+      "path_distance_m": 1.3126838010527764,
+      "straight_distance_m": 1.3125549468186088,
+      "estimated_initial_speed_mps": 2.8179854768907333,
+      "peak_speed_mps": 2.8179854768907333,
+      "median_decel_mps2": 8.1039146732325,
+      "p75_decel_mps2": 17.674214771129027,
+      "kick_power": 1.5,
+      "kick_direction_rad": 2.93678
+    },
+    {
+      "dataset": "match_dataset_5.jsonl",
+      "kick_id": 11,
+      "player_id": 1,
+      "ready_slot": "center",
+      "reason": "center kick",
+      "end_reason": "next_kick",
+      "duration_sec": 0.67662,
+      "points": 21,
+      "start": {
+        "x": -6.147618,
+        "y": -2.427202
+      },
+      "stop": {
+        "x": -5.701291,
+        "y": -1.333842
+      },
+      "path_distance_m": 1.1812381150311089,
+      "straight_distance_m": 1.1809504140856208,
+      "estimated_initial_speed_mps": 2.580766888030977,
+      "peak_speed_mps": 2.580766888030977,
+      "median_decel_mps2": 4.781199600287451,
+      "p75_decel_mps2": 7.403228183811164,
+      "kick_power": 1.5,
+      "kick_direction_rad": 2.232217
+    },
+    {
+      "dataset": "match_dataset_5.jsonl",
+      "kick_id": 12,
+      "player_id": 2,
+      "ready_slot": "side",
+      "reason": "side clear",
+      "end_reason": "ball_settled",
+      "duration_sec": 3.587789,
+      "points": 107,
+      "start": {
+        "x": -5.701291,
+        "y": -1.333842
+      },
+      "stop": {
+        "x": -4.242028,
+        "y": 0.693953
+      },
+      "path_distance_m": 2.516709670900283,
+      "straight_distance_m": 2.498279621098087,
+      "estimated_initial_speed_mps": 1.6732202938279737,
+      "peak_speed_mps": 1.6732202938279737,
+      "median_decel_mps2": 1.7747770229574065,
+      "p75_decel_mps2": 5.239847051583745,
+      "kick_power": 1.5,
+      "kick_direction_rad": 1.780479
+    },
+    {
+      "dataset": "match_dataset_5.jsonl",
+      "kick_id": 13,
+      "player_id": 1,
+      "ready_slot": "center",
+      "reason": "center kick to target",
+      "end_reason": "next_kick",
+      "duration_sec": 0.067199,
+      "points": 3,
+      "start": {
+        "x": -2.472731,
+        "y": -0.39327
+      },
+      "stop": {
+        "x": -2.292063,
+        "y": -0.352528
+      },
+      "path_distance_m": 0.18520485087751049,
+      "straight_distance_m": 0.18520485087599606,
+      "estimated_initial_speed_mps": 3.4437711212571758,
+      "peak_speed_mps": 3.4437711212571758,
+      "median_decel_mps2": 30.474433369560366,
+      "p75_decel_mps2": 30.474433369560366,
+      "kick_power": 1.5,
+      "kick_direction_rad": -0.905426
+    },
+    {
+      "dataset": "match_dataset_5.jsonl",
+      "kick_id": 14,
+      "player_id": 2,
+      "ready_slot": "side",
+      "reason": "side clear",
+      "end_reason": "ball_settled",
+      "duration_sec": 4.69279,
+      "points": 140,
+      "start": {
+        "x": -2.292063,
+        "y": -0.352528
+      },
+      "stop": {
+        "x": 2.019329,
+        "y": 1.302398
+      },
+      "path_distance_m": 4.678051014846585,
+      "straight_distance_m": 4.618103619792436,
+      "estimated_initial_speed_mps": 2.5639662205498626,
+      "peak_speed_mps": 2.5639662205498626,
+      "median_decel_mps2": 3.3862516617334406,
+      "p75_decel_mps2": 5.594697029221972,
+      "kick_power": 1.5,
+      "kick_direction_rad": 0.725856
+    },
+    {
+      "dataset": "match_dataset_5.jsonl",
+      "kick_id": 15,
+      "player_id": 1,
+      "ready_slot": "center",
+      "reason": "center kick",
+      "end_reason": "ball_settled",
+      "duration_sec": 3.911806,
+      "points": 116,
+      "start": {
+        "x": 2.196352,
+        "y": 1.984067
+      },
+      "stop": {
+        "x": 0.11194,
+        "y": 0.181191
+      },
+      "path_distance_m": 2.7632648346687207,
+      "straight_distance_m": 2.755927295325477,
+      "estimated_initial_speed_mps": 2.3613406559673025,
+      "peak_speed_mps": 2.3613406559673025,
+      "median_decel_mps2": 2.7950534068969186,
+      "p75_decel_mps2": 5.859699383911519,
+      "kick_power": 1.5,
+      "kick_direction_rad": -0.035196
+    },
+    {
+      "dataset": "match_dataset_5.jsonl",
+      "kick_id": 16,
+      "player_id": 3,
+      "ready_slot": "keeper",
+      "reason": "goalkeeper clear",
+      "end_reason": "ball_settled",
+      "duration_sec": 3.785159,
+      "points": 113,
+      "start": {
+        "x": -2.594382,
+        "y": -1.611355
+      },
+      "stop": {
+        "x": -2.299003,
+        "y": -0.438399
+      },
+      "path_distance_m": 1.3394737297083616,
+      "straight_distance_m": 1.2095761784926984,
+      "estimated_initial_speed_mps": 1.8895611033931572,
+      "peak_speed_mps": 1.8895611033931572,
+      "median_decel_mps2": 1.6821535909982304,
+      "p75_decel_mps2": 6.555799964266611,
+      "kick_power": 1.5,
+      "kick_direction_rad": 0.167808
+    },
+    {
+      "dataset": "match_dataset_5.jsonl",
+      "kick_id": 17,
+      "player_id": 3,
+      "ready_slot": "keeper",
+      "reason": "goalkeeper clear",
+      "end_reason": "ball_settled",
+      "duration_sec": 0.539997,
+      "points": 17,
+      "start": {
+        "x": -2.810353,
+        "y": -0.775562
+      },
+      "stop": {
+        "x": -2.8582,
+        "y": -0.807755
+      },
+      "path_distance_m": 0.05767503446661412,
+      "straight_distance_m": 0.05766909621278973,
+      "estimated_initial_speed_mps": 0.24322919680511096,
+      "peak_speed_mps": 0.24322919680511096,
+      "median_decel_mps2": 0.6941834205442912,
+      "p75_decel_mps2": 1.029843881728125,
+      "kick_power": 1.5,
+      "kick_direction_rad": 0.714126
+    },
+    {
+      "dataset": "match_dataset_5.jsonl",
+      "kick_id": 18,
+      "player_id": 1,
+      "ready_slot": "center",
+      "reason": "center kick to target",
+      "end_reason": "ball_settled",
+      "duration_sec": 3.741095,
+      "points": 112,
+      "start": {
+        "x": -4.539245,
+        "y": 0.124837
+      },
+      "stop": {
+        "x": -7.431037,
+        "y": -0.886188
+      },
+      "path_distance_m": 3.2993496628478844,
+      "straight_distance_m": 3.063434758875893,
+      "estimated_initial_speed_mps": 2.7755052237038336,
+      "peak_speed_mps": 2.7755052237038336,
+      "median_decel_mps2": 2.8821506886731303,
+      "p75_decel_mps2": 6.687285882933444,
+      "kick_power": 1.5,
+      "kick_direction_rad": -1.624938
+    },
+    {
+      "dataset": "match_dataset_5.jsonl",
+      "kick_id": 19,
+      "player_id": 1,
+      "ready_slot": "center",
+      "reason": "center kick to target",
+      "end_reason": "timeout",
+      "duration_sec": 8.028268,
+      "points": 238,
+      "start": {
+        "x": 0.0,
+        "y": 0.0
+      },
+      "stop": {
+        "x": 2.55664,
+        "y": 2.248342
+      },
+      "path_distance_m": 6.988926791502368,
+      "straight_distance_m": 3.404621834883281,
+      "estimated_initial_speed_mps": 2.9831087110490393,
+      "peak_speed_mps": 3.7637325352827626,
+      "median_decel_mps2": 3.9443025308017496,
+      "p75_decel_mps2": 9.41819643972732,
+      "kick_power": 1.5,
+      "kick_direction_rad": -0.232231
+    },
+    {
+      "dataset": "match_dataset_5.jsonl",
+      "kick_id": 20,
+      "player_id": 2,
+      "ready_slot": "side",
+      "reason": "side clear",
+      "end_reason": "ball_settled",
+      "duration_sec": 1.972279,
+      "points": 59,
+      "start": {
+        "x": 1.772023,
+        "y": 2.91545
+      },
+      "stop": {
+        "x": -0.008656,
+        "y": 4.618972
+      },
+      "path_distance_m": 2.550447340127187,
+      "straight_distance_m": 2.46430617122244,
+      "estimated_initial_speed_mps": 2.864727869128689,
+      "peak_speed_mps": 2.864727869128689,
+      "median_decel_mps2": 5.667664842794714,
+      "p75_decel_mps2": 12.270148210518167,
+      "kick_power": 1.5,
+      "kick_direction_rad": -2.101834
+    },
+    {
+      "dataset": "match_dataset_5.jsonl",
+      "kick_id": 21,
+      "player_id": 2,
+      "ready_slot": "side",
+      "reason": "side clear to target",
+      "end_reason": "next_kick",
+      "duration_sec": 6.055629,
+      "points": 179,
+      "start": {
+        "x": -0.008656,
+        "y": 4.45
+      },
+      "stop": {
+        "x": 0.447999,
+        "y": 3.67594
+      },
+      "path_distance_m": 0.8987577254830279,
+      "straight_distance_m": 0.8987228007706269,
+      "estimated_initial_speed_mps": 3.1643109666768905,
+      "peak_speed_mps": 3.1643109666768905,
+      "median_decel_mps2": 7.119935080389065,
+      "p75_decel_mps2": 9.983904634972781,
+      "kick_power": 1.5,
+      "kick_direction_rad": 2.947161
+    },
+    {
+      "dataset": "match_dataset_5.jsonl",
+      "kick_id": 22,
+      "player_id": 1,
+      "ready_slot": "center",
+      "reason": "center kick to target",
+      "end_reason": "ball_settled",
+      "duration_sec": 6.601038,
+      "points": 195,
+      "start": {
+        "x": 0.447999,
+        "y": 3.67594
+      },
+      "stop": {
+        "x": 0.056499,
+        "y": 0.697137
+      },
+      "path_distance_m": 6.708079837827221,
+      "straight_distance_m": 3.004420004395025,
+      "estimated_initial_speed_mps": 3.051754453800737,
+      "peak_speed_mps": 3.051754453800737,
+      "median_decel_mps2": 3.8551049041227796,
+      "p75_decel_mps2": 8.053404953176662,
+      "kick_power": 1.5,
+      "kick_direction_rad": 1.931682
+    },
+    {
+      "dataset": "match_dataset_5.jsonl",
+      "kick_id": 23,
+      "player_id": 3,
+      "ready_slot": "keeper",
+      "reason": "goalkeeper clear",
+      "end_reason": "next_kick",
+      "duration_sec": 6.877146,
+      "points": 203,
+      "start": {
+        "x": -2.937686,
+        "y": -0.08936
+      },
+      "stop": {
+        "x": -2.519989,
+        "y": -3.507076
+      },
+      "path_distance_m": 5.195909914086581,
+      "straight_distance_m": 3.4431458639542125,
+      "estimated_initial_speed_mps": 2.1494140526236323,
+      "peak_speed_mps": 2.284192417552609,
+      "median_decel_mps2": 3.5160405465062796,
+      "p75_decel_mps2": 7.576254018990952,
+      "kick_power": 1.5,
+      "kick_direction_rad": 0.584338
+    },
+    {
+      "dataset": "match_dataset_5.jsonl",
+      "kick_id": 24,
+      "player_id": 1,
+      "ready_slot": "center",
+      "reason": "center kick",
+      "end_reason": "next_kick",
+      "duration_sec": 5.310013,
+      "points": 158,
+      "start": {
+        "x": -2.519989,
+        "y": -3.507076
+      },
+      "stop": {
+        "x": -2.528723,
+        "y": -3.507138
+      },
+      "path_distance_m": 0.05308871068630258,
+      "straight_distance_m": 0.008734220056765246,
+      "estimated_initial_speed_mps": 0.10558884332370347,
+      "peak_speed_mps": 0.8201155515131644,
+      "median_decel_mps2": 1.7953138850737642,
+      "p75_decel_mps2": 1.7953138850737642,
+      "kick_power": 1.5,
+      "kick_direction_rad": 2.081191
+    },
+    {
+      "dataset": "match_dataset_5.jsonl",
+      "kick_id": 25,
+      "player_id": 3,
+      "ready_slot": "keeper",
+      "reason": "goalkeeper clear",
+      "end_reason": "ball_settled",
+      "duration_sec": 3.387139,
+      "points": 101,
+      "start": {
+        "x": -2.528723,
+        "y": -3.507138
+      },
+      "stop": {
+        "x": 0.453402,
+        "y": -4.627144
+      },
+      "path_distance_m": 3.88009859938145,
+      "straight_distance_m": 3.185511411949579,
+      "estimated_initial_speed_mps": 1.6434898048048834,
+      "peak_speed_mps": 6.365853298351702,
+      "median_decel_mps2": 5.842527859103494,
+      "p75_decel_mps2": 12.653552455713129,
+      "kick_power": 1.5,
+      "kick_direction_rad": -1.865745
+    },
+    {
+      "dataset": "match_dataset_5.jsonl",
+      "kick_id": 26,
+      "player_id": 1,
+      "ready_slot": "center",
+      "reason": "center kick to target",
+      "end_reason": "timeout",
+      "duration_sec": 8.030195,
+      "points": 237,
+      "start": {
+        "x": 0.453402,
+        "y": -4.45
+      },
+      "stop": {
+        "x": 3.140701,
+        "y": -0.239162
+      },
+      "path_distance_m": 5.052045520926934,
+      "straight_distance_m": 4.995271021440678,
+      "estimated_initial_speed_mps": 3.5240773508524628,
+      "peak_speed_mps": 3.5240773508524628,
+      "median_decel_mps2": 3.1632350791071078,
+      "p75_decel_mps2": 6.465844114803488,
+      "kick_power": 1.5,
+      "kick_direction_rad": 1.622793
+    },
+    {
+      "dataset": "match_dataset_5.jsonl",
+      "kick_id": 27,
+      "player_id": 2,
+      "ready_slot": "side",
+      "reason": "side clear",
+      "end_reason": "ball_settled",
+      "duration_sec": 3.345514,
+      "points": 100,
+      "start": {
+        "x": 0.462309,
+        "y": 0.766901
+      },
+      "stop": {
+        "x": -1.139768,
+        "y": 4.619085
+      },
+      "path_distance_m": 4.352634381598924,
+      "straight_distance_m": 4.172046534230533,
+      "estimated_initial_speed_mps": 2.508607257521347,
+      "peak_speed_mps": 2.508607257521347,
+      "median_decel_mps2": 5.494004798845371,
+      "p75_decel_mps2": 10.8198541658448,
+      "kick_power": 1.5,
+      "kick_direction_rad": -0.916198
+    },
+    {
+      "dataset": "match_dataset_5.jsonl",
+      "kick_id": 28,
+      "player_id": 2,
+      "ready_slot": "side",
+      "reason": "side clear to target",
+      "end_reason": "timeout",
+      "duration_sec": 8.01533,
+      "points": 237,
+      "start": {
+        "x": -1.139768,
+        "y": 4.45
+      },
+      "stop": {
+        "x": 0.992801,
+        "y": 1.644854
+      },
+      "path_distance_m": 3.5319659664443077,
+      "straight_distance_m": 3.5237330519034784,
+      "estimated_initial_speed_mps": 3.1172093293548935,
+      "peak_speed_mps": 3.1172093293548935,
+      "median_decel_mps2": 7.411415876535152,
+      "p75_decel_mps2": 9.023579423982477,
+      "kick_power": 1.5,
+      "kick_direction_rad": -2.567162
+    },
+    {
+      "dataset": "match_dataset_5.jsonl",
+      "kick_id": 29,
+      "player_id": 1,
+      "ready_slot": "center",
+      "reason": "center kick",
+      "end_reason": "ball_settled",
+      "duration_sec": 4.324438,
+      "points": 129,
+      "start": {
+        "x": 1.910431,
+        "y": 2.429908
+      },
+      "stop": {
+        "x": -0.800314,
+        "y": 0.145415
+      },
+      "path_distance_m": 3.5580396867756687,
+      "straight_distance_m": 3.545003063760877,
+      "estimated_initial_speed_mps": 2.0286050316109296,
+      "peak_speed_mps": 2.0286050316109296,
+      "median_decel_mps2": 2.652919317524398,
+      "p75_decel_mps2": 6.05782607676122,
+      "kick_power": 1.5,
+      "kick_direction_rad": -0.389751
+    },
+    {
+      "dataset": "match_dataset_5.jsonl",
+      "kick_id": 30,
+      "player_id": 2,
+      "ready_slot": "side",
+      "reason": "side clear",
+      "end_reason": "ball_settled",
+      "duration_sec": 2.478724,
+      "points": 74,
+      "start": {
+        "x": -1.273049,
+        "y": 1.836085
+      },
+      "stop": {
+        "x": -2.0051,
+        "y": 2.658898
+      },
+      "path_distance_m": 1.1024417624396674,
+      "straight_distance_m": 1.1013264273456804,
+      "estimated_initial_speed_mps": 1.2040986168873913,
+      "peak_speed_mps": 1.2040986168873913,
+      "median_decel_mps2": 2.4778421501904284,
+      "p75_decel_mps2": 4.111842951364945,
+      "kick_power": 1.5,
+      "kick_direction_rad": 2.930709
+    },
+    {
+      "dataset": "match_dataset_5.jsonl",
+      "kick_id": 31,
+      "player_id": 1,
+      "ready_slot": "center",
+      "reason": "center kick",
+      "end_reason": "next_kick",
+      "duration_sec": 0.273399,
+      "points": 9,
+      "start": {
+        "x": -2.591403,
+        "y": 2.249577
+      },
+      "stop": {
+        "x": -3.010302,
+        "y": 1.937671
+      },
+      "path_distance_m": 0.5222883569651965,
+      "straight_distance_m": 0.52226595240069,
+      "estimated_initial_speed_mps": 2.2049370351653677,
+      "peak_speed_mps": 2.2049370351653677,
+      "median_decel_mps2": 7.8162686439250635,
+      "p75_decel_mps2": 10.456302424136474,
+      "kick_power": 1.5,
+      "kick_direction_rad": -1.261942
+    },
+    {
+      "dataset": "match_dataset_5.jsonl",
+      "kick_id": 32,
+      "player_id": 3,
+      "ready_slot": "keeper",
+      "reason": "goalkeeper clear",
+      "end_reason": "ball_settled",
+      "duration_sec": 4.797167,
+      "points": 143,
+      "start": {
+        "x": -3.010302,
+        "y": 1.937671
+      },
+      "stop": {
+        "x": -6.234606,
+        "y": -1.094458
+      },
+      "path_distance_m": 4.429150862802335,
+      "straight_distance_m": 4.426052706086655,
+      "estimated_initial_speed_mps": 2.2895616278746904,
+      "peak_speed_mps": 2.2895616278746904,
+      "median_decel_mps2": 2.63527503530948,
+      "p75_decel_mps2": 7.231433334753293,
+      "kick_power": 1.5,
+      "kick_direction_rad": -2.63645
+    },
+    {
+      "dataset": "match_dataset_5.jsonl",
+      "kick_id": 33,
+      "player_id": 2,
+      "ready_slot": "side",
+      "reason": "side clear",
+      "end_reason": "next_kick",
+      "duration_sec": 0.100355,
+      "points": 4,
+      "start": {
+        "x": -2.411945,
+        "y": 0.451333
+      },
+      "stop": {
+        "x": -2.61166,
+        "y": 0.396438
+      },
+      "path_distance_m": 0.20712228483072337,
+      "straight_distance_m": 0.20712204675021953,
+      "estimated_initial_speed_mps": 2.3328662677817475,
+      "peak_speed_mps": 2.3328662677817475,
+      "median_decel_mps2": 9.113853963177656,
+      "p75_decel_mps2": 9.113853963177656,
+      "kick_power": 1.5,
+      "kick_direction_rad": -0.023238
+    },
+    {
+      "dataset": "match_dataset_5.jsonl",
+      "kick_id": 34,
+      "player_id": 3,
+      "ready_slot": "keeper",
+      "reason": "goalkeeper clear",
+      "end_reason": "next_kick",
+      "duration_sec": 0.270948,
+      "points": 9,
+      "start": {
+        "x": -2.61166,
+        "y": 0.396438
+      },
+      "stop": {
+        "x": -3.057691,
+        "y": 0.268862
+      },
+      "path_distance_m": 0.4639220343417647,
+      "straight_distance_m": 0.46391732963643434,
+      "estimated_initial_speed_mps": 2.5402832165317535,
+      "peak_speed_mps": 2.5402832165317535,
+      "median_decel_mps2": 24.02028264954935,
+      "p75_decel_mps2": 26.71904783194076,
+      "kick_power": 1.5,
+      "kick_direction_rad": -2.355199
+    },
+    {
+      "dataset": "match_dataset_5.jsonl",
+      "kick_id": 35,
+      "player_id": 2,
+      "ready_slot": "side",
+      "reason": "side clear",
+      "end_reason": "ball_settled",
+      "duration_sec": 4.150688,
+      "points": 124,
+      "start": {
+        "x": -3.057691,
+        "y": 0.268862
+      },
+      "stop": {
+        "x": -6.149485,
+        "y": -1.299698
+      },
+      "path_distance_m": 3.5136734463026,
+      "straight_distance_m": 3.466925238887623,
+      "estimated_initial_speed_mps": 3.095226204684911,
+      "peak_speed_mps": 3.095226204684911,
+      "median_decel_mps2": 3.0656477667170217,
+      "p75_decel_mps2": 5.593503733209146,
+      "kick_power": 1.5,
+      "kick_direction_rad": 0.137759
+    },
+    {
+      "dataset": "match_dataset_5.jsonl",
+      "kick_id": 36,
+      "player_id": 2,
+      "ready_slot": "side",
+      "reason": "side clear to target",
+      "end_reason": "ball_settled",
+      "duration_sec": 1.285124,
+      "points": 39,
+      "start": {
+        "x": -7.459691,
+        "y": 0.303274
+      },
+      "stop": {
+        "x": -7.180014,
+        "y": 1.014475
+      },
+      "path_distance_m": 1.1748048786602763,
+      "straight_distance_m": 0.7642159948142935,
+      "estimated_initial_speed_mps": 1.7521447434237902,
+      "peak_speed_mps": 1.7521447434237902,
+      "median_decel_mps2": 3.0343946813570915,
+      "p75_decel_mps2": 7.741513998391278,
+      "kick_power": 1.5,
+      "kick_direction_rad": 2.147845
+    },
+    {
+      "dataset": "match_dataset_5.jsonl",
+      "kick_id": 37,
+      "player_id": 1,
+      "ready_slot": "center",
+      "reason": "center kick to target",
+      "end_reason": "timeout",
+      "duration_sec": 8.029253,
+      "points": 238,
+      "start": {
+        "x": 0.0,
+        "y": 0.0
+      },
+      "stop": {
+        "x": 3.23703,
+        "y": 2.82722
+      },
+      "path_distance_m": 6.934593292629191,
+      "straight_distance_m": 4.297852504367733,
+      "estimated_initial_speed_mps": 3.069441428912738,
+      "peak_speed_mps": 3.143380046763451,
+      "median_decel_mps2": 5.841892760464343,
+      "p75_decel_mps2": 10.041332515333389,
+      "kick_power": 1.5,
+      "kick_direction_rad": -0.229443
+    },
+    {
+      "dataset": "match_dataset_5.jsonl",
+      "kick_id": 38,
+      "player_id": 1,
+      "ready_slot": "center",
+      "reason": "center kick to target",
+      "end_reason": "timeout",
+      "duration_sec": 8.017892,
+      "points": 238,
+      "start": {
+        "x": 1.550353,
+        "y": 4.45
+      },
+      "stop": {
+        "x": 4.735732,
+        "y": 0.602892
+      },
+      "path_distance_m": 5.012029364532227,
+      "straight_distance_m": 4.994685108923784,
+      "estimated_initial_speed_mps": 3.2339687242971413,
+      "peak_speed_mps": 3.2339687242971413,
+      "median_decel_mps2": 8.557301411783582,
+      "p75_decel_mps2": 12.839744362016054,
+      "kick_power": 1.5,
+      "kick_direction_rad": 2.819023
+    }
+  ]
+}

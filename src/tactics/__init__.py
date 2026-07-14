@@ -10,6 +10,31 @@ The PLAY-stage "which player chases" decision is not in this layer; it belongs
 to the playbook layer in :mod:`src.play.playbook`.
 """
 
+from .ball_prediction import (
+    BallMotionPrediction,
+    BallObservation,
+    BallResistanceModel,
+    BallStopPrediction,
+    DEFAULT_BALL_RESISTANCE_MODEL,
+    SlidingWindowBallPredictor,
+    predict_ball_motion,
+    predict_ball_stop,
+)
+from .attack_watchdog import (
+    AttackAttemptObservation,
+    AttackPhase,
+    AttackWatchdog,
+    AttackWatchdogConfig,
+    AttackWatchdogStatus,
+)
+from .opponent_pressure import (
+    OpponentMotion,
+    OpponentMotionTracker,
+    OpponentPressureConfig,
+    OpponentPressureEstimate,
+    OpponentPressureEstimator,
+    OpponentPressureReport,
+)
 from .kick_hysteresis import KickHysteresis
 from .geometry import TeamFieldFrame
 from .motion import MotionController
@@ -18,11 +43,30 @@ from .ready_stance import ReadyStance
 from .targeting import Targeting
 
 __all__ = [
+    "AttackAttemptObservation",
+    "AttackPhase",
+    "AttackWatchdog",
+    "AttackWatchdogConfig",
+    "AttackWatchdogStatus",
+    "BallMotionPrediction",
+    "BallObservation",
+    "BallResistanceModel",
+    "BallStopPrediction",
+    "DEFAULT_BALL_RESISTANCE_MODEL",
     "KickHysteresis",
     "MotionController",
     "Obstacle",
     "ObstacleCollector",
+    "OpponentMotion",
+    "OpponentMotionTracker",
+    "OpponentPressureConfig",
+    "OpponentPressureEstimate",
+    "OpponentPressureEstimator",
+    "OpponentPressureReport",
     "ReadyStance",
+    "SlidingWindowBallPredictor",
     "Targeting",
     "TeamFieldFrame",
+    "predict_ball_motion",
+    "predict_ball_stop",
 ]

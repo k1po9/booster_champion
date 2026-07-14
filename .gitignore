@@ -1,0 +1,10 @@
+# Python generated files
+__pycache__/
+*.py[cod]
+
+# Local simulation datasets are large and remain immutable outside Git.
+/dataset/
+
+# Legacy default analyzer output; versioned reports live under analysis/v1/.
+/analysis/match_data_analysis.json
+/analysis/match_data_analysis.md

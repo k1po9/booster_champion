@@ -51,6 +51,9 @@ src/
 │   │   └── __init__.py    # Targeting facade with stable public API
 │   ├── motion.py          # MotionController obstacle avoidance/walking/kick commands
 │   ├── kick_hysteresis.py # Kick enter/exit hysteresis model
+│   ├── ball_prediction.py # Online ball velocity, future position, and stop-region prediction
+│   ├── attack_watchdog.py # Progress-aware approach/align/kick timeout model
+│   ├── opponent_pressure.py # Conservative opponent arrival/pressure-time model
 │   └── ready_stance.py    # READY positioning calculation
 ├── behavior_tree/         # BT infrastructure: blackboard, nodes, subtrees, assembly
 │   ├── __init__.py        # Exports TeamStrategyTree, TeamCommandExecutor, create_team_tree
@@ -151,6 +154,9 @@ changes:
 | Obstacle avoidance or teammate avoidance | [src/tactics/navigation.py](src/tactics/navigation.py) |
 | Team field coordinate geometry and coordinate transforms | [src/tactics/geometry.py](src/tactics/geometry.py) |
 | Kick enter/exit hysteresis | [src/tactics/kick_hysteresis.py](src/tactics/kick_hysteresis.py) |
+| Ball velocity, future position, and stop-region prediction | [src/tactics/ball_prediction.py](src/tactics/ball_prediction.py) |
+| Attack attempt timeout and no-progress detection | [src/tactics/attack_watchdog.py](src/tactics/attack_watchdog.py) |
+| Opponent pressure time and predicted contest point | [src/tactics/opponent_pressure.py](src/tactics/opponent_pressure.py) |
 | READY / SafetyGuards / SafetyOverrides | [src/behavior_tree/ready_subtree.py](src/behavior_tree/ready_subtree.py) / [src/behavior_tree/safety_subtree.py](src/behavior_tree/safety_subtree.py) |
 | How one frame of data is written to the blackboard | [src/behavior_tree/nodes/data.py](src/behavior_tree/nodes/data.py) |
 
@@ -331,3 +337,6 @@ no need to temporarily rewrite the goalkeeper as `"chaser"` in
   `src/soccer_framework`.
 - [docs/bt_structure.md](docs/bt_structure.md): detailed behavior tree
   structure.
+- [docs/自定义策略/README.md](docs/自定义策略/README.md): current custom-tactic capability index, maturity, and validation links.
+- [docs/自定义策略/统一比赛数据与能力建设.md](docs/自定义策略/统一比赛数据与能力建设.md): unified match-data format, collection goals, and competitive capability roadmap.
+- [analysis/v1/README.md](analysis/v1/README.md): latest reproducible dataset and model-validation results.
