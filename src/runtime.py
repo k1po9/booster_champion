@@ -221,6 +221,25 @@ def _robot_record(
     return record
 
 
+def _observed_robot_record(robot: RobotState, now: float) -> dict[str, object]:
+    return {
+        "player_id": robot.player_id,
+        "pose": _pose_record(robot.pose),
+        "pose_age_sec": (
+            round(max(0.0, now - robot.last_seen_at), 3)
+            if robot.last_seen_at > 0.0
+            else None
+        ),
+    }
+
+
+def _positive_float_env(name: str, default: float) -> float:
+    try:
+        return max(0.1, float(os.environ.get(name, str(default))))
+    except ValueError:
+        return default
+
+
 class SoccerTeamRuntime(TeamCommandExecutor):
     """Control loop that connects framework adapters and the behavior tree.
 
@@ -243,7 +262,7 @@ class SoccerTeamRuntime(TeamCommandExecutor):
         from .play import PLAYBOOKS
 
         self.kit = SoccerKit(self.config)
-        playbook_name = os.environ.get("SOCCER_PLAYBOOK", "default").strip()
+        playbook_name = os.environ.get("SOCCER_PLAYBOOK", "champion").strip()
         self.playbook: Playbook = PLAYBOOKS.create(playbook_name, self.kit)
         self._playbook_name = playbook_name
         from .soccer_framework.robot import TeamRobotManager
@@ -266,6 +285,11 @@ class SoccerTeamRuntime(TeamCommandExecutor):
         self._control_thread: threading.Thread | None = None
         self._stop_event = threading.Event()
         self._last_command_log_at = 0.0
+        self._last_strategy_log_at = 0.0
+        self._strategy_log_period_sec = 1.0 / _positive_float_env(
+            "SOCCER_STRATEGY_LOG_HZ", 5.0
+        )
+        self._last_loop_elapsed_ms: float | None = None
         self._started = False
 
     def start(self) -> None:
@@ -323,6 +347,11 @@ class SoccerTeamRuntime(TeamCommandExecutor):
                 self._log_commands(
                     started_at, self.tree.last_context, self.tree.last_executed_commands,
                 )
+                self._log_strategy_sample(
+                    started_at,
+                    self.tree.last_context,
+                    self.tree.last_executed_commands,
+                )
             except Exception as exc:
                 self._logger.warn(
                     f"control loop failed: {exc.__class__.__name__}: {exc}",
@@ -334,6 +363,7 @@ class SoccerTeamRuntime(TeamCommandExecutor):
                 self.robot_manager.stop_all("control loop error")
 
             elapsed = time.monotonic() - started_at
+            self._last_loop_elapsed_ms = elapsed * 1000.0
             self._stop_event.wait(max(0.0, period - elapsed))
 
     def execute_team_commands(
@@ -375,6 +405,65 @@ class SoccerTeamRuntime(TeamCommandExecutor):
             ],
         )
 
+    def _log_strategy_sample(
+        self,
+        now: float,
+        context: PlayContext,
+        commands: dict[int, RobotCommand],
+    ) -> None:
+        if now - self._last_strategy_log_at < self._strategy_log_period_sec:
+            return
+        self._last_strategy_log_at = now
+        game = context.game_state
+        own_team = None if game is None else game.get_team_state(self.config.team_id)
+        opponent_team = (
+            None if game is None else game.get_team_state(self.config.opponent_team_id())
+        )
+        self._logger.info(
+            "Champion strategy sample",
+            event="strategy_sample",
+            console=False,
+            team_id=self.config.team_id,
+            playbook=self._playbook_name,
+            loop_elapsed_ms=(
+                None
+                if self._last_loop_elapsed_ms is None
+                else round(self._last_loop_elapsed_ms, 3)
+            ),
+            game=(
+                None
+                if game is None
+                else {
+                    "state": game.state.value,
+                    "stopped": game.stopped,
+                    "set_play": game.set_play.value,
+                    "kicking_team": game.kicking_team,
+                    "secs_remaining": game.secs_remaining,
+                    "secondary_time": game.secondary_time,
+                    "own_score": None if own_team is None else own_team.score,
+                    "opponent_score": (
+                        None if opponent_team is None else opponent_team.score
+                    ),
+                }
+            ),
+            ball=_ball_record(context.ball, now),
+            teammates=[
+                _robot_record(
+                    robot,
+                    game,
+                    self.config,
+                    commands.get(player_id),
+                    now,
+                )
+                for player_id, robot in sorted(context.teammates.items())
+            ],
+            opponents=[
+                _observed_robot_record(robot, now)
+                for _, robot in sorted(context.opponents.items())
+            ],
+            strategy=self.playbook.diagnostics(),
+        )
+
     def _log_config(self) -> None:
         mapping = ", ".join(
             f"p{player_id}:{robot_name or '<default>'}/"
@@ -402,7 +491,9 @@ class SoccerTeamRuntime(TeamCommandExecutor):
             event="runtime_config",
             console=False,
             team_id=self.config.team_id,
+            playbook=self._playbook_name,
             control_hz=self.config.control_hz,
+            strategy_log_hz=round(1.0 / self._strategy_log_period_sec, 3),
             game_controller_topic=self.config.game_controller_topic,
             robots=[
                 {

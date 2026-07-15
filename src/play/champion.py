@@ -69,7 +69,7 @@ class ChampionTuning:
     decision_budget_ms: float = 8.0
     performance_window_size: int = 180
     enable_action_selection: bool = True
-    enable_action_execution: bool = False
+    enable_action_execution: bool = True
     enable_outlet_positioning: bool = True
     action_switch_margin: float = 0.18
     action_min_hold_sec: float = 0.35

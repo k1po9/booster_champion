@@ -23,6 +23,29 @@ A typical Agent project repository has this structure:
                    # This project depends on py_trees==2.4.0
 ```
 
+### Champion strategy and JSONL logs
+
+The runtime starts with `champion` by default. Set `SOCCER_PLAYBOOK=default` to
+temporarily return to the original strategy for an A/B run.
+
+Structured JSONL logging is also enabled by default. Each run writes to:
+
+```text
+/tmp/booster_agent/soccer_logs/<run_id>/soccersim.teamN.jsonl
+```
+
+The `strategy_sample` event is recorded at 5 Hz without printing to the console.
+It contains the ball, both teams' public poses, executed commands, role/action
+decisions, pressure, match risk, set-play state, and timing. Useful overrides:
+
+```bash
+SOCCER_LOG_FILE=/path/to/match-01.jsonl
+SOCCER_STRATEGY_LOG_HZ=5
+SOCCER_PRETTY_LOG=on  # optional human-readable duplicate; off by default
+```
+
+Use a different `SOCCER_LOG_FILE` or `SOCCER_RUN_ID` for every simulated match.
+
 ## Code Map
 
 This section answers two questions: **what the code looks like** and **where to

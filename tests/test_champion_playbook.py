@@ -56,11 +56,11 @@ class ChampionPlaybookTest(unittest.TestCase):
         self.clock = FakeClock()
         self.playbook = ChampionPlaybook(self.kit, clock=self.clock)
 
-    def test_champion_is_registered_without_replacing_default(self):
+    def test_champion_is_registered_as_default_with_legacy_fallback(self):
         self.assertIn("champion", PLAYBOOKS.names())
         self.assertIsInstance(PLAYBOOKS.create("champion", self.kit), ChampionPlaybook)
-        self.assertIsInstance(PLAYBOOKS.create_default(self.kit), DefaultPlaybook)
-        self.assertNotIsInstance(PLAYBOOKS.create_default(self.kit), ChampionPlaybook)
+        self.assertIsInstance(PLAYBOOKS.create_default(self.kit), ChampionPlaybook)
+        self.assertIsInstance(PLAYBOOKS.create("default", self.kit), DefaultPlaybook)
 
     def test_full_team_has_handler_outlet_and_configured_cover(self):
         assignment = self.playbook.assign_roles(make_context())

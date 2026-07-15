@@ -345,14 +345,14 @@ def create_soccer_logger(
     SOCCER_LOG_DIR: directory for generated JSONL files.
     Defaults to /tmp/booster_agent/soccer_logs.
     SOCCER_LOG_FILE: exact JSONL file path, overrides SOCCER_LOG_DIR.
-    SOCCER_PRETTY_LOG: pretty companion log is on by default; set off/false/0.
+    SOCCER_PRETTY_LOG: pretty companion log is off by default; set on/true/1.
     SOCCER_RUN_ID: stable run id for correlating multiple channels.
     Environment variables:
     SOCCER_LOG: jsonl/on/true/1 by default, or off/none/false/0.
     SOCCER_TELEMETRY: legacy alias used when SOCCER_LOG is unset.
     SOCCER_LOG_DIR: directory for generated JSONL files, defaulting to /tmp/booster_agent/soccer_logs.
     SOCCER_LOG_FILE: exact JSONL file path, overriding SOCCER_LOG_DIR.
-    SOCCER_PRETTY_LOG: pretty companion log is on by default; set off/false/0.
+    SOCCER_PRETTY_LOG: pretty companion log is off by default; set on/true/1.
     SOCCER_RUN_ID: stable run id for correlating multiple channels.
     """
 
@@ -383,8 +383,8 @@ def create_structured_log_plugin(source: str = "soccersim") -> StructuredLogPlug
         path = log_dir.expanduser() / run_id / f"{_safe_path_part(source)}.jsonl"
 
     pretty_path = _pretty_log_path(path)
-    pretty_mode = os.environ.get("SOCCER_PRETTY_LOG", "on").strip().lower()
-    if pretty_mode in _OFF_VALUES:
+    pretty_mode = os.environ.get("SOCCER_PRETTY_LOG", "off").strip().lower()
+    if pretty_mode not in _ON_VALUES:
         pretty_path = None
 
     try:

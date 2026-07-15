@@ -53,8 +53,8 @@ from .play_subtree import create_play_subtree
 # ----------------------------------------------------------------------
 # Built-in Playbook registration is visible and uses the same API as custom Playbooks.
 # ----------------------------------------------------------------------
-PLAYBOOKS.register("default", DefaultPlaybook, default=True)
-PLAYBOOKS.register("champion", ChampionPlaybook)
+PLAYBOOKS.register("default", DefaultPlaybook)
+PLAYBOOKS.register("champion", ChampionPlaybook, default=True)
 
 __all__ = [
     "AssignRoles",
