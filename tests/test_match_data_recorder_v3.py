@@ -43,6 +43,11 @@ def _context(now: float, ball_x: float | None, robot_x: float = -2.0) -> PlayCon
     )
 
 
+class _Kicker:
+    def mark_kicking(self, _player_id: int) -> None:
+        pass
+
+
 class _NoObstacles:
     def collect_all(self, _player_id: int, _context: PlayContext) -> list:
         return []
@@ -69,7 +74,7 @@ class MatchDataRecorderV3Tests(unittest.TestCase):
         controller = MotionController(
             SoccerConfig(robot_names=("robot1",)),
             None,
-            None,
+            _Kicker(),
             _NoObstacles(),
         )
         context = _context(50.0, None, robot_x=0.0)
@@ -80,6 +85,31 @@ class MatchDataRecorderV3Tests(unittest.TestCase):
         self.assertEqual(command.motion_target.requested_target, target)
         self.assertEqual(command.motion_target.control_target, target)
         self.assertEqual(command.motion_target.phase, "run")
+        self.assertEqual(command.motion_target.linear_speed_limit_mps, 0.4)
+        self.assertEqual(command.intent.vx, 0.4)
+
+        next_target = Pose2D(2.0, 0.0, 0.0)
+        next_command = controller.move_to_target(1, context, next_target, "eta test 2")
+        assert next_command.motion_target is not None
+        self.assertEqual(next_command.motion_target.linear_speed_limit_mps, 0.6)
+        self.assertEqual(next_command.intent.vx, 0.6)
+
+    def test_kick_power_is_stable_per_episode_and_rotates(self) -> None:
+        controller = MotionController(
+            SoccerConfig(robot_names=("robot1",)),
+            None,
+            _Kicker(),
+            _NoObstacles(),
+        )
+        first = _context(60.00, 0.1, robot_x=0.0)
+        same = _context(60.05, 0.1, robot_x=0.0)
+        second = _context(61.00, 0.1, robot_x=0.0)
+        first_command = controller.kick_command(1, first, 0.0, "kick")
+        same_command = controller.kick_command(1, same, 0.0, "kick")
+        second_command = controller.kick_command(1, second, 0.0, "kick")
+        self.assertEqual(first_command.intent.power, 1.0)
+        self.assertEqual(same_command.intent.power, 1.0)
+        self.assertEqual(second_command.intent.power, 1.25)
 
     def test_ready_ball_placement_is_not_a_motion_sample(self) -> None:
         for now, x in ((75.0, -4.0), (75.1, 0.0), (75.2, 0.5)):
@@ -110,6 +140,13 @@ class MatchDataRecorderV3Tests(unittest.TestCase):
         self.assertFalse(motions[-1]["free_roll_terminal_candidate"])
         self.assertIn("boundary_crossing", motions[-1]["quality_flags"])
 
+        for now, x in ((200.23, 7.16), (200.26, 7.20)):
+            self.recorder.observe(now, _context(now, x), {1: RobotCommand.stop("outside")})
+        self.assertEqual(
+            len([row for row in self.records() if row["record_type"] == "ball_motion"]),
+            1,
+        )
+
         confirmed = _context(200.30, 7.13)
         assert confirmed.game_state is not None
         confirmed.game_state.teams[0].score = 1
@@ -130,6 +167,15 @@ class MatchDataRecorderV3Tests(unittest.TestCase):
         self.assertEqual(motions[-1]["end_reason"], "natural_stop_candidate")
         self.assertIn("robot_contact_candidate", motions[-1]["quality_flags"])
         self.assertFalse(motions[-1]["free_roll_terminal_candidate"])
+
+    def test_finished_state_writes_durable_match_end(self) -> None:
+        context = _context(270.0, None)
+        assert context.game_state is not None
+        context.game_state.state = GameState.FINISHED
+        self.recorder.observe(270.0, context, {1: RobotCommand.stop("finished")})
+        rows = [row for row in self.records() if row["record_type"] == "match_end"]
+        self.assertEqual(len(rows), 1)
+        self.assertEqual(rows[0]["game"]["state"], "FINISHED")
 
     def test_eta_target_change_creates_censored_segment(self) -> None:
         for now, target_x in ((280.0, 1.0), (280.1, 2.0)):

@@ -381,6 +381,7 @@ class MotionTargetTrace:
     arrive_distance: float
     phase: str
     avoidance_applied: bool = False
+    linear_speed_limit_mps: float | None = None
 
 
 @dataclass(frozen=True)

@@ -42,7 +42,7 @@ DEFAULT_READY_SLOT_SEQUENCE = (
 
 @dataclass
 class SoccerDebugConfig:
-    """Debug-only switches for optional diagnostics.
+    """Debug and data-collection controls that never come from match env vars.
 
     These controls are intentionally kept out of environment parsing so normal
     match startup has a small, predictable public surface. Change defaults or
@@ -51,6 +51,8 @@ class SoccerDebugConfig:
 
     bt_trace_ticks: str = "off"
     bt_trace_sample_sec: float = 0.5
+    collection_kick_power_levels: tuple[float, ...] = (1.0, 1.25, 1.5, 1.75, 2.0)
+    collection_linear_speed_levels: tuple[float, ...] = (0.4, 0.6, 0.8)
 
 
 @dataclass

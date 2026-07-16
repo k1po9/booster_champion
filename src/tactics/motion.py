@@ -76,6 +76,10 @@ class MotionController:
         self._kicker = kicker
         self._obstacles = obstacles
         self._avoid_side_by_player: dict[int, float] = {}
+        self._speed_profile_by_player: dict[int, tuple[Pose2D, float]] = {}
+        self._next_speed_profile = 0
+        self._kick_power_by_player: dict[int, tuple[float, float]] = {}
+        self._next_kick_power_profile = 0
 
     # Public interface
 
@@ -100,6 +104,8 @@ class MotionController:
         if robot is None or robot.pose is None:
             return RobotCommand.stop(f"{reason}: waiting for pose")
 
+        speed_limit = self._collection_linear_speed(player_id, target)
+
         # Path detour: compute via point
         adjusted_target = self._avoidance_target(player_id, robot.pose, target, context)
         adjusted_reason = (
@@ -114,6 +120,7 @@ class MotionController:
             adjusted_reason,
             arrive_dist,
             hold_vyaw,
+            speed_limit,
         )
         command = RobotCommand(
             intent=command.intent,
@@ -130,6 +137,7 @@ class MotionController:
                     hold_vyaw,
                 ),
                 avoidance_applied=adjusted_target != target,
+                linear_speed_limit_mps=speed_limit,
             ),
         )
 
@@ -174,15 +182,53 @@ class MotionController:
             return RobotCommand.stop(f"{reason}: waiting for pose")
         self._kicker.mark_kicking(player_id)
         rel_ball = field_to_relative(ball.x, ball.y, robot.pose)
+        kick_power = self._collection_kick_power(player_id, ball.last_seen_at)
         return RobotCommand(
             intent=KickIntent(
                 direction=normalize_angle(kick_theta - robot.pose.theta),
-                power=self._config.strategy.soccer_kick_power,
+                power=kick_power,
                 ball_x=rel_ball.x,
                 ball_y=rel_ball.y,
             ),
             reason=reason,
         )
+
+    def _collection_kick_power(self, player_id: int, stamp: float) -> float:
+        levels = tuple(
+            max(1.0, min(10.0, float(value)))
+            for value in self._config.debug.collection_kick_power_levels
+        )
+        if not levels:
+            return max(1.0, min(10.0, self._config.strategy.soccer_kick_power))
+        previous = self._kick_power_by_player.get(player_id)
+        if previous is not None and stamp - previous[0] <= 0.25:
+            self._kick_power_by_player[player_id] = (stamp, previous[1])
+            return previous[1]
+        power = levels[self._next_kick_power_profile % len(levels)]
+        self._next_kick_power_profile += 1
+        self._kick_power_by_player[player_id] = (stamp, power)
+        return power
+
+    def _collection_linear_speed(self, player_id: int, target: Pose2D) -> float:
+        configured_max = self._config.strategy.max_linear_speed
+        levels = tuple(
+            min(configured_max, max(_LINEAR_SPEED_FLOOR, float(value)))
+            for value in self._config.debug.collection_linear_speed_levels
+            if float(value) > 0.0
+        )
+        if not levels:
+            return configured_max
+        previous = self._speed_profile_by_player.get(player_id)
+        if previous is not None:
+            old_target, speed = previous
+            target_shift = math.hypot(target.x - old_target.x, target.y - old_target.y)
+            theta_shift = abs(normalize_angle(target.theta - old_target.theta))
+            if target_shift <= 0.25 and theta_shift <= 0.35:
+                return speed
+        speed = levels[self._next_speed_profile % len(levels)]
+        self._next_speed_profile += 1
+        self._speed_profile_by_player[player_id] = (target, speed)
+        return speed
 
     def approach_target(
         self,
@@ -330,6 +376,7 @@ class MotionController:
         reason: str,
         arrive_distance: float,
         hold_vyaw: float,
+        linear_speed_limit: float | None = None,
     ) -> RobotCommand:
         """Unicycle-style movement: pure turning at long angles, then vx plus small vyaw when aligned.
 
@@ -371,20 +418,30 @@ class MotionController:
             )
 
         # Forward plus tracking turn; vx is cosine-scaled to reduce lateral drift, and vy is forced to 0.
-        vx = self._linear_speed(distance, angle_error)
+        vx = self._linear_speed(distance, angle_error, linear_speed_limit)
         vyaw = self._angular_velocity(angle_error)
         return RobotCommand(intent=MoveIntent(vx=vx, vy=0.0, vyaw=vyaw), reason=reason)
 
-    def _linear_speed(self, distance: float, angle_error: float) -> float:
-        """vx equals gain * distance * cos(err), then applies floor and max clamps."""
+    def _linear_speed(
+        self,
+        distance: float,
+        angle_error: float,
+        linear_speed_limit: float | None = None,
+    ) -> float:
+        """vx equals gain * distance * cos(err), then applies floor and selected cap."""
         if distance <= 1e-6:
             return 0.0
         raw = _LINEAR_GAIN * distance * math.cos(angle_error)
         magnitude = abs(raw)
-        floor = min(_LINEAR_SPEED_FLOOR, self._config.strategy.max_linear_speed)
+        speed_limit = (
+            self._config.strategy.max_linear_speed
+            if linear_speed_limit is None
+            else min(self._config.strategy.max_linear_speed, linear_speed_limit)
+        )
+        floor = min(_LINEAR_SPEED_FLOOR, speed_limit)
         if magnitude < floor:
             return floor if raw >= 0.0 else -floor
-        return clamp(raw, -self._config.strategy.max_linear_speed, self._config.strategy.max_linear_speed)
+        return clamp(raw, -speed_limit, speed_limit)
 
     def _angular_velocity(self, angle_error: float) -> float:
         """omega equals clamp(2 * err, +/-max), then applies a floor.

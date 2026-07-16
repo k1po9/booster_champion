@@ -105,10 +105,12 @@ class MatchDataRecorder:
         self._ball_history: deque[dict[str, object]] = deque(maxlen=24)
         self._last_ball_stamp = -1.0
         self._ball_motion: _BallMotionSample | None = None
+        self._ball_outside_latched = False
         self._next_motion_id = 1
         self._completed_ball_motions = 0
         self._recent_motion_ends: deque[tuple[int, float, str]] = deque(maxlen=16)
         self._last_game_marker: dict[str, object] | None = None
+        self._match_end_written = False
         self._eta_samples: dict[int, _EtaSample] = {}
         self._next_eta_id = 1
         self._completed_eta_samples = 0
@@ -216,6 +218,21 @@ class MatchDataRecorder:
             return
         previous = self._last_game_marker
         self._last_game_marker = current
+        if current.get("state") == "FINISHED" and not self._match_end_written:
+            self._match_end_written = True
+            self._write(
+                {
+                    "record_type": "match_end",
+                    "monotonic_sec": _round(now),
+                    "elapsed_sec": _round(max(0.0, now - self._started_at)),
+                    "game": current,
+                    "frames": self._frame_id,
+                    "completed_kicks": self._completed_kicks,
+                    "completed_ball_motions": self._completed_ball_motions,
+                    "completed_eta_samples": self._completed_eta_samples,
+                },
+                flush=True,
+            )
         if previous is None or _game_signature(previous) == _game_signature(current):
             return
         label = _game_transition_label(previous, current)
@@ -262,6 +279,19 @@ class MatchDataRecorder:
         point = self._ball_motion_point(now, context)
         if point is None:
             return
+        evidence = point.get("field_evidence")
+        whole_ball_in_field = (
+            bool(evidence.get("whole_ball_in_field", True))
+            if isinstance(evidence, dict) else True
+        )
+        if self._ball_motion is None and self._ball_outside_latched:
+            self._ball_history.clear()
+            self._ball_history.append(point)
+            if whole_ball_in_field:
+                self._ball_outside_latched = False
+            return
+        if not whole_ball_in_field:
+            self._ball_outside_latched = True
         self._ball_history.append(point)
 
         sample = self._ball_motion
@@ -682,6 +712,11 @@ class MatchDataRecorder:
                 "official_event_association_sec": 2.5,
             },
             "strategy_tuning": asdict(config.strategy),
+            "collection_profiles": {
+                "kick_power_levels": list(config.debug.collection_kick_power_levels),
+                "linear_speed_levels_mps": list(config.debug.collection_linear_speed_levels),
+                "selection": "deterministic round-robin; fixed within one kick or ETA segment",
+            },
             "sampling": {
                 "world_frames": "fixed-rate latest public snapshot",
                 "kick_trajectory": "every new public ball observation during an own kick",
@@ -1096,6 +1131,10 @@ def _eta_point(
         "arrive_distance_m": _round(trace.arrive_distance),
         "phase": trace.phase,
         "avoidance_applied": trace.avoidance_applied,
+        "linear_speed_limit_mps": (
+            _round(trace.linear_speed_limit_mps)
+            if trace.linear_speed_limit_mps is not None else None
+        ),
         "distance_to_requested_m": _round(math.hypot(dx, dy)),
         "heading_to_path_error_rad": _round(_normalize_angle(line_heading - pose.theta)),
         "final_heading_error_rad": _round(_normalize_angle(trace.requested_target.theta - pose.theta)),
@@ -1242,6 +1281,10 @@ def _command_record(
             "arrive_distance_m": _round(trace.arrive_distance),
             "phase": trace.phase,
             "avoidance_applied": trace.avoidance_applied,
+            "linear_speed_limit_mps": (
+                _round(trace.linear_speed_limit_mps)
+                if trace.linear_speed_limit_mps is not None else None
+            ),
         }
     return record
 
