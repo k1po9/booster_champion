@@ -20,6 +20,7 @@ import math
 from ..soccer_framework import (
     BallState,
     KickIntent,
+    MotionTargetTrace,
     MoveIntent,
     Pose2D,
     RobotCommand,
@@ -114,6 +115,23 @@ class MotionController:
             arrive_dist,
             hold_vyaw,
         )
+        command = RobotCommand(
+            intent=command.intent,
+            reason=command.reason,
+            motion_target=MotionTargetTrace(
+                requested_target=target,
+                control_target=adjusted_target,
+                arrive_distance=arrive_dist,
+                phase=self._motion_phase(
+                    robot.pose,
+                    adjusted_target,
+                    command,
+                    arrive_dist,
+                    hold_vyaw,
+                ),
+                avoidance_applied=adjusted_target != target,
+            ),
+        )
 
         # Yaw avoidance: add vyaw bias
         return self._apply_yaw_avoidance(
@@ -122,6 +140,25 @@ class MotionController:
             command,
             avoid_opponents,
         )
+
+    @staticmethod
+    def _motion_phase(
+        pose: Pose2D,
+        target: Pose2D,
+        command: RobotCommand,
+        arrive_distance: float,
+        hold_vyaw: float,
+    ) -> str:
+        distance = math.hypot(target.x - pose.x, target.y - pose.y)
+        final_theta_error = abs(normalize_angle(target.theta - pose.theta))
+        if distance < arrive_distance and final_theta_error < _ARRIVE_ANGLE:
+            return "hold" if abs(hold_vyaw) > 1e-6 else "arrived"
+        if distance < arrive_distance:
+            return "align"
+        intent = command.intent
+        if isinstance(intent, MoveIntent) and abs(intent.vx) <= 1e-6:
+            return "turn"
+        return "run"
 
     def kick_command(
         self,
@@ -449,6 +486,7 @@ class MotionController:
         return RobotCommand(
             intent=MoveIntent(vx=intent.vx, vy=intent.vy, vyaw=new_vyaw),
             reason=f"{command.reason} yaw avoid",
+            motion_target=command.motion_target,
         )
 
     def _yaw_avoid_scale(

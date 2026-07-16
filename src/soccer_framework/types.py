@@ -31,6 +31,7 @@ __all__ = [
     "GamePhase",
     "GameState",
     "KickIntent",
+    "MotionTargetTrace",
     "MoveIntent",
     "NoopIntent",
     "Penalty",
@@ -368,6 +369,21 @@ class MoveIntent:
 
 
 @dataclass(frozen=True)
+class MotionTargetTrace:
+    """Read-only navigation metadata carried beside an executed command.
+
+    The hardware dispatcher still consumes only :class:`MoveIntent`. This trace
+    preserves both requested and detoured targets for auditable ETA samples.
+    """
+
+    requested_target: Pose2D
+    control_target: Pose2D
+    arrive_distance: float
+    phase: str
+    avoidance_applied: bool = False
+
+
+@dataclass(frozen=True)
 class KickIntent:
     """Kick intent forwarded by :class:`PlayerKickStateMachine` to SoccerKickManager.
 
@@ -406,6 +422,7 @@ class RobotCommand:
 
     intent: RobotIntent = StopIntent()
     reason: str = "stop"
+    motion_target: MotionTargetTrace | None = None
 
     @classmethod
     def stop(cls, reason: str) -> "RobotCommand":
