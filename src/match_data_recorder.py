@@ -33,7 +33,7 @@ from .soccer_framework import (
 )
 
 
-_SCHEMA_VERSION = 3
+_SCHEMA_VERSION = 4
 _FRAME_HZ = 10.0
 _MAX_TRAJECTORY_SEC = 8.0
 _MAX_BALL_MOTION_SEC = 12.0
@@ -73,6 +73,8 @@ class _BallMotionSample:
     game: dict[str, object] | None
     trajectory: list[dict[str, object]] = field(default_factory=list)
     kick_id: int | None = None
+    kick_player_id: int | None = None
+    kick_power: float | None = None
 
 
 @dataclass
@@ -264,8 +266,13 @@ class MatchDataRecorder:
                     "motion_id": motion_id,
                     "monotonic_sec": _round(now),
                     "official_label": label,
+                    "label_scope": "terminal_event_override",
+                    "label_priority": "official_over_geometry_over_candidate",
                     "association": "nearest_preceding_motion_within_2.5s",
                     "association_delay_sec": _round(now - related[1]),
+                    "association_confidence": (
+                        0.85 if now - related[1] <= 0.75 else 0.65
+                    ),
                 },
                 flush=True,
             )
@@ -313,6 +320,12 @@ class MatchDataRecorder:
                     source=source,
                     game=_game_record(context.game_state, now),
                     kick_id=kick_id,
+                    kick_player_id=(
+                        self._kick_sample.player_id if self._kick_sample else None
+                    ),
+                    kick_power=(
+                        self._kick_sample.command.power if self._kick_sample else None
+                    ),
                 )
                 self._next_motion_id += 1
                 sample.trajectory.extend(
@@ -410,8 +423,6 @@ class MatchDataRecorder:
         self._ball_motion = None
         if sample is None:
             return
-        flags = _ball_quality_flags(sample.trajectory)
-        eligible = end_reason == "natural_stop_candidate" and not flags
         self._completed_ball_motions += 1
         self._recent_motion_ends.append((sample.motion_id, now, end_reason))
         self._ball_history.clear()
@@ -425,13 +436,16 @@ class MatchDataRecorder:
                 "motion_id": sample.motion_id,
                 "source": sample.source,
                 "kick_id": sample.kick_id,
+                "kick_player_id": sample.kick_player_id,
+                "kick_power": (
+                    _round(sample.kick_power) if sample.kick_power is not None else None
+                ),
                 "started_monotonic_sec": _round(sample.started_at),
                 "duration_sec": _round(max(0.0, now - sample.started_at)),
                 "end_reason": end_reason,
                 "label_source": label_source,
                 "game_at_start": sample.game,
-                "quality_flags": flags,
-                "free_roll_terminal_candidate": eligible,
+                "label_policy_version": 1,
                 "trajectory": sample.trajectory,
             },
             flush=True,
@@ -444,7 +458,7 @@ class MatchDataRecorder:
             end_reason=end_reason,
             label_source=label_source,
             points=len(sample.trajectory),
-            quality_flags=flags,
+            labels_enriched_by="background_writer",
         )
 
     def _observe_eta(
@@ -635,7 +649,6 @@ class MatchDataRecorder:
         if sample is None:
             return
         self._completed_kicks += 1
-        quality_flags = _ball_quality_flags(sample.trajectory)
         self._write(
             {
                 "record_type": "kick",
@@ -648,10 +661,6 @@ class MatchDataRecorder:
                 "end_reason": end_reason,
                 "reason": sample.reason,
                 "motion_ids": sample.motion_ids,
-                "quality_flags": quality_flags,
-                "free_roll_terminal_candidate": (
-                    end_reason == "natural_stop_candidate" and not quality_flags
-                ),
                 "game_at_start": sample.game,
                 "kick": {
                     "direction_rad": _round(sample.command.direction),
@@ -710,6 +719,8 @@ class MatchDataRecorder:
                 "robot_contact_candidate_m": _ROBOT_CONTACT_CANDIDATE_M,
                 "post_proximity_candidate_m": _POST_PROXIMITY_CANDIDATE_M,
                 "official_event_association_sec": 2.5,
+                "ball_event_label_policy_version": 1,
+                "free_path_high_confidence_event_threshold": 0.75,
             },
             "strategy_tuning": asdict(config.strategy),
             "collection_profiles": {
@@ -784,6 +795,7 @@ class MatchDataRecorder:
                 record, flush = item
                 if self._fp is None:
                     continue
+                _enrich_dataset_record(record)
                 self._fp.write(
                     json.dumps(record, ensure_ascii=False, separators=(",", ":"))
                     + "\n"
@@ -818,6 +830,39 @@ class MatchDataRecorder:
         info = getattr(self._logger, "info", None)
         if callable(info):
             info(message, **fields)
+
+
+def _enrich_dataset_record(record: dict[str, object]) -> None:
+    record_type = record.get("record_type")
+    trajectory = record.get("trajectory")
+    if not isinstance(trajectory, list):
+        return
+    points = [point for point in trajectory if isinstance(point, dict)]
+    if record_type == "kick":
+        flags = _ball_quality_flags(points)
+        record["quality_flags"] = flags
+        record["free_roll_terminal_candidate"] = (
+            record.get("end_reason") == "natural_stop_candidate" and not flags
+        )
+        return
+    if record_type != "ball_motion":
+        return
+    flags = _ball_quality_flags(points)
+    labels = _classify_ball_motion_events(
+        points,
+        source=str(record.get("source", "observed_motion")),
+        kick_player_id=(
+            int(record["kick_player_id"])
+            if isinstance(record.get("kick_player_id"), int) else None
+        ),
+        end_reason=str(record.get("end_reason", "unknown")),
+        label_source=str(record.get("label_source", "observation")),
+    )
+    record["quality_flags"] = flags
+    record.update(labels)
+    record["free_roll_terminal_candidate"] = (
+        record.get("end_reason") == "natural_stop_candidate" and not flags
+    )
 
 
 def _relative_ball_point(
@@ -982,6 +1027,353 @@ def _trajectory_has_settled(points: list[dict[str, object]]) -> bool:
         float(last["y"]) - float(window[0]["y"]),
     )
     return travel <= _SETTLE_MAX_TRAVEL_M
+
+
+def _classify_ball_motion_events(
+    points: list[dict[str, object]],
+    *,
+    source: str,
+    kick_player_id: int | None,
+    end_reason: str,
+    label_source: str,
+) -> dict[str, object]:
+    """Build conservative, auditable labels without pretending contact truth exists."""
+
+    onset = _motion_onset(points)
+    onset_index = int(onset["point_index"])
+    onset_t = float(onset["t_sec"])
+    onset_point = points[onset_index] if points else {}
+    launch_identity: tuple[str, int] | None = None
+
+    if source == "own_kick" and kick_player_id is not None:
+        launch_identity = ("teammate", kick_player_id)
+        nearest = onset_point.get("nearest_teammate")
+        launch_distance = (
+            nearest.get("distance_m")
+            if isinstance(nearest, dict) and nearest.get("player_id") == kick_player_id
+            else None
+        )
+        launch_event = {
+            "type": "own_kick_command",
+            "label_source": "command",
+            "confidence": 1.0,
+            "point_index": onset_index,
+            "t_sec": _round(onset_t),
+            "team": "teammate",
+            "player_id": kick_player_id,
+            "robot_distance_m": launch_distance,
+            "pre_speed_mps": onset["pre_speed_mps"],
+            "post_speed_mps": onset["post_speed_mps"],
+        }
+    else:
+        field = onset_point.get("field_evidence")
+        post_distance = (
+            field.get("nearest_post_center_distance_m")
+            if isinstance(field, dict) else None
+        )
+        nearest_launch = _nearest_robot_evidence(onset_point)
+        if isinstance(post_distance, (int, float)) and post_distance <= _POST_PROXIMITY_CANDIDATE_M:
+            launch_event = {
+                "type": "goal_post_rebound_candidate",
+                "label_source": "geometry_and_motion",
+                "confidence": 0.75,
+                "point_index": onset_index,
+                "t_sec": _round(onset_t),
+                "nearest_post_center_distance_m": _round(float(post_distance)),
+                "pre_speed_mps": onset["pre_speed_mps"],
+                "post_speed_mps": onset["post_speed_mps"],
+            }
+        elif nearest_launch is not None and nearest_launch[2] <= 0.55:
+            team, player_id, distance = nearest_launch
+            launch_identity = (team, player_id)
+            confidence = 0.80 if distance <= 0.35 else (0.65 if distance <= 0.45 else 0.45)
+            launch_event = {
+                "type": "robot_kick_candidate",
+                "label_source": "robot_proximity_and_motion",
+                "confidence": confidence,
+                "point_index": onset_index,
+                "t_sec": _round(onset_t),
+                "team": team,
+                "player_id": player_id,
+                "robot_distance_m": _round(distance),
+                "pre_speed_mps": onset["pre_speed_mps"],
+                "post_speed_mps": onset["post_speed_mps"],
+            }
+        else:
+            launch_event = {
+                "type": "unattributed_acceleration_candidate",
+                "label_source": "motion_only",
+                "confidence": 0.35,
+                "point_index": onset_index,
+                "t_sec": _round(onset_t),
+                "pre_speed_mps": onset["pre_speed_mps"],
+                "post_speed_mps": onset["post_speed_mps"],
+            }
+
+    candidates = _interaction_candidates(points, onset_index, launch_identity)
+    terminal = _terminal_ball_event(points, end_reason, label_source)
+    terminal_t = float(terminal["t_sec"])
+    conservative_until = terminal_t
+    high_confidence_until = terminal_t
+    for event in candidates:
+        event_t = float(event["t_sec"])
+        conservative_until = min(conservative_until, event_t)
+        if float(event.get("confidence", 0.0)) >= 0.75:
+            high_confidence_until = min(high_confidence_until, event_t)
+    return {
+        "launch_event": launch_event,
+        "event_candidates": candidates,
+        "terminal_event": terminal,
+        "free_path_valid_until_sec": _round(high_confidence_until),
+        "free_path_conservative_until_sec": _round(conservative_until),
+        "free_path_horizon_sec": _round(max(0.0, high_confidence_until - onset_t)),
+        "free_path_conservative_horizon_sec": _round(
+            max(0.0, conservative_until - onset_t)
+        ),
+    }
+
+
+def _motion_onset(points: list[dict[str, object]]) -> dict[str, object]:
+    if not points:
+        return {"point_index": 0, "t_sec": 0.0, "pre_speed_mps": 0.0, "post_speed_mps": 0.0}
+    speeds: list[float] = []
+    onset_index = 0
+    for index in range(1, len(points)):
+        first = points[index - 1]
+        second = points[index]
+        dt = float(second["t_sec"]) - float(first["t_sec"])
+        if dt <= 0.0:
+            speeds.append(0.0)
+            continue
+        distance = math.hypot(
+            float(second["x"]) - float(first["x"]),
+            float(second["y"]) - float(first["y"]),
+        )
+        speed = distance / dt
+        speeds.append(speed)
+        if onset_index == 0 and distance >= 0.01 and speed >= _MOTION_START_SPEED_MPS:
+            onset_index = index
+    speed_offset = max(0, onset_index - 1)
+    before = speeds[max(0, speed_offset - 3):speed_offset]
+    after = speeds[speed_offset:min(len(speeds), speed_offset + 4)]
+    return {
+        "point_index": onset_index,
+        "t_sec": _round(float(points[onset_index].get("t_sec", 0.0))),
+        "pre_speed_mps": _round(_median(before)),
+        "post_speed_mps": _round(_median(after)),
+    }
+
+
+def _median(values: list[float]) -> float:
+    if not values:
+        return 0.0
+    ordered = sorted(values)
+    middle = len(ordered) // 2
+    if len(ordered) % 2:
+        return ordered[middle]
+    return 0.5 * (ordered[middle - 1] + ordered[middle])
+
+
+def _nearest_robot_evidence(point: Mapping[str, object]) -> tuple[str, int, float] | None:
+    candidates: list[tuple[float, str, int]] = []
+    for key, team in (("nearest_teammate", "teammate"), ("nearest_opponent", "opponent")):
+        nearest = point.get(key)
+        if not isinstance(nearest, dict):
+            continue
+        player_id = nearest.get("player_id")
+        distance = nearest.get("distance_m")
+        if isinstance(player_id, int) and isinstance(distance, (int, float)):
+            candidates.append((float(distance), team, player_id))
+    if not candidates:
+        return None
+    distance, team, player_id = min(candidates)
+    return team, player_id, distance
+
+
+def _interaction_candidates(
+    points: list[dict[str, object]],
+    onset_index: int,
+    launch_identity: tuple[str, int] | None,
+) -> list[dict[str, object]]:
+    events: list[dict[str, object]] = []
+    if not points:
+        return events
+    onset_t = float(points[onset_index].get("t_sec", 0.0))
+    launch_released = launch_identity is None
+    seen_contacts: set[tuple[str, int]] = set()
+    seen_post = False
+    seen_unattributed = False
+
+    for index in range(onset_index + 1, len(points)):
+        point = points[index]
+        t_sec = float(point.get("t_sec", 0.0))
+        if t_sec < onset_t + 0.12:
+            continue
+        kinematics = _kinematic_change(points, index)
+
+        if launch_identity is not None and not launch_released:
+            team, player_id = launch_identity
+            key = "nearest_teammate" if team == "teammate" else "nearest_opponent"
+            nearest = point.get(key)
+            launch_released = (
+                not isinstance(nearest, dict)
+                or nearest.get("player_id") != player_id
+                or float(nearest.get("distance_m", 99.0)) > 0.60
+            )
+
+        for key, team in (("nearest_teammate", "teammate"), ("nearest_opponent", "opponent")):
+            nearest = point.get(key)
+            if not isinstance(nearest, dict):
+                continue
+            player_id = nearest.get("player_id")
+            distance = nearest.get("distance_m")
+            if not isinstance(player_id, int) or not isinstance(distance, (int, float)):
+                continue
+            identity = (team, player_id)
+            if identity == launch_identity and not launch_released:
+                continue
+            distance = float(distance)
+            if distance > _ROBOT_CONTACT_CANDIDATE_M or identity in seen_contacts:
+                continue
+            changed = bool(kinematics["motion_changed"])
+            confidence = 0.55
+            if distance <= 0.32:
+                confidence += 0.10
+            if changed:
+                confidence += 0.25
+            confidence = min(0.95, confidence)
+            speed_delta = kinematics.get("speed_delta_mps")
+            accelerated = (
+                isinstance(speed_delta, (int, float)) and speed_delta >= 0.50
+            )
+            events.append({
+                "type": (
+                    "robot_kick_candidate" if accelerated
+                    else "robot_contact_candidate"
+                ),
+                "label_source": "robot_proximity_and_motion" if changed else "robot_proximity",
+                "confidence": confidence,
+                "point_index": index,
+                "t_sec": _round(t_sec),
+                "team": team,
+                "player_id": player_id,
+                "robot_distance_m": _round(distance),
+                **kinematics,
+            })
+            seen_contacts.add(identity)
+
+        field = point.get("field_evidence")
+        post_distance = (
+            float(field.get("nearest_post_center_distance_m", 99.0))
+            if isinstance(field, dict) else 99.0
+        )
+        if post_distance <= _POST_PROXIMITY_CANDIDATE_M and not seen_post:
+            changed = bool(kinematics["motion_changed"])
+            events.append({
+                "type": "goal_post_contact_candidate",
+                "label_source": "geometry_and_motion" if changed else "geometry_proximity",
+                "confidence": 0.85 if changed else 0.55,
+                "point_index": index,
+                "t_sec": _round(t_sec),
+                "nearest_post_center_distance_m": _round(post_distance),
+                **kinematics,
+            })
+            seen_post = True
+
+        nearest = _nearest_robot_evidence(point)
+        if (
+            bool(kinematics["motion_changed"])
+            and (nearest is None or nearest[2] > 0.60)
+            and post_distance > 0.50
+            and not seen_unattributed
+        ):
+            speed_delta = kinematics.get("speed_delta_mps")
+            events.append({
+                "type": (
+                    "unattributed_acceleration_candidate"
+                    if isinstance(speed_delta, (int, float)) and speed_delta >= 0.50
+                    else "unattributed_motion_change_candidate"
+                ),
+                "label_source": "motion_only",
+                "confidence": 0.45,
+                "point_index": index,
+                "t_sec": _round(t_sec),
+                **kinematics,
+            })
+            seen_unattributed = True
+    return events
+
+
+def _kinematic_change(points: list[dict[str, object]], index: int) -> dict[str, object]:
+    empty = {
+        "speed_before_mps": None,
+        "speed_after_mps": None,
+        "speed_delta_mps": None,
+        "direction_change_rad": None,
+        "motion_changed": False,
+    }
+    if index < 2 or index >= len(points) - 1:
+        return empty
+    before_end = index - 1
+    before_index = before_end - 1
+    while before_index > 0 and float(points[before_end]["t_sec"]) - float(points[before_index]["t_sec"]) < 0.08:
+        before_index -= 1
+    after_index = index + 1
+    while after_index < len(points) - 1 and float(points[after_index]["t_sec"]) - float(points[index]["t_sec"]) < 0.08:
+        after_index += 1
+    before_dt = float(points[before_end]["t_sec"]) - float(points[before_index]["t_sec"])
+    after_dt = float(points[after_index]["t_sec"]) - float(points[index]["t_sec"])
+    if before_dt <= 0.0 or after_dt <= 0.0:
+        return empty
+    before_vx = (float(points[before_end]["x"]) - float(points[before_index]["x"])) / before_dt
+    before_vy = (float(points[before_end]["y"]) - float(points[before_index]["y"])) / before_dt
+    after_vx = (float(points[after_index]["x"]) - float(points[index]["x"])) / after_dt
+    after_vy = (float(points[after_index]["y"]) - float(points[index]["y"])) / after_dt
+    before_speed = math.hypot(before_vx, before_vy)
+    after_speed = math.hypot(after_vx, after_vy)
+    direction_change = 0.0
+    if before_speed > 0.05 and after_speed > 0.05:
+        cosine = max(-1.0, min(1.0, (before_vx * after_vx + before_vy * after_vy) / (before_speed * after_speed)))
+        direction_change = math.acos(cosine)
+    speed_delta = after_speed - before_speed
+    changed = abs(speed_delta) >= 0.50 or direction_change >= math.radians(30.0)
+    return {
+        "speed_before_mps": _round(before_speed),
+        "speed_after_mps": _round(after_speed),
+        "speed_delta_mps": _round(speed_delta),
+        "direction_change_rad": _round(direction_change),
+        "motion_changed": changed,
+    }
+
+
+def _terminal_ball_event(
+    points: list[dict[str, object]],
+    end_reason: str,
+    label_source: str,
+) -> dict[str, object]:
+    t_sec = float(points[-1].get("t_sec", 0.0)) if points else 0.0
+    mapping: dict[str, tuple[str, float]] = {
+        "natural_stop_candidate": ("natural_stop_candidate", 0.80),
+        "boundary_crossing": ("boundary_exit", 0.95),
+        "goal_line_crossing_candidate": ("goal_line_exit_candidate", 0.85),
+        "own_kick_command": ("new_own_kick_command_censor", 1.0),
+        "next_kick": ("new_own_kick_command_censor", 1.0),
+        "ball_stale": ("observation_lost", 0.40),
+        "timeout": ("timeout_censor", 0.40),
+        "runtime_close": ("runtime_close_censor", 0.50),
+    }
+    if end_reason.startswith("referee_") or end_reason == "goal_confirmed":
+        event_type, confidence = end_reason, 1.0
+    else:
+        event_type, confidence = mapping.get(end_reason, (end_reason, 0.50))
+    return {
+        "type": event_type,
+        "label_source": label_source,
+        "confidence": confidence,
+        "point_index": max(0, len(points) - 1),
+        "t_sec": _round(t_sec),
+        "raw_end_reason": end_reason,
+    }
 
 
 def _ball_quality_flags(points: list[dict[str, object]]) -> list[str]:

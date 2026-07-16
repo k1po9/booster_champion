@@ -9,6 +9,7 @@ from src.soccer_framework import (
     BallState,
     GameControlState,
     GameState,
+    KickIntent,
     MotionTargetTrace,
     MoveIntent,
     PlayContext,
@@ -53,7 +54,7 @@ class _NoObstacles:
         return []
 
 
-class MatchDataRecorderV3Tests(unittest.TestCase):
+class MatchDataRecorderV4Tests(unittest.TestCase):
     def setUp(self) -> None:
         self.tempdir = tempfile.TemporaryDirectory()
         self.path = Path(self.tempdir.name) / "match_dataset.team1.jsonl"
@@ -130,6 +131,15 @@ class MatchDataRecorderV3Tests(unittest.TestCase):
         self.assertTrue(motions[-1]["free_roll_terminal_candidate"])
         self.assertIn("nearest_teammate", motions[-1]["trajectory"][0])
         self.assertIn("field_evidence", motions[-1]["trajectory"][0])
+        self.assertEqual(motions[-1]["schema_version"], 4)
+        self.assertEqual(motions[-1]["terminal_event"]["type"], "natural_stop_candidate")
+        self.assertEqual(
+            motions[-1]["free_path_valid_until_sec"],
+            motions[-1]["terminal_event"]["t_sec"],
+        )
+        self.assertIn(motions[-1]["launch_event"]["type"], {
+            "unattributed_acceleration_candidate", "robot_kick_candidate"
+        })
 
     def test_boundary_crossing_is_not_natural_stop(self) -> None:
         for now, x in ((200.00, 6.90), (200.10, 7.00), (200.20, 7.13)):
@@ -139,6 +149,7 @@ class MatchDataRecorderV3Tests(unittest.TestCase):
         self.assertEqual(motions[-1]["label_source"], "geometry")
         self.assertFalse(motions[-1]["free_roll_terminal_candidate"])
         self.assertIn("boundary_crossing", motions[-1]["quality_flags"])
+        self.assertEqual(motions[-1]["terminal_event"]["type"], "goal_line_exit_candidate")
 
         for now, x in ((200.23, 7.16), (200.26, 7.20)):
             self.recorder.observe(now, _context(now, x), {1: RobotCommand.stop("outside")})
@@ -154,6 +165,76 @@ class MatchDataRecorderV3Tests(unittest.TestCase):
         labels = [row for row in self.records() if row["record_type"] == "ball_motion_label"]
         self.assertEqual(labels[-1]["motion_id"], motions[-1]["motion_id"])
         self.assertEqual(labels[-1]["official_label"], "goal_confirmed_team_1")
+
+    def test_later_robot_contact_limits_free_path_horizon(self) -> None:
+        rows = (
+            (230.00, 0.00, -2.0),
+            (230.05, 0.05, -2.0),
+            (230.10, 0.12, -2.0),
+            (230.20, 0.22, 0.72),
+            (230.30, 0.32, 0.80),
+            (230.40, 0.24, 0.30),
+            (230.60, 0.24, 0.30),
+            (230.80, 0.24, 0.30),
+        )
+        for now, ball_x, robot_x in rows:
+            self.recorder.observe(
+                now,
+                _context(now, ball_x, robot_x=robot_x),
+                {1: RobotCommand.stop("contact test")},
+            )
+        motion = [row for row in self.records() if row["record_type"] == "ball_motion"][-1]
+        contacts = [
+            event for event in motion["event_candidates"]
+            if event["type"] == "robot_contact_candidate"
+        ]
+        self.assertTrue(contacts)
+        self.assertGreaterEqual(contacts[0]["confidence"], 0.75)
+        self.assertLessEqual(
+            motion["free_path_valid_until_sec"], contacts[0]["t_sec"]
+        )
+
+    def test_own_kick_command_labels_launch_event(self) -> None:
+        kick = RobotCommand(
+            intent=KickIntent(direction=0.0, power=1.25, ball_x=0.1, ball_y=0.0),
+            reason="label kick",
+        )
+        self.recorder.observe(240.00, _context(240.00, 0.0, robot_x=-0.1), {1: kick})
+        for now, x in ((240.05, 0.05), (240.10, 0.12), (240.20, 0.25),
+                       (240.40, 0.25), (240.60, 0.25)):
+            self.recorder.observe(now, _context(now, x, robot_x=-0.1), {1: kick})
+        motion = [row for row in self.records() if row["record_type"] == "ball_motion"][-1]
+        self.assertEqual(motion["source"], "own_kick")
+        self.assertEqual(motion["kick_player_id"], 1)
+        self.assertEqual(motion["kick_power"], 1.25)
+        self.assertEqual(motion["launch_event"]["type"], "own_kick_command")
+        self.assertEqual(motion["launch_event"]["confidence"], 1.0)
+
+    def test_secondary_robot_acceleration_is_kick_candidate(self) -> None:
+        rows = (
+            (235.00, 0.00, -2.0),
+            (235.10, 0.05, -2.0),
+            (235.20, 0.10, -2.0),
+            (235.30, 0.15, 0.70),
+            (235.40, 0.40, 0.45),
+            (235.50, 0.65, 0.70),
+            (235.70, 0.65, 0.70),
+            (235.90, 0.65, 0.70),
+        )
+        for now, ball_x, robot_x in rows:
+            self.recorder.observe(
+                now,
+                _context(now, ball_x, robot_x=robot_x),
+                {1: RobotCommand.stop("second kick test")},
+            )
+        motion = [row for row in self.records() if row["record_type"] == "ball_motion"][-1]
+        kicks = [
+            event for event in motion["event_candidates"]
+            if event["type"] == "robot_kick_candidate"
+        ]
+        self.assertTrue(kicks)
+        self.assertGreaterEqual(kicks[0]["speed_delta_mps"], 0.5)
+        self.assertLessEqual(motion["free_path_valid_until_sec"], kicks[0]["t_sec"])
 
     def test_nearby_robot_marks_stop_as_contact_candidate(self) -> None:
         for now, x in ((250.00, 0.00), (250.05, 0.04), (250.10, 0.10),
