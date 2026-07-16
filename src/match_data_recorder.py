@@ -112,6 +112,7 @@ class MatchDataRecorder:
         self._completed_ball_motions = 0
         self._recent_motion_ends: deque[tuple[int, float, str]] = deque(maxlen=16)
         self._last_game_marker: dict[str, object] | None = None
+        self._match_id = 1
         self._match_end_written = False
         self._eta_samples: dict[int, _EtaSample] = {}
         self._next_eta_id = 1
@@ -157,6 +158,14 @@ class MatchDataRecorder:
         if self._closed or self._fp is None:
             return
 
+        game_state = context.game_state
+        current_state = game_state.state.value if game_state is not None else None
+        if current_state == "FINISHED":
+            self._finish_match(now, context)
+            return
+        if self._match_end_written and current_state is not None:
+            self._begin_next_match(now, context)
+
         self._observe_game_event(now, context)
         self._observe_ball_motion(now, context)
         self._append_kick_ball(now, context)
@@ -194,6 +203,7 @@ class MatchDataRecorder:
         self._write(
             {
                 "record_type": "session_end",
+                "match_id": self._match_id,
                 "monotonic_sec": _round(ended_at),
                 "elapsed_sec": _round(max(0.0, ended_at - self._started_at)),
                 "frames": self._frame_id,
@@ -214,27 +224,55 @@ class MatchDataRecorder:
         self._fp = None
         self._writer_thread = None
 
+    def _finish_match(self, now: float, context: PlayContext) -> None:
+        if self._match_end_written:
+            return
+        if self._kick_sample is not None:
+            self._finish_kick("referee_state_finished", now)
+        if self._ball_motion is not None:
+            self._finish_ball_motion("referee_state_finished", now, "official")
+        for player_id in list(self._eta_samples):
+            self._finish_eta(player_id, "game_finished", now)
+        self._observe_game_event(now, context)
+        self._match_end_written = True
+        self._write(
+            {
+                "record_type": "match_end",
+                "match_id": self._match_id,
+                "monotonic_sec": _round(now),
+                "elapsed_sec": _round(max(0.0, now - self._started_at)),
+                "game": _game_marker(context.game_state),
+                "frames": self._frame_id,
+                "completed_kicks": self._completed_kicks,
+                "completed_ball_motions": self._completed_ball_motions,
+                "completed_eta_samples": self._completed_eta_samples,
+            },
+            flush=True,
+        )
+
+    def _begin_next_match(self, now: float, context: PlayContext) -> None:
+        self._match_id += 1
+        self._match_end_written = False
+        self._last_game_marker = None
+        self._ball_history.clear()
+        self._ball_outside_latched = False
+        self._write(
+            {
+                "record_type": "match_start",
+                "match_id": self._match_id,
+                "monotonic_sec": _round(now),
+                "elapsed_sec": _round(max(0.0, now - self._started_at)),
+                "game": _game_marker(context.game_state),
+            },
+            flush=True,
+        )
+
     def _observe_game_event(self, now: float, context: PlayContext) -> None:
         current = _game_marker(context.game_state)
         if current is None:
             return
         previous = self._last_game_marker
         self._last_game_marker = current
-        if current.get("state") == "FINISHED" and not self._match_end_written:
-            self._match_end_written = True
-            self._write(
-                {
-                    "record_type": "match_end",
-                    "monotonic_sec": _round(now),
-                    "elapsed_sec": _round(max(0.0, now - self._started_at)),
-                    "game": current,
-                    "frames": self._frame_id,
-                    "completed_kicks": self._completed_kicks,
-                    "completed_ball_motions": self._completed_ball_motions,
-                    "completed_eta_samples": self._completed_eta_samples,
-                },
-                flush=True,
-            )
         if previous is None or _game_signature(previous) == _game_signature(current):
             return
         label = _game_transition_label(previous, current)
@@ -263,6 +301,7 @@ class MatchDataRecorder:
             self._write(
                 {
                     "record_type": "ball_motion_label",
+                    "match_id": self._match_id,
                     "motion_id": motion_id,
                     "monotonic_sec": _round(now),
                     "official_label": label,
@@ -433,6 +472,7 @@ class MatchDataRecorder:
         self._write(
             {
                 "record_type": "ball_motion",
+                "match_id": self._match_id,
                 "motion_id": sample.motion_id,
                 "source": sample.source,
                 "kick_id": sample.kick_id,
@@ -537,6 +577,7 @@ class MatchDataRecorder:
         self._write(
             {
                 "record_type": "robot_eta",
+                "match_id": self._match_id,
                 "eta_id": sample.eta_id,
                 "team_id": self._config.team_id,
                 "player_id": sample.player_id,
@@ -652,6 +693,7 @@ class MatchDataRecorder:
         self._write(
             {
                 "record_type": "kick",
+                "match_id": self._match_id,
                 "kick_id": sample.kick_id,
                 "team_id": self._config.team_id,
                 "player_id": sample.player_id,
@@ -746,6 +788,7 @@ class MatchDataRecorder:
     ) -> dict[str, object]:
         return {
             "record_type": "frame",
+            "match_id": self._match_id,
             "frame_id": self._frame_id,
             "monotonic_sec": _round(now),
             "elapsed_sec": _round(max(0.0, now - self._started_at)),
@@ -785,6 +828,11 @@ class MatchDataRecorder:
         if self._writer_thread is None:
             return
         self._write_queue.join()
+        if self._fp is not None:
+            try:
+                self._fp.flush()
+            except OSError as exc:
+                self._writer_error = f"{exc.__class__.__name__}: {exc}"
 
     def _writer_loop(self) -> None:
         while True:

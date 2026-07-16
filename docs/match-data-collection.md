@@ -27,7 +27,7 @@ Agent 启动后，终端会出现：
 Match dataset path: /tmp/booster_agent/soccer_logs/<run-id>/match_dataset.team<N>.jsonl
 ```
 
-整个进程只写这一个 JSONL 文件。新版每行都有 `schema_version=4`，主要记录类型如下：
+整个进程只写这一个 JSONL 文件。新版每行都有 `schema_version=4`；除首次metadata外，比赛内主要记录带 `match_id`，主要记录类型如下：
 
 - `metadata`：队伍、机器人名、场地尺寸、球半径假设、策略参数和采样说明。
 - `frame`：10 Hz 全场快照，包含裁判/比分/处罚、球、双方机器人、实际执行命令、动态角色和自身运行状态。
@@ -36,7 +36,8 @@ Match dataset path: /tmp/booster_agent/soccer_logs/<run-id>/match_dataset.team<N
 - `robot_eta`：有明确导航目标时的高频自身位姿序列，保存原始目标、避障后的控制目标、到达阈值、转向/奔跑/对齐/到达阶段和实际执行速度。
 - `game_event`：GameControl 状态、定位球、停止、发球权或比分变化。
 - `ball_motion_label`：裁判事件晚于几何越界时，以追加记录把最近球段关联到进球或定位球等官方标签；关联方法和延迟会原样保存。
-- `match_end`：首次收到官方 `FINISHED` 时立即持久化的比赛完成检查点，即使随后直接关闭仿真也可判断比赛数据完整性。
+- `match_start`：同一Agent进程在上一场结束后重新进入比赛时，写入新的 `match_id` 和初始GameControl状态。
+- `match_end`：首次收到官方 `FINISHED` 时先收尾活动球段/踢球/ETA，再立即持久化并停止该场后续帧；即使随后直接关闭仿真也可判断比赛数据完整性。
 - `session_end`：Agent 正常关闭并排空写队列后的运行时长及各类完成样本计数。
 
 世界帧保持 10 Hz，以控制体积；球运动和 ETA 位姿只在官方 topic 出现新时间戳时去重保存，最高跟随 30 Hz 控制循环。每个控制周期只做常数次距离、边界和状态比较，不做训练、拟合或磁盘扫描。

@@ -249,14 +249,28 @@ class MatchDataRecorderV4Tests(unittest.TestCase):
         self.assertIn("robot_contact_candidate", motions[-1]["quality_flags"])
         self.assertFalse(motions[-1]["free_roll_terminal_candidate"])
 
-    def test_finished_state_writes_durable_match_end(self) -> None:
+    def test_finished_state_stops_frames_and_allows_next_match(self) -> None:
         context = _context(270.0, None)
         assert context.game_state is not None
         context.game_state.state = GameState.FINISHED
         self.recorder.observe(270.0, context, {1: RobotCommand.stop("finished")})
-        rows = [row for row in self.records() if row["record_type"] == "match_end"]
+        self.recorder.observe(271.0, context, {1: RobotCommand.stop("still finished")})
+        records = self.records()
+        rows = [row for row in records if row["record_type"] == "match_end"]
         self.assertEqual(len(rows), 1)
         self.assertEqual(rows[0]["game"]["state"], "FINISHED")
+        self.assertEqual(rows[0]["match_id"], 1)
+        self.assertEqual([row for row in records if row["record_type"] == "frame"], [])
+
+        next_context = _context(272.0, None)
+        assert next_context.game_state is not None
+        next_context.game_state.state = GameState.READY
+        self.recorder.observe(272.0, next_context, {1: RobotCommand.stop("next match")})
+        records = self.records()
+        starts = [row for row in records if row["record_type"] == "match_start"]
+        self.assertEqual(starts[-1]["match_id"], 2)
+        frames = [row for row in records if row["record_type"] == "frame"]
+        self.assertEqual(frames[-1]["match_id"], 2)
 
     def test_eta_target_change_creates_censored_segment(self) -> None:
         for now, target_x in ((280.0, 1.0), (280.1, 2.0)):
