@@ -20,6 +20,13 @@ from .ball_prediction import (
     predict_ball_motion,
     predict_ball_stop,
 )
+from .ball_trajectory import (
+    BallObservation as BallTrajectoryObservation,
+    BallPathKnot,
+    BallTrajectoryPrediction,
+    EventBallTrajectoryPredictor,
+    predict_launched_ball_path,
+)
 from .action_selection import (
     ActionCandidate,
     ActionKind,
@@ -73,8 +80,12 @@ __all__ = [
     "BallObservation",
     "BallResistanceModel",
     "BallStopPrediction",
+    "BallPathKnot",
+    "BallTrajectoryObservation",
+    "BallTrajectoryPrediction",
     "BoundedActionSelector",
     "DEFAULT_BALL_RESISTANCE_MODEL",
+    "EventBallTrajectoryPredictor",
     "KickHysteresis",
     "KickoffPhase",
     "KickoffStatus",
@@ -99,4 +110,5 @@ __all__ = [
     "own_restart_target",
     "predict_ball_motion",
     "predict_ball_stop",
+    "predict_launched_ball_path",
 ]
