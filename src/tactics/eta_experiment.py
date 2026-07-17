@@ -45,20 +45,22 @@ class EtaScenario:
 # The first minutes deliberately contain every expensive case. Speed caps and
 # active players rotate independently so one process covers the full matrix.
 ETA_SCENARIOS: tuple[EtaScenario, ...] = (
+    # Put expensive long/turn cells first. Their indexes deliberately select
+    # the rarest 0.4/0.6/0.8 combinations before match time can expire.
+    EtaScenario("long_oblique_right", 3.20, -0.70, -0.65),
+    EtaScenario("medium_quarter_right", 1.80, -1.45, 0.00),
+    EtaScenario("long_final_reverse", 3.60, 0.00, math.pi),
+    EtaScenario("medium_quarter_left", 1.80, 1.45, 0.00),
+    EtaScenario("teammate_avoidance", 3.00, 0.00, 0.00, teammate_avoidance=True),
+    EtaScenario("long_reverse", 3.00, math.pi, 0.00),
+    EtaScenario("moving_retarget_left", 2.60, 0.85, 0.50, moving_retarget=True),
+    EtaScenario("moving_retarget_right", 2.60, -0.85, -0.50, moving_retarget=True),
+    EtaScenario("long_oblique_left", 3.20, 0.70, 0.65),
     EtaScenario("short_straight", 0.60, 0.00, 0.00),
     EtaScenario("short_turn_left", 0.80, 0.75, 0.00),
-    EtaScenario("teammate_avoidance", 3.00, 0.00, 0.00, teammate_avoidance=True),
     EtaScenario("short_turn_right", 0.80, -0.75, 0.00),
-    EtaScenario("moving_retarget_left", 2.60, 0.85, 0.50, moving_retarget=True),
     EtaScenario("medium_straight_align_left", 1.50, 0.00, 1.20),
-    EtaScenario("moving_retarget_right", 2.60, -0.85, -0.50, moving_retarget=True),
     EtaScenario("medium_straight_align_right", 1.50, 0.00, -1.20),
-    EtaScenario("medium_quarter_left", 1.80, 1.45, 0.00),
-    EtaScenario("medium_quarter_right", 1.80, -1.45, 0.00),
-    EtaScenario("long_oblique_left", 3.20, 0.70, 0.65),
-    EtaScenario("long_oblique_right", 3.20, -0.70, -0.65),
-    EtaScenario("long_reverse", 3.00, math.pi, 0.00),
-    EtaScenario("long_final_reverse", 3.60, 0.00, math.pi),
 )
 
 

@@ -63,9 +63,10 @@ class EtaBallGuardRole(ChaserRole):
     ) -> Pose2D:
         del player_id
         ball = context.known_ball
-        lateral_y = -3.0 if ball.y > 0.0 else 3.0
+        lateral_y = 3.2 if ball.y >= 0.0 else -3.2
+        deep_x = kit.field.opponent_goal_x() - 2.0
         return kit.field.clamp_inside_field(
-            Pose2D(0.0, lateral_y, 0.0),
+            Pose2D(deep_x, lateral_y, 0.0),
             0.45,
         )
 

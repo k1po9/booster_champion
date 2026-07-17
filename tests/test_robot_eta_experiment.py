@@ -62,6 +62,7 @@ class EtaExperimentTests(unittest.TestCase):
             ROLE_ETA_BALL_GUARD,
             ROLE_ETA_EXPERIMENT,
             ROLE_GOALKEEPER,
+            EtaBallGuardRole,
             EtaExperimentPlaybook,
         )
 
@@ -73,6 +74,13 @@ class EtaExperimentTests(unittest.TestCase):
         self.assertEqual(assignment.role_of(1), ROLE_ETA_EXPERIMENT)
         self.assertEqual(assignment.role_of(2), ROLE_ETA_BALL_GUARD)
         self.assertEqual(assignment.role_of(3), ROLE_GOALKEEPER)
+        guard_target = EtaBallGuardRole().kick_target(
+            self.kit,
+            2,
+            _context(5.1),
+        )
+        self.assertGreater(guard_target.x, 4.0)
+        self.assertGreater(abs(guard_target.y), 3.0)
 
     def test_target_is_held_through_arrival_confirmation(self) -> None:
         self.coordinator.update(_context(10.0))
@@ -130,6 +138,17 @@ class EtaExperimentTests(unittest.TestCase):
                 },
                 {0.4, 0.6, 0.8},
             )
+        self.assertEqual(
+            [(name, speed) for name, speed, _ in observed[:6]],
+            [
+                ("long_oblique_right", 0.4),
+                ("medium_quarter_right", 0.6),
+                ("long_final_reverse", 0.8),
+                ("medium_quarter_left", 0.4),
+                ("teammate_avoidance", 0.6),
+                ("long_reverse", 0.8),
+            ],
+        )
         avoidance_index = next(
             index
             for index, (name, _, _) in enumerate(observed)
