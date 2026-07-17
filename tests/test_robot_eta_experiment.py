@@ -1,9 +1,11 @@
 import importlib.util
 import math
 import unittest
+from collections import Counter
 
 from src.match_data_recorder import _eta_experiment_record
 from src.soccer_framework import (
+    BallState,
     GameControlState,
     GameState,
     Penalty,
@@ -35,6 +37,7 @@ def _context(
     game = GameControlState(state=GameState.PLAYING)
     game.last_seen_at = now
     return PlayContext(
+        ball=BallState(x=0.0, y=0.0, last_seen_at=now),
         game_state=game,
         teammates={
             1: RobotState(1, p1, now),
@@ -54,14 +57,22 @@ class EtaExperimentTests(unittest.TestCase):
         "runtime dependency py_trees is not installed",
     )
     def test_collection_playbook_is_default_on_recorder_branch(self) -> None:
-        from src.play import PLAYBOOKS, EtaExperimentPlaybook
-
-        self.assertIsInstance(
-            PLAYBOOKS.create_default(self.kit),
+        from src.play import (
+            PLAYBOOKS,
+            ROLE_ETA_BALL_GUARD,
+            ROLE_ETA_EXPERIMENT,
+            ROLE_GOALKEEPER,
             EtaExperimentPlaybook,
         )
+
+        playbook = PLAYBOOKS.create_default(self.kit)
+        self.assertIsInstance(playbook, EtaExperimentPlaybook)
         self.assertIn("normal-match", PLAYBOOKS.names())
         self.assertIn("eta-experiment", PLAYBOOKS.names())
+        assignment = playbook.assign_roles(_context(5.0))
+        self.assertEqual(assignment.role_of(1), ROLE_ETA_EXPERIMENT)
+        self.assertEqual(assignment.role_of(2), ROLE_ETA_BALL_GUARD)
+        self.assertEqual(assignment.role_of(3), ROLE_GOALKEEPER)
 
     def test_target_is_held_through_arrival_confirmation(self) -> None:
         self.coordinator.update(_context(10.0))
@@ -78,7 +89,53 @@ class EtaExperimentTests(unittest.TestCase):
 
         self.coordinator.update(_context(10.40, p1=first))
         self.assertEqual(self.coordinator.scenario_index, 1)
-        self.assertEqual(self.coordinator.episode.active_player, 1)
+        self.assertEqual(self.coordinator.episode.active_player, 2)
+        self.assertEqual(self.coordinator.episode.speed_limit_mps, 0.6)
+
+    def test_first_matrix_balances_scenarios_speeds_and_players(self) -> None:
+        context = _context(11.0)
+        self.coordinator.update(context)
+        observed: list[tuple[str, float, int]] = []
+        total = len(ETA_SCENARIOS) * len(self.coordinator.speed_levels())
+        for index in range(total):
+            episode = self.coordinator.episode
+            self.assertIsNotNone(episode)
+            observed.append(
+                (
+                    episode.scenario.name,
+                    episode.speed_limit_mps,
+                    episode.active_player,
+                )
+            )
+            self.coordinator._advance(
+                context,
+                11.1 + index,
+                self.coordinator.available_players(context),
+            )
+
+        self.assertEqual(
+            Counter(speed for _, speed, _ in observed),
+            Counter({0.4: 14, 0.6: 14, 0.8: 14}),
+        )
+        self.assertEqual(
+            Counter(player for _, _, player in observed),
+            Counter({1: 21, 2: 21}),
+        )
+        for scenario in ETA_SCENARIOS:
+            self.assertEqual(
+                {
+                    speed
+                    for name, speed, _ in observed
+                    if name == scenario.name
+                },
+                {0.4, 0.6, 0.8},
+            )
+        avoidance_index = next(
+            index
+            for index, (name, _, _) in enumerate(observed)
+            if name == "teammate_avoidance"
+        )
+        self.assertLess(avoidance_index, 5)
 
     def test_collection_pauses_for_kickoff_and_opponent_restart(self) -> None:
         context = _context(11.0)
@@ -192,7 +249,8 @@ class EtaExperimentTests(unittest.TestCase):
     def test_reason_is_parsed_into_typed_json_fields(self) -> None:
         record = _eta_experiment_record(
             "eta_exp|scenario=long_reverse|episode=7|active=2"
-            "|mode=rest_start|distance=3.00|path_error=3.142|final_error=0.000"
+            "|mode=rest_start|distance=3.00|speed=0.60"
+            "|path_error=3.142|final_error=0.000"
         )
         self.assertEqual(
             record,
@@ -202,6 +260,7 @@ class EtaExperimentTests(unittest.TestCase):
                 "active": 2,
                 "mode": "rest_start",
                 "distance": 3.0,
+                "speed": 0.6,
                 "path_error": 3.142,
                 "final_error": 0.0,
             },

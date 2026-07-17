@@ -92,6 +92,7 @@ class MotionController:
         arrive_distance: float | None = None,
         hold_vyaw: float = 0.0,
         avoid_opponents: bool = False,
+        linear_speed_limit: float | None = None,
     ) -> RobotCommand:
         """Generate a movement command with avoidance applied.
 
@@ -99,12 +100,21 @@ class MotionController:
         nonzero turn rate after arrival; ``avoid_opponents`` includes opponents in
         yaw avoidance. PLAY passes False so chasers are not pushed away from opponents,
         while READY/recovery/opponent restarts pass True.
+        An explicit linear speed limit pins one experiment episode to a cap;
+        otherwise the configured collection profile rotates on target changes.
         """
         robot = context.teammates.get(player_id)
         if robot is None or robot.pose is None:
             return RobotCommand.stop(f"{reason}: waiting for pose")
 
-        speed_limit = self._collection_linear_speed(player_id, target)
+        speed_limit = (
+            self._collection_linear_speed(player_id, target)
+            if linear_speed_limit is None
+            else min(
+                self._config.strategy.max_linear_speed,
+                max(_LINEAR_SPEED_FLOOR, float(linear_speed_limit)),
+            )
+        )
 
         # Path detour: compute via point
         adjusted_target = self._avoidance_target(player_id, robot.pose, target, context)

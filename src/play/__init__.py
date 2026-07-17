@@ -19,7 +19,9 @@ from .default_roles import (
 )
 from .eta_experiment import (
     ETA_SCENARIOS,
+    ROLE_ETA_BALL_GUARD,
     ROLE_ETA_EXPERIMENT,
+    EtaBallGuardRole,
     EtaExperimentCoordinator,
     EtaExperimentPlaybook,
     EtaExperimentRole,
@@ -64,6 +66,7 @@ __all__ = [
     "ChaserRole",
     "DefaultPlaybook",
     "ETA_SCENARIOS",
+    "EtaBallGuardRole",
     "EtaExperimentCoordinator",
     "EtaExperimentPlaybook",
     "EtaExperimentRole",
@@ -79,6 +82,7 @@ __all__ = [
     "Playbook",
     "PlaybookRegistry",
     "ROLE_CHASER",
+    "ROLE_ETA_BALL_GUARD",
     "ROLE_ETA_EXPERIMENT",
     "ROLE_GOALKEEPER",
     "ROLE_NONE",

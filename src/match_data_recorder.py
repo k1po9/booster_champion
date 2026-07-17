@@ -1606,7 +1606,7 @@ def _eta_experiment_record(reason: str) -> dict[str, object] | None:
                 record[key] = int(value)
             except ValueError:
                 record[key] = value
-        elif key in {"distance", "path_error", "final_error"}:
+        elif key in {"distance", "speed", "path_error", "final_error"}:
             try:
                 record[key] = float(value)
             except ValueError:

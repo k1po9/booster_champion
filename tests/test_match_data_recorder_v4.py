@@ -95,6 +95,21 @@ class MatchDataRecorderV4Tests(unittest.TestCase):
         self.assertEqual(next_command.motion_target.linear_speed_limit_mps, 0.6)
         self.assertEqual(next_command.intent.vx, 0.6)
 
+        explicit_target = Pose2D(3.0, 0.0, 0.0)
+        explicit_command = controller.move_to_target(
+            1,
+            context,
+            explicit_target,
+            "eta explicit speed",
+            linear_speed_limit=0.7,
+        )
+        assert explicit_command.motion_target is not None
+        self.assertEqual(
+            explicit_command.motion_target.linear_speed_limit_mps,
+            0.7,
+        )
+        self.assertEqual(explicit_command.intent.vx, 0.7)
+
     def test_kick_power_is_stable_per_episode_and_rotates(self) -> None:
         controller = MotionController(
             SoccerConfig(robot_names=("robot1",)),

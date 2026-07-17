@@ -25,10 +25,11 @@ _ARRIVAL_DISTANCE_M = 0.15
 _ARRIVAL_ANGLE_RAD = 0.20
 _ARRIVAL_HOLD_SEC = 0.25
 _UPDATE_GAP_RESET_SEC = 1.00
-_EPISODE_TIMEOUT_SEC = 20.5
+_EPISODE_TIMEOUT_SEC = 19.5
 _MOVING_RETARGET_MIN_SEC = 0.85
 _MOVING_RETARGET_MAX_SEC = 1.80
 _MOVING_RETARGET_MIN_TRAVEL_M = 0.12
+_BLOCKER_PREPARE_MAX_SEC = 4.0
 
 
 @dataclass(frozen=True)
@@ -41,13 +42,16 @@ class EtaScenario:
     teammate_avoidance: bool = False
 
 
-# A compact covering array, not a full Cartesian product. Repeated runs cycle
-# deterministically while MotionController rotates speed caps independently.
+# The first minutes deliberately contain every expensive case. Speed caps and
+# active players rotate independently so one process covers the full matrix.
 ETA_SCENARIOS: tuple[EtaScenario, ...] = (
     EtaScenario("short_straight", 0.60, 0.00, 0.00),
     EtaScenario("short_turn_left", 0.80, 0.75, 0.00),
+    EtaScenario("teammate_avoidance", 3.00, 0.00, 0.00, teammate_avoidance=True),
     EtaScenario("short_turn_right", 0.80, -0.75, 0.00),
+    EtaScenario("moving_retarget_left", 2.60, 0.85, 0.50, moving_retarget=True),
     EtaScenario("medium_straight_align_left", 1.50, 0.00, 1.20),
+    EtaScenario("moving_retarget_right", 2.60, -0.85, -0.50, moving_retarget=True),
     EtaScenario("medium_straight_align_right", 1.50, 0.00, -1.20),
     EtaScenario("medium_quarter_left", 1.80, 1.45, 0.00),
     EtaScenario("medium_quarter_right", 1.80, -1.45, 0.00),
@@ -55,9 +59,6 @@ ETA_SCENARIOS: tuple[EtaScenario, ...] = (
     EtaScenario("long_oblique_right", 3.20, -0.70, -0.65),
     EtaScenario("long_reverse", 3.00, math.pi, 0.00),
     EtaScenario("long_final_reverse", 3.60, 0.00, math.pi),
-    EtaScenario("moving_retarget_left", 2.60, 0.85, 0.50, moving_retarget=True),
-    EtaScenario("moving_retarget_right", 2.60, -0.85, -0.50, moving_retarget=True),
-    EtaScenario("teammate_avoidance", 3.00, 0.00, 0.00, teammate_avoidance=True),
 )
 
 
@@ -66,6 +67,7 @@ class _Episode:
     number: int
     scenario: EtaScenario
     active_player: int
+    speed_limit_mps: float
     target: Pose2D
     reason: str
     started_at: float
@@ -90,6 +92,7 @@ class EtaExperimentCoordinator:
             for player_id in kit.config.player_ids
         }
         self.scenario_index = 0
+        self.speed_index = 0
         self.active_index = 0
         self.episode_number = 0
         self.episode: _Episode | None = None
@@ -193,7 +196,7 @@ class EtaExperimentCoordinator:
                 and blocker_target is not None
                 and self._arrived(blocker.pose, blocker_target)
             )
-            if blocker_ready or now - episode.started_at >= 8.0:
+            if blocker_ready or now - episode.started_at >= _BLOCKER_PREPARE_MAX_SEC:
                 assert episode.final_target is not None
                 episode.target = episode.final_target
                 episode.stage = "active"
@@ -225,6 +228,35 @@ class EtaExperimentCoordinator:
     def reason_for(self, player_id: int) -> str:
         return self.reasons[player_id]
 
+    def speed_for(self, player_id: int) -> float | None:
+        episode = self.episode
+        if episode is None or episode.active_player != player_id:
+            return None
+        return episode.speed_limit_mps
+
+    def eta_players(self) -> tuple[int, ...]:
+        episode = self.episode
+        if episode is None:
+            return ()
+        players = [episode.active_player]
+        if episode.blocker_player is not None:
+            players.append(episode.blocker_player)
+        return tuple(players)
+
+    def available_players(self, context: PlayContext) -> tuple[int, ...]:
+        return self._experiment_players(context)
+
+    def speed_levels(self) -> tuple[float, ...]:
+        configured_max = self.kit.config.strategy.max_linear_speed
+        levels = tuple(
+            min(configured_max, max(0.10, float(value)))
+            for value in self.kit.config.debug.collection_linear_speed_levels
+            if float(value) > 0.0
+        )
+        if levels:
+            return levels
+        return (configured_max,)
+
     def _advance(
         self,
         context: PlayContext,
@@ -237,17 +269,12 @@ class EtaExperimentCoordinator:
             self.targets[blocker] = self._parking_target(blocker)
             self.reasons[blocker] = f"eta_exp|mode=parking|player={blocker}"
         next_scenario = (self.scenario_index + 1) % len(ETA_SCENARIOS)
+        self.speed_index = (self.speed_index + 1) % len(self.speed_levels())
+        self.active_index += 1
         if next_scenario == 0:
-            # One robot completes the whole matrix before handing over. This
-            # prevents the previous finisher becoming an uncontrolled obstacle
-            # in every other episode.
-            old_active = old.active_player if old is not None else None
-            if old_active is not None:
-                self.targets[old_active] = self._parking_target(old_active)
-                self.reasons[old_active] = (
-                    f"eta_exp|mode=parking_handover|player={old_active}"
-                )
-            self.active_index = (self.active_index + 1) % len(candidates)
+            # Fourteen is even, so add one more step at matrix wrap to ensure
+            # the same scenario uses the other field player next cycle.
+            self.active_index += 1
         self.scenario_index = next_scenario
         self.episode = None
         self._start_episode(context, now, candidates)
@@ -267,10 +294,12 @@ class EtaExperimentCoordinator:
             return
         self.episode_number += 1
         target = self._relative_target(robot.pose, scenario)
+        speed_limit = self.speed_levels()[self.speed_index]
         episode = _Episode(
             number=self.episode_number,
             scenario=scenario,
             active_player=active,
+            speed_limit_mps=speed_limit,
             target=target,
             reason="",
             started_at=now,
@@ -396,6 +425,7 @@ class EtaExperimentCoordinator:
             f"eta_exp|scenario={scenario.name}|episode={episode.number}"
             f"|active={episode.active_player}|mode={mode}"
             f"|distance={scenario.distance_m:.2f}"
+            f"|speed={episode.speed_limit_mps:.2f}"
             f"|path_error={scenario.path_error_rad:.3f}"
             f"|final_error={scenario.final_heading_offset_rad:.3f}"
         )

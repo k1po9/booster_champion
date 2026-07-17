@@ -133,6 +133,7 @@ TargetFn = Callable[[PlayContext], Pose2D]
 WantsKickFn = Callable[[PlayContext], bool]
 ReasonFn = Callable[[], str]
 KickReasonFn = Callable[[Pose2D], str]
+SpeedLimitFn = Callable[[], float | None]
 
 
 def _default_move_reason(player_id: int) -> str:
@@ -171,6 +172,7 @@ class MoveToTarget(py_trees.behaviour.Behaviour):
         *,
         reason_fn: ReasonFn | None = None,
         hold_vyaw: float = 0.0,
+        linear_speed_limit_fn: SpeedLimitFn | None = None,
     ):
         super().__init__(f"MoveToTarget({player_id})")
         self._kit = kit
@@ -180,6 +182,7 @@ class MoveToTarget(py_trees.behaviour.Behaviour):
             lambda: _default_move_reason(player_id)
         )
         self._hold_vyaw = hold_vyaw
+        self._linear_speed_limit_fn = linear_speed_limit_fn
         self.blackboard = BlackboardClient(name=self.name)
 
     def update(self) -> py_trees.common.Status:
@@ -200,6 +203,11 @@ class MoveToTarget(py_trees.behaviour.Behaviour):
             target,
             self._reason_fn(),
             hold_vyaw=self._hold_vyaw,
+            linear_speed_limit=(
+                self._linear_speed_limit_fn()
+                if self._linear_speed_limit_fn is not None
+                else None
+            ),
         )
         self.blackboard.write(cmd_key(player_id), command)
         return py_trees.common.Status.SUCCESS
