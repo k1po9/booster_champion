@@ -22,7 +22,11 @@ from ..tactics import (
     AttackWatchdog,
     AttackWatchdogStatus,
     BallMotionPrediction,
+    BallTrajectoryPrediction,
     BoundedActionSelector,
+    DynamicRobotArrivalEstimator,
+    EventBallTrajectoryPredictor,
+    InterceptEstimate,
     KickoffPhase,
     KickoffStatus,
     KickoffTransaction,
@@ -31,8 +35,12 @@ from ..tactics import (
     OpponentShapeTracker,
     OpponentPressureEstimator,
     OpponentPressureReport,
+    RobotArrivalEstimate,
+    RobotArrivalQuery,
+    RobotMotionTracker,
     SlidingWindowBallPredictor,
     calculate_match_risk,
+    estimate_earliest_intercept,
     own_restart_target,
 )
 from .playbook import (
@@ -63,6 +71,9 @@ class ChampionTuning:
     watchdog_align_distance_m: float = 0.45
     watchdog_align_angle_rad: float = 0.35
     enable_prediction: bool = True
+    enable_robot_eta: bool = True
+    enable_intercept: bool = True
+    intercept_safety_margin_sec: float = 0.35
     enable_pressure: bool = True
     enable_watchdog: bool = True
     enable_baseline_shadow: bool = True
@@ -88,6 +99,9 @@ class ChampionSnapshot:
     cover_id: int | None
     chase_target: Pose2D
     ball_prediction: BallMotionPrediction | None
+    ball_trajectory: BallTrajectoryPrediction | None
+    handler_eta: RobotArrivalEstimate | None
+    intercept: InterceptEstimate | None
     pressure: OpponentPressureReport | None
     pressure_level: str
     watchdog: AttackWatchdogStatus | None
@@ -124,6 +138,9 @@ class ChampionPlaybook(DefaultPlaybook):
         self.tuning = ChampionTuning() if tuning is None else tuning
         self._clock = clock
         self._ball_predictor = SlidingWindowBallPredictor()
+        self._ball_trajectory_predictor = EventBallTrajectoryPredictor()
+        self._arrival_estimator = DynamicRobotArrivalEstimator()
+        self._robot_motion = RobotMotionTracker()
         self._pressure_estimator = OpponentPressureEstimator()
         self._attack_watchdog = AttackWatchdog()
         self._action_selector = BoundedActionSelector(
@@ -143,6 +160,7 @@ class ChampionPlaybook(DefaultPlaybook):
         )
         self._budget_exceeded_count = 0
         self._action_selected_at = -math.inf
+        self._eta_target_state: dict[int, tuple[Pose2D, float]] = {}
         self.role_registry.replace(ChampionChaserRole(self))
         self.role_registry.replace(ChampionSupporterRole(self))
 
@@ -158,11 +176,12 @@ class ChampionPlaybook(DefaultPlaybook):
         started_at = time.perf_counter()
         now = self._clock()
         active = self._active_players(context, now)
-        prediction = self._update_prediction(context)
-        chase_target = self._chase_target(context, prediction)
-
+        prediction, trajectory = self._update_predictions(context)
         cover_id = self._select_cover(active, context)
         handler_candidates = tuple(pid for pid in active if pid != cover_id)
+        chase_target, intercept = self._chase_target(
+            context, prediction, trajectory, handler_candidates, now
+        )
         handler_id = self._select_handler(handler_candidates, chase_target, context, now)
 
         mapping: dict[int, str] = {}
@@ -202,6 +221,11 @@ class ChampionPlaybook(DefaultPlaybook):
             mapping[second_id] = ROLE_CHASER
             handler_id = second_id
 
+        handler_eta = (
+            self._estimate_arrival(handler_id, chase_target, context, now)
+            if handler_id is not None and self.tuning.enable_robot_eta
+            else None
+        )
         pressure = self._update_pressure(context, chase_target, prediction, now)
         risk = (
             calculate_match_risk(
@@ -235,6 +259,9 @@ class ChampionPlaybook(DefaultPlaybook):
             cover_id=cover_id,
             chase_target=chase_target,
             ball_prediction=prediction,
+            ball_trajectory=trajectory,
+            handler_eta=handler_eta,
+            intercept=intercept,
             pressure=pressure,
             pressure_level=self._pressure_level(pressure),
             watchdog=watchdog,
@@ -290,6 +317,44 @@ class ChampionPlaybook(DefaultPlaybook):
                 None
                 if snapshot.ball_prediction is None
                 else snapshot.ball_prediction.motion_state
+            ),
+            "ball_path": (
+                None
+                if snapshot.ball_trajectory is None
+                else {
+                    "usable": snapshot.ball_trajectory.usable,
+                    "model": snapshot.ball_trajectory.model_name,
+                    "segment": snapshot.ball_trajectory.segment_id,
+                    "invalid_reason": snapshot.ball_trajectory.invalid_reason,
+                }
+            ),
+            "handler_eta": (
+                None
+                if snapshot.handler_eta is None
+                else {
+                    "eta_sec": snapshot.handler_eta.eta_sec,
+                    "earliest_sec": snapshot.handler_eta.earliest_sec,
+                    "latest_sec": snapshot.handler_eta.latest_sec,
+                    "confidence": round(snapshot.handler_eta.confidence, 3),
+                    "model": snapshot.handler_eta.model_name,
+                    "alternate_eta_sec": snapshot.handler_eta.alternate_eta_sec,
+                    "selection_reason": snapshot.handler_eta.selection_reason,
+                }
+            ),
+            "intercept": (
+                None
+                if snapshot.intercept is None
+                else {
+                    "point": {
+                        "x": round(snapshot.intercept.intercept_point.x, 3),
+                        "y": round(snapshot.intercept.intercept_point.y, 3),
+                    },
+                    "time_sec": snapshot.intercept.intercept_time_sec,
+                    "robot_eta_sec": snapshot.intercept.robot_eta_sec,
+                    "margin_sec": snapshot.intercept.arrival_margin_sec,
+                    "confidence": round(snapshot.intercept.confidence, 3),
+                    "reason": snapshot.intercept.reason,
+                }
             ),
             "pressure_level": snapshot.pressure_level,
             "pressure_time_sec": (
@@ -364,6 +429,19 @@ class ChampionPlaybook(DefaultPlaybook):
                 "budget_exceeded": performance.budget_exceeded_count,
             },
         }
+
+    def handler_chase_target(self, player_id: int, context: PlayContext) -> Pose2D:
+        """Return the stabilized predicted target only to the assigned Handler."""
+
+        snapshot = self._last_snapshot
+        if (
+            snapshot is not None
+            and snapshot.handler_id == player_id
+            and self.tuning.enable_prediction
+        ):
+            return snapshot.chase_target
+        ball = context.known_ball
+        return Pose2D(ball.x, ball.y, 0.0)
 
     def handler_kick_target(self, player_id: int, context: PlayContext) -> Pose2D:
         fallback = self._default_kick_target(player_id, context)
@@ -586,7 +664,7 @@ class ChampionPlaybook(DefaultPlaybook):
     def _active_players(self, context: PlayContext, now: float) -> tuple[int, ...]:
         game = context.known_game
         team_id = self.kit.config.team_id
-        return tuple(
+        active = tuple(
             player_id
             for player_id in self.kit.config.player_ids
             if game.is_active_player(team_id, player_id)
@@ -594,6 +672,12 @@ class ChampionPlaybook(DefaultPlaybook):
             and robot.pose is not None
             and robot.is_recent(now)
         )
+        for player_id in active:
+            robot = context.teammates[player_id]
+            assert robot.pose is not None
+            observed_at = robot.last_seen_at if robot.last_seen_at > 0.0 else now
+            self._robot_motion.update(player_id, robot.pose, observed_at)
+        return active
 
     def _select_cover(self, active: tuple[int, ...], context: PlayContext) -> int | None:
         if not active:
@@ -629,7 +713,7 @@ class ChampionPlaybook(DefaultPlaybook):
             return None
 
         scores = {
-            player_id: self._claim_cost(player_id, target, context)
+            player_id: self._claim_cost(player_id, target, context, now)
             for player_id in candidates
         }
         challenger = min(candidates, key=lambda pid: (scores[pid], pid))
@@ -653,61 +737,212 @@ class ChampionPlaybook(DefaultPlaybook):
             self._handler_selected_at = now
         return selected
 
-    def _claim_cost(self, player_id: int, target: Pose2D, context: PlayContext) -> float:
+    def _claim_cost(
+        self,
+        player_id: int,
+        target: Pose2D,
+        context: PlayContext,
+        now: float,
+    ) -> float:
         pose = context.teammates[player_id].pose
         assert pose is not None
-        dx = target.x - pose.x
-        dy = target.y - pose.y
-        distance_cost = math.hypot(dx, dy) / max(0.01, self.tuning.translation_speed_mps)
-        desired_heading = math.atan2(dy, dx)
-        heading_error = abs(_wrap_angle(desired_heading - pose.theta))
-        turn_cost = heading_error / max(0.01, self.tuning.yaw_speed_radps)
         slot = self.kit.config.ready_slot_for_player(player_id)
         slot_bias = {
             ReadySlot.CENTER: -0.20,
             ReadySlot.SIDE: -0.10,
             ReadySlot.KEEPER: 0.30,
         }.get(slot, 0.0)
+        if self.tuning.enable_robot_eta:
+            estimate = self._estimate_arrival(player_id, target, context, now)
+            if estimate.reachable and estimate.eta_sec is not None:
+                return estimate.eta_sec + 0.20 * estimate.uncertainty_sec + slot_bias
+        dx = target.x - pose.x
+        dy = target.y - pose.y
+        distance_cost = math.hypot(dx, dy) / max(0.01, self.tuning.translation_speed_mps)
+        desired_heading = math.atan2(dy, dx)
+        heading_error = abs(_wrap_angle(desired_heading - pose.theta))
+        turn_cost = heading_error / max(0.01, self.tuning.yaw_speed_radps)
         return distance_cost + turn_cost + slot_bias
 
-    def _update_prediction(self, context: PlayContext) -> BallMotionPrediction | None:
+    def _estimate_arrival(
+        self,
+        player_id: int,
+        target: Pose2D,
+        context: PlayContext,
+        now: float,
+        *,
+        track_target: bool = True,
+    ) -> RobotArrivalEstimate:
+        return self._arrival_estimator.estimate(
+            self._arrival_query(
+                player_id, target, context, now, track_target=track_target
+            )
+        )
+
+    def _arrival_query(
+        self,
+        player_id: int,
+        target: Pose2D,
+        context: PlayContext,
+        now: float,
+        *,
+        track_target: bool,
+    ) -> RobotArrivalQuery:
+        robot = context.teammates[player_id]
+        assert robot.pose is not None
+        pose = robot.pose
+        desired = math.atan2(target.y - pose.y, target.x - pose.x)
+        oriented_target = Pose2D(target.x, target.y, desired)
+        changed = True
+        age = 0.0
+        if track_target:
+            previous = self._eta_target_state.get(player_id)
+            changed = (
+                previous is None
+                or math.hypot(target.x - previous[0].x, target.y - previous[0].y) > 0.35
+            )
+            if changed:
+                self._eta_target_state[player_id] = (target, now)
+            else:
+                age = max(0.0, now - previous[1])
+        motion = self._robot_motion.motion(player_id)
+        return RobotArrivalQuery(
+            now_sec=now,
+            robot_id=player_id,
+            pose=pose,
+            raw_target=oriented_target,
+            observed_linear_speed_mps=(
+                None if motion is None else motion.linear_speed_mps
+            ),
+            observed_yaw_rate_radps=(
+                None if motion is None else motion.yaw_rate_radps
+            ),
+            arrive_distance_m=0.15,
+            arrive_angle_rad=0.20,
+            linear_speed_limit_mps=self.kit.config.strategy.max_linear_speed,
+            runtime_mode="walk",
+            fall_state="normal",
+            target_age_sec=age,
+            target_changed=changed,
+        )
+
+    def _update_predictions(
+        self, context: PlayContext
+    ) -> tuple[BallMotionPrediction | None, BallTrajectoryPrediction | None]:
         if not self.tuning.enable_prediction:
-            return None
+            return None, None
         ball = context.known_ball
         stamp = ball.last_seen_at
         if stamp > 0.0 and stamp != self._last_ball_stamp:
             self._ball_predictor.add_ball(ball)
+            self._ball_trajectory_predictor.add_ball(ball)
             self._last_ball_stamp = stamp
-        return self._ball_predictor.predict()
+        return self._ball_predictor.predict(), self._ball_trajectory_predictor.predict()
 
     def _chase_target(
         self,
         context: PlayContext,
         prediction: BallMotionPrediction | None,
-    ) -> Pose2D:
+        trajectory: BallTrajectoryPrediction | None,
+        candidates: tuple[int, ...],
+        now: float,
+    ) -> tuple[Pose2D, InterceptEstimate | None]:
         ball = context.known_ball
         current = Pose2D(ball.x, ball.y, 0.0)
+        if (
+            self.tuning.enable_intercept
+            and self.tuning.enable_robot_eta
+            and trajectory is not None
+            and trajectory.usable
+        ):
+            intercepts = []
+            for player_id in candidates:
+                base_query = self._arrival_query(
+                    player_id, current, context, now, track_target=False
+                )
+                estimate = estimate_earliest_intercept(
+                    self._arrival_estimator,
+                    base_query,
+                    trajectory,
+                    safety_margin_sec=self.tuning.intercept_safety_margin_sec,
+                )
+                if estimate.intercept_time_sec is not None:
+                    intercepts.append(estimate)
+            if intercepts:
+                selected = min(
+                    intercepts,
+                    key=lambda item: (
+                        item.intercept_time_sec or math.inf,
+                        -item.confidence,
+                        item.robot_id,
+                    ),
+                )
+                weight = min(
+                    self.tuning.lead_max_weight,
+                    max(0.15, selected.confidence),
+                )
+                return (
+                    Pose2D(
+                        current.x
+                        + (selected.intercept_point.x - current.x) * weight,
+                        current.y
+                        + (selected.intercept_point.y - current.y) * weight,
+                        0.0,
+                    ),
+                    selected,
+                )
+        if trajectory is not None and trajectory.is_strategy_usable(
+            now,
+            self.tuning.lead_horizon_sec,
+            min_confidence=max(0.20, self.tuning.lead_min_confidence * 0.75),
+            max_uncertainty_m=min(0.60, self.tuning.lead_max_uncertainty_m),
+        ):
+            predicted = trajectory.position_ahead(
+                now, self.tuning.lead_horizon_sec
+            )
+            relative = (
+                max(0.0, now - trajectory.observed_at_sec)
+                + self.tuning.lead_horizon_sec
+            )
+            if predicted is not None:
+                confidence = trajectory.confidence_at(relative)
+                uncertainty = trajectory.uncertainty_at(relative) or 0.60
+                weight = self.tuning.lead_max_weight * max(
+                    0.0,
+                    min(1.0, confidence * (1.0 - uncertainty / 0.60)),
+                )
+                return (
+                    Pose2D(
+                        current.x + (predicted.x - current.x) * weight,
+                        current.y + (predicted.y - current.y) * weight,
+                        0.0,
+                    ),
+                    None,
+                )
         if (
             prediction is None
             or prediction.motion_state != "rolling"
             or prediction.confidence < self.tuning.lead_min_confidence
             or prediction.uncertainty_radius_m > self.tuning.lead_max_uncertainty_m
         ):
-            return current
+            return current, None
         predicted = prediction.position_at(self.tuning.lead_horizon_sec)
-        confidence_scale = (prediction.confidence - self.tuning.lead_min_confidence) / max(
-            1e-6, 1.0 - self.tuning.lead_min_confidence
-        )
+        confidence_scale = (
+            prediction.confidence - self.tuning.lead_min_confidence
+        ) / max(1e-6, 1.0 - self.tuning.lead_min_confidence)
         uncertainty_scale = 1.0 - (
             prediction.uncertainty_radius_m / self.tuning.lead_max_uncertainty_m
         )
         weight = self.tuning.lead_max_weight * max(
             0.0, min(1.0, confidence_scale * uncertainty_scale)
         )
-        return Pose2D(
-            current.x + (predicted.x - current.x) * weight,
-            current.y + (predicted.y - current.y) * weight,
-            0.0,
+        return (
+            Pose2D(
+                current.x + (predicted.x - current.x) * weight,
+                current.y + (predicted.y - current.y) * weight,
+                0.0,
+            ),
+            None,
         )
 
     def _update_pressure(
@@ -809,6 +1044,9 @@ class ChampionChaserRole(ChaserRole):
 
     def __init__(self, playbook: ChampionPlaybook):
         self._playbook = playbook
+
+    def target(self, kit, player_id: int, context: PlayContext) -> Pose2D:
+        return self._playbook.handler_chase_target(player_id, context)
 
     def kick_target(self, kit, player_id: int, context: PlayContext) -> Pose2D:
         return self._playbook.handler_kick_target(player_id, context)

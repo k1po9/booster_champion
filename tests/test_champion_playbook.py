@@ -111,9 +111,9 @@ class ChampionPlaybookTest(unittest.TestCase):
         self.clock.now += 0.5
         self.assertEqual(self.playbook.assign_roles(early).players_of(ROLE_CHASER), (2,))
 
-    def test_prediction_pressure_and_watchdog_are_exposed_as_shadow_state(self):
-        for index, x in enumerate((0.0, 0.08, 0.16, 0.24, 0.32)):
-            stamp = 10.0 + index * 0.1
+    def test_prediction_eta_pressure_and_watchdog_are_exposed(self):
+        for index, x in enumerate((0.0, 0.08, 0.16, 0.24, 0.32, 0.40, 0.48)):
+            stamp = 10.0 + index * 0.04
             self.clock.now = stamp
             context = make_context(
                 poses={
@@ -130,6 +130,15 @@ class ChampionPlaybookTest(unittest.TestCase):
         self.assertIsNotNone(snapshot)
         assert snapshot is not None
         self.assertIsNotNone(snapshot.ball_prediction)
+        self.assertIsNotNone(snapshot.ball_trajectory)
+        assert snapshot.ball_trajectory is not None
+        self.assertTrue(snapshot.ball_trajectory.usable)
+        self.assertIsNotNone(snapshot.handler_eta)
+        self.assertIsNotNone(snapshot.handler_id)
+        self.assertEqual(
+            self.playbook.handler_chase_target(snapshot.handler_id, context),
+            snapshot.chase_target,
+        )
         self.assertGreaterEqual(snapshot.chase_target.x, context.known_ball.x)
         self.assertIsNotNone(snapshot.pressure)
         self.assertIsNotNone(snapshot.watchdog)

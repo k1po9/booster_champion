@@ -59,6 +59,15 @@ from .match_strategy import (
     calculate_match_risk,
     own_restart_target,
 )
+from .robot_eta import (
+    DynamicRobotArrivalEstimator,
+    InterceptEstimate,
+    RobotArrivalEstimate,
+    RobotArrivalQuery,
+    RobotMotionEstimate,
+    RobotMotionTracker,
+    estimate_earliest_intercept,
+)
 from .kick_hysteresis import KickHysteresis
 from .geometry import TeamFieldFrame
 from .motion import MotionController
@@ -85,7 +94,9 @@ __all__ = [
     "BallTrajectoryPrediction",
     "BoundedActionSelector",
     "DEFAULT_BALL_RESISTANCE_MODEL",
+    "DynamicRobotArrivalEstimator",
     "EventBallTrajectoryPredictor",
+    "InterceptEstimate",
     "KickHysteresis",
     "KickoffPhase",
     "KickoffStatus",
@@ -103,10 +114,15 @@ __all__ = [
     "OpponentShape",
     "OpponentShapeTracker",
     "ReadyStance",
+    "RobotArrivalEstimate",
+    "RobotArrivalQuery",
+    "RobotMotionEstimate",
+    "RobotMotionTracker",
     "SlidingWindowBallPredictor",
     "Targeting",
     "TeamFieldFrame",
     "calculate_match_risk",
+    "estimate_earliest_intercept",
     "own_restart_target",
     "predict_ball_motion",
     "predict_ball_stop",
