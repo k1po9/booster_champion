@@ -286,6 +286,28 @@ class MatchDataRecorderV4Tests(unittest.TestCase):
         self.assertTrue(rows[-1]["censored"])
         self.assertFalse(rows[-1]["eta_training_candidate"])
 
+    def test_eta_hold_finishes_once_and_does_not_restart(self) -> None:
+        target = Pose2D(1.0, 0.0, 0.0)
+        for now, x, phase, vx in (
+            (290.00, 0.00, "run", 0.5),
+            (290.10, 0.50, "run", 0.5),
+            (290.20, 0.96, "hold", 0.0),
+            (290.30, 0.96, "hold", 0.0),
+        ):
+            command = RobotCommand(
+                intent=MoveIntent(vx=vx),
+                reason="hold target",
+                motion_target=MotionTargetTrace(target, target, 0.15, phase),
+            )
+            self.recorder.observe(now, _context(now, None, robot_x=x), {1: command})
+        rows = [
+            row for row in self.records()
+            if row["record_type"] == "robot_eta"
+        ]
+        self.assertEqual(len(rows), 1)
+        self.assertEqual(rows[0]["end_reason"], "arrived")
+        self.assertEqual([point["phase"] for point in rows[0]["trajectory"]], ["run", "run", "hold"])
+
     def test_eta_record_preserves_target_and_phases(self) -> None:
         target = Pose2D(1.0, 0.0, 0.0)
         for now, x, phase, vx in (
@@ -296,7 +318,11 @@ class MatchDataRecorderV4Tests(unittest.TestCase):
         ):
             command = RobotCommand(
                 intent=MoveIntent(vx=vx),
-                reason="ready target",
+                reason=(
+                    "eta_exp|scenario=short_straight|episode=1|active=1"
+                    "|mode=rest_start|distance=0.60|path_error=0.000"
+                    "|final_error=0.000"
+                ),
                 motion_target=MotionTargetTrace(
                     requested_target=target,
                     control_target=target,
@@ -317,6 +343,8 @@ class MatchDataRecorderV4Tests(unittest.TestCase):
         self.assertEqual(eta["requested_target_at_start"]["x"], 1.0)
         self.assertEqual([p["phase"] for p in eta["trajectory"]], ["turn", "run", "run", "arrived"])
         self.assertIn("heading_to_path_error_rad", eta["trajectory"][0])
+        self.assertEqual(eta["experiment_at_start"]["scenario"], "short_straight")
+        self.assertEqual(eta["experiment_at_start"]["episode"], 1)
 
 
 if __name__ == "__main__":

@@ -32,6 +32,8 @@ from .soccer_framework import (
     SoccerConfig,
 )
 
+from .tactics.eta_experiment import ETA_SCENARIOS
+
 
 _SCHEMA_VERSION = 4
 _FRAME_HZ = 10.0
@@ -534,7 +536,7 @@ class MatchDataRecorder:
                 sample = None
 
             if sample is None:
-                if trace.phase == "arrived":
+                if trace.phase in {"arrived", "hold"}:
                     continue
                 sample = _EtaSample(
                     eta_id=self._next_eta_id,
@@ -562,7 +564,7 @@ class MatchDataRecorder:
                     )
                 )
 
-            if trace.phase == "arrived":
+            if trace.phase in {"arrived", "hold"}:
                 self._finish_eta(player_id, "arrived", now)
             elif now - sample.started_at >= _MAX_ETA_SEC:
                 self._finish_eta(player_id, "timeout", now)
@@ -589,6 +591,7 @@ class MatchDataRecorder:
                 "censored": not arrived,
                 "reason_at_start": sample.reason,
                 "role_at_start": sample.role,
+                "experiment_at_start": _eta_experiment_record(sample.reason),
                 "game_at_start": sample.game,
                 "requested_target_at_start": _pose_record(sample.requested_target),
                 "quality_flags": flags,
@@ -768,6 +771,8 @@ class MatchDataRecorder:
             "collection_profiles": {
                 "kick_power_levels": list(config.debug.collection_kick_power_levels),
                 "linear_speed_levels_mps": list(config.debug.collection_linear_speed_levels),
+                "eta_playbook": "eta-experiment",
+                "eta_scenarios": [asdict(scenario) for scenario in ETA_SCENARIOS],
                 "selection": "deterministic round-robin; fixed within one kick or ETA segment",
             },
             "sampling": {
@@ -1584,6 +1589,31 @@ def _eta_point(
         "robot_status": _status_record(status, now) if status is not None else None,
         "game_marker": _game_marker(game),
     }
+
+
+def _eta_experiment_record(reason: str) -> dict[str, object] | None:
+    """Parse structured labels emitted by EtaExperimentPlaybook."""
+
+    if not reason.startswith("eta_exp|"):
+        return None
+    record: dict[str, object] = {}
+    for token in reason.split("|")[1:]:
+        if "=" not in token:
+            continue
+        key, value = token.split("=", 1)
+        if key in {"episode", "active", "player"}:
+            try:
+                record[key] = int(value)
+            except ValueError:
+                record[key] = value
+        elif key in {"distance", "path_error", "final_error"}:
+            try:
+                record[key] = float(value)
+            except ValueError:
+                record[key] = value
+        else:
+            record[key] = value
+    return record
 
 
 def _eta_quality_flags(points: list[dict[str, object]]) -> list[str]:

@@ -17,6 +17,14 @@ from .default_roles import (
     GoalkeeperRole,
     SupporterRole,
 )
+from .eta_experiment import (
+    ETA_SCENARIOS,
+    ROLE_ETA_EXPERIMENT,
+    EtaExperimentCoordinator,
+    EtaExperimentPlaybook,
+    EtaExperimentRole,
+    EtaScenario,
+)
 from .nodes import (
     AssignRoles,
     AttackSubtreeConfig,
@@ -47,13 +55,19 @@ from .play_subtree import create_play_subtree
 # ----------------------------------------------------------------------
 # Built-in Playbook registration is visible and uses the same API as custom Playbooks.
 # ----------------------------------------------------------------------
-PLAYBOOKS.register("default", DefaultPlaybook, default=True)
+PLAYBOOKS.register("normal-match", DefaultPlaybook)
+PLAYBOOKS.register("eta-experiment", EtaExperimentPlaybook, default=True)
 
 __all__ = [
     "AssignRoles",
     "AttackSubtreeConfig",
     "ChaserRole",
     "DefaultPlaybook",
+    "ETA_SCENARIOS",
+    "EtaExperimentCoordinator",
+    "EtaExperimentPlaybook",
+    "EtaExperimentRole",
+    "EtaScenario",
     "DefenderRole",
     "GoalkeeperRole",
     "IsRole",
@@ -65,6 +79,7 @@ __all__ = [
     "Playbook",
     "PlaybookRegistry",
     "ROLE_CHASER",
+    "ROLE_ETA_EXPERIMENT",
     "ROLE_GOALKEEPER",
     "ROLE_NONE",
     "ROLE_SUPPORTER",
