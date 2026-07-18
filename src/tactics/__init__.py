@@ -68,6 +68,16 @@ from .robot_eta import (
     RobotMotionTracker,
     estimate_earliest_intercept,
 )
+from .team_coordination import (
+    BallOwnerRole,
+    KeeperTakeoverCoordinator,
+    KeeperTakeoverEvidence,
+    KeeperTakeoverStatus,
+    OpponentThreat,
+    TeamPhase,
+    marker_target,
+    select_dangerous_opponent,
+)
 from .kick_hysteresis import KickHysteresis
 from .geometry import TeamFieldFrame
 from .motion import MotionController
@@ -85,6 +95,7 @@ __all__ = [
     "AttackWatchdog",
     "AttackWatchdogConfig",
     "AttackWatchdogStatus",
+    "BallOwnerRole",
     "BallMotionPrediction",
     "BallObservation",
     "BallResistanceModel",
@@ -98,6 +109,9 @@ __all__ = [
     "EventBallTrajectoryPredictor",
     "InterceptEstimate",
     "KickHysteresis",
+    "KeeperTakeoverCoordinator",
+    "KeeperTakeoverEvidence",
+    "KeeperTakeoverStatus",
     "KickoffPhase",
     "KickoffStatus",
     "KickoffTransaction",
@@ -113,6 +127,7 @@ __all__ = [
     "OpponentPressureReport",
     "OpponentShape",
     "OpponentShapeTracker",
+    "OpponentThreat",
     "ReadyStance",
     "RobotArrivalEstimate",
     "RobotArrivalQuery",
@@ -121,8 +136,11 @@ __all__ = [
     "SlidingWindowBallPredictor",
     "Targeting",
     "TeamFieldFrame",
+    "TeamPhase",
     "calculate_match_risk",
     "estimate_earliest_intercept",
+    "marker_target",
+    "select_dangerous_opponent",
     "own_restart_target",
     "predict_ball_motion",
     "predict_ball_stop",

@@ -16,6 +16,8 @@ from .champion import (
     ChampionPlaybook,
     ChampionSnapshot,
     ChampionTuning,
+    ROLE_MARKER,
+    ROLE_SECOND_BALL,
 )
 from .default_roles import (
     ChaserRole,
@@ -77,6 +79,8 @@ __all__ = [
     "PlaybookRegistry",
     "ROLE_CHASER",
     "ROLE_GOALKEEPER",
+    "ROLE_MARKER",
+    "ROLE_SECOND_BALL",
     "ROLE_NONE",
     "ROLE_SUPPORTER",
     "RoleAssignment",

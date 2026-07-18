@@ -14,9 +14,10 @@ from dataclasses import dataclass, replace
 import math
 import time
 
-from ..soccer_framework import PlayContext, Pose2D, ReadySlot
+from ..soccer_framework import PlayContext, Pose2D, ReadySlot, SetPlay
 from ..tactics import (
     ActionSelection,
+    BallOwnerRole,
     AttackAttemptObservation,
     AttackPhase,
     AttackWatchdog,
@@ -30,6 +31,9 @@ from ..tactics import (
     KickoffPhase,
     KickoffStatus,
     KickoffTransaction,
+    KeeperTakeoverCoordinator,
+    KeeperTakeoverEvidence,
+    KeeperTakeoverStatus,
     MatchRisk,
     OpponentShape,
     OpponentShapeTracker,
@@ -39,9 +43,12 @@ from ..tactics import (
     RobotArrivalQuery,
     RobotMotionTracker,
     SlidingWindowBallPredictor,
+    TeamPhase,
     calculate_match_risk,
     estimate_earliest_intercept,
+    marker_target,
     own_restart_target,
+    select_dangerous_opponent,
 )
 from .playbook import (
     DefaultPlaybook,
@@ -50,8 +57,13 @@ from .playbook import (
     ROLE_SUPPORTER,
     RoleAssignment,
 )
-from .default_roles import ChaserRole, SupporterRole
-from .nodes import AttackSubtreeConfig, build_attack_subtree
+from .default_roles import ChaserRole, GoalkeeperRole, SupporterRole
+from .nodes import AttackSubtreeConfig, MoveToTarget, build_attack_subtree
+from .role import RoleStrategy
+
+
+ROLE_MARKER = "marker"
+ROLE_SECOND_BALL = "second_ball"
 
 
 @dataclass(frozen=True)
@@ -82,6 +94,15 @@ class ChampionTuning:
     enable_action_selection: bool = True
     enable_action_execution: bool = True
     enable_outlet_positioning: bool = True
+    enable_team_coordination: bool = True
+    enable_marker: bool = True
+    keeper_takeover_min_hold_sec: float = 0.60
+    keeper_takeover_max_sec: float = 3.00
+    keeper_recover_hold_sec: float = 0.80
+    keeper_takeover_max_distance_m: float = 2.20
+    keeper_takeover_advantage_sec: float = 0.35
+    marker_distance_m: float = 0.75
+    marker_switch_margin: float = 0.30
     action_switch_margin: float = 0.18
     action_min_hold_sec: float = 0.35
     enable_watchdog_escape: bool = True
@@ -97,6 +118,14 @@ class ChampionSnapshot:
 
     handler_id: int | None
     cover_id: int | None
+    ball_owner_id: int | None
+    ball_owner_role: BallOwnerRole
+    team_phase: TeamPhase
+    coordination_since_sec: float
+    coordination_reason: str
+    field_candidate_id: int | None
+    marker_id: int | None
+    marked_opponent_id: int | None
     chase_target: Pose2D
     ball_prediction: BallMotionPrediction | None
     ball_trajectory: BallTrajectoryPrediction | None
@@ -161,8 +190,21 @@ class ChampionPlaybook(DefaultPlaybook):
         self._budget_exceeded_count = 0
         self._action_selected_at = -math.inf
         self._eta_target_state: dict[int, tuple[Pose2D, float]] = {}
+        self._keeper_takeover = KeeperTakeoverCoordinator(
+            minimum_hold_sec=self.tuning.keeper_takeover_min_hold_sec,
+            maximum_hold_sec=self.tuning.keeper_takeover_max_sec,
+            recover_hold_sec=self.tuning.keeper_recover_hold_sec,
+        )
+        self._team_phase = TeamPhase.ATTACK
+        self._team_phase_started_at = -math.inf
+        self._marked_opponent_id: int | None = None
+        self._marker_target: Pose2D | None = None
+        self._second_ball_target: Pose2D | None = None
         self.role_registry.replace(ChampionChaserRole(self))
         self.role_registry.replace(ChampionSupporterRole(self))
+        self.role_registry.replace(ChampionGoalkeeperRole(self))
+        self.role_registry.register(ChampionMarkerRole(self))
+        self.role_registry.register(ChampionSecondBallRole(self))
 
     @property
     def last_snapshot(self) -> ChampionSnapshot | None:
@@ -182,13 +224,95 @@ class ChampionPlaybook(DefaultPlaybook):
         chase_target, intercept = self._chase_target(
             context, prediction, trajectory, handler_candidates, now
         )
-        handler_id = self._select_handler(handler_candidates, chase_target, context, now)
+        field_candidate_id = self._select_handler(
+            handler_candidates, chase_target, context, now
+        )
+        field_candidate_eta = (
+            self._estimate_arrival(
+                field_candidate_id, chase_target, context, now
+            )
+            if field_candidate_id is not None and self.tuning.enable_robot_eta
+            else None
+        )
+        keeper_eta = (
+            self._estimate_arrival(
+                cover_id,
+                Pose2D(context.known_ball.x, context.known_ball.y, 0.0),
+                context,
+                now,
+                track_target=False,
+            )
+            if cover_id is not None and self.tuning.enable_robot_eta
+            else None
+        )
+        takeover = self._update_keeper_takeover(
+            context=context,
+            cover_id=cover_id,
+            field_candidate_id=field_candidate_id,
+            keeper_eta=keeper_eta,
+            handler_eta=field_candidate_eta,
+            prediction=prediction,
+            now=now,
+        )
+        defending = self._is_defending(context, active, now)
+        if takeover.active:
+            team_phase = TeamPhase.KEEPER_EMERGENCY
+        elif takeover.recovering:
+            team_phase = TeamPhase.KEEPER_RECOVER
+        elif defending:
+            team_phase = TeamPhase.DEFEND
+        else:
+            team_phase = TeamPhase.ATTACK
+        if team_phase is not self._team_phase:
+            self._team_phase = team_phase
+            self._team_phase_started_at = now
+        elif not math.isfinite(self._team_phase_started_at):
+            self._team_phase_started_at = now
 
         mapping: dict[int, str] = {}
         if cover_id is not None:
             mapping[cover_id] = ROLE_GOALKEEPER
-        if handler_id is not None:
+
+        handler_id = field_candidate_id
+        ball_owner_id = handler_id
+        ball_owner_role = (
+            BallOwnerRole.HANDLER if handler_id is not None else BallOwnerRole.NONE
+        )
+        marker_id: int | None = None
+        marked_opponent_id: int | None = None
+        self._marker_target = None
+        self._second_ball_target = None
+
+        if team_phase is TeamPhase.KEEPER_EMERGENCY and cover_id is not None:
+            handler_id = None
+            ball_owner_id = cover_id
+            ball_owner_role = BallOwnerRole.KEEPER
+            if field_candidate_id is not None:
+                mapping[field_candidate_id] = ROLE_SECOND_BALL
+                self._second_ball_target = self._compute_second_ball_target(
+                    field_candidate_id, context
+                )
+        elif handler_id is not None:
             mapping[handler_id] = ROLE_CHASER
+
+        remaining = tuple(pid for pid in active if pid not in mapping)
+        if (
+            self.tuning.enable_team_coordination
+            and self.tuning.enable_marker
+            and team_phase in {
+                TeamPhase.DEFEND,
+                TeamPhase.KEEPER_EMERGENCY,
+                TeamPhase.KEEPER_RECOVER,
+            }
+            and remaining
+        ):
+            marker_id = remaining[0]
+            marked_opponent_id, self._marker_target = self._select_marker_target(
+                marker_id, context, active, now
+            )
+            if self._marker_target is not None:
+                mapping[marker_id] = ROLE_MARKER
+
         for player_id in active:
             if player_id not in mapping:
                 mapping[player_id] = ROLE_SUPPORTER
@@ -207,7 +331,8 @@ class ChampionPlaybook(DefaultPlaybook):
             else None
         )
         if (
-            kickoff is not None
+            team_phase is not TeamPhase.KEEPER_EMERGENCY
+            and kickoff is not None
             and kickoff.phase in {
                 KickoffPhase.SECOND_PLAYER_ACQUIRE,
                 KickoffPhase.SECOND_KICK_ACTIVE,
@@ -220,6 +345,12 @@ class ChampionPlaybook(DefaultPlaybook):
                 mapping[handler_id] = ROLE_SUPPORTER
             mapping[second_id] = ROLE_CHASER
             handler_id = second_id
+            ball_owner_id = second_id
+            ball_owner_role = BallOwnerRole.HANDLER
+            if marker_id == second_id:
+                marker_id = None
+                marked_opponent_id = None
+                self._marker_target = None
 
         handler_eta = (
             self._estimate_arrival(handler_id, chase_target, context, now)
@@ -257,6 +388,25 @@ class ChampionPlaybook(DefaultPlaybook):
         self._last_snapshot = ChampionSnapshot(
             handler_id=handler_id,
             cover_id=cover_id,
+            ball_owner_id=ball_owner_id,
+            ball_owner_role=ball_owner_role,
+            team_phase=team_phase,
+            coordination_since_sec=self._team_phase_started_at,
+            coordination_reason=(
+                takeover.reason
+                if team_phase in {
+                    TeamPhase.KEEPER_EMERGENCY,
+                    TeamPhase.KEEPER_RECOVER,
+                }
+                else (
+                    "defensive press and mark structure"
+                    if team_phase is TeamPhase.DEFEND
+                    else "normal field ownership"
+                )
+            ),
+            field_candidate_id=field_candidate_id,
+            marker_id=marker_id,
+            marked_opponent_id=marked_opponent_id,
             chase_target=chase_target,
             ball_prediction=prediction,
             ball_trajectory=trajectory,
@@ -303,6 +453,18 @@ class ChampionPlaybook(DefaultPlaybook):
             "name": "champion",
             "handler_id": snapshot.handler_id,
             "cover_id": snapshot.cover_id,
+            "team_phase": snapshot.team_phase.value,
+            "ball_ownership": {
+                "owner_id": snapshot.ball_owner_id,
+                "owner_role": snapshot.ball_owner_role.value,
+                "phase_started_at_sec": snapshot.coordination_since_sec,
+                "reason": snapshot.coordination_reason,
+                "field_candidate_id": snapshot.field_candidate_id,
+            },
+            "marking": {
+                "marker_id": snapshot.marker_id,
+                "opponent_id": snapshot.marked_opponent_id,
+            },
             "roles": dict(self._last_assignment.by_player),
             "baseline_roles": (
                 None
@@ -659,6 +821,269 @@ class ChampionPlaybook(DefaultPlaybook):
             selected.x,
             selected.y,
             self.kit.field.face_ball_theta(selected.x, selected.y, ball),
+        )
+
+    def goalkeeper_owns_ball(self) -> bool:
+        snapshot = self._last_snapshot
+        return (
+            snapshot is not None
+            and snapshot.ball_owner_role is BallOwnerRole.KEEPER
+            and snapshot.ball_owner_id == snapshot.cover_id
+        )
+
+    def marker_position_target(
+        self, player_id: int, context: PlayContext
+    ) -> Pose2D:
+        snapshot = self._last_snapshot
+        if (
+            snapshot is not None
+            and snapshot.marker_id == player_id
+            and self._marker_target is not None
+        ):
+            return self._marker_target
+        return self.outlet_target(player_id, context)
+
+    def second_ball_position_target(
+        self, player_id: int, context: PlayContext
+    ) -> Pose2D:
+        snapshot = self._last_snapshot
+        if (
+            snapshot is not None
+            and snapshot.field_candidate_id == player_id
+            and self._second_ball_target is not None
+        ):
+            return self._second_ball_target
+        return self.outlet_target(player_id, context)
+
+    def _update_keeper_takeover(
+        self,
+        *,
+        context: PlayContext,
+        cover_id: int | None,
+        field_candidate_id: int | None,
+        keeper_eta: RobotArrivalEstimate | None,
+        handler_eta: RobotArrivalEstimate | None,
+        prediction: BallMotionPrediction | None,
+        now: float,
+    ) -> KeeperTakeoverStatus:
+        if not self.tuning.enable_team_coordination:
+            self._keeper_takeover.reset()
+            return self._keeper_takeover.update(
+                now,
+                KeeperTakeoverEvidence(False, False, False, False),
+            )
+
+        ball = context.known_ball
+        defensive = self.kit.targeting.ball_in_own_defensive_area(ball)
+        set_play_clear = context.known_game.set_play is SetPlay.NONE
+        keeper_pose = (
+            None
+            if cover_id is None or cover_id not in context.teammates
+            else context.teammates[cover_id].pose
+        )
+        handler_pose = (
+            None
+            if field_candidate_id is None
+            or field_candidate_id not in context.teammates
+            else context.teammates[field_candidate_id].pose
+        )
+        keeper_distance = (
+            math.inf
+            if keeper_pose is None
+            else math.hypot(ball.x - keeper_pose.x, ball.y - keeper_pose.y)
+        )
+        handler_distance = (
+            math.inf
+            if handler_pose is None
+            else math.hypot(ball.x - handler_pose.x, ball.y - handler_pose.y)
+        )
+
+        opponents = tuple(
+            robot.pose
+            for player_id, robot in context.opponents.items()
+            if robot.pose is not None
+            and robot.is_recent(now)
+            and context.known_game.is_active_player(
+                self.kit.config.opponent_team_id(), player_id
+            )
+        )
+        nearest_opponent = min(
+            (
+                math.hypot(ball.x - pose.x, ball.y - pose.y)
+                for pose in opponents
+            ),
+            default=math.inf,
+        )
+        own_goal_x = self.kit.field.own_goal_x()
+        goal_corridor = (
+            ball.x <= own_goal_x + min(2.60, self.kit.config.penalty_area_length)
+            and abs(ball.y) <= self.kit.config.penalty_area_width / 2.0
+        )
+        rolling_toward_goal = (
+            prediction is not None
+            and prediction.motion_state == "rolling"
+            and prediction.velocity_x <= -0.30
+        )
+        opponent_threat = nearest_opponent <= 1.25
+        emergency_threat = goal_corridor or rolling_toward_goal or opponent_threat
+
+        eta_advantage = False
+        if field_candidate_id is None:
+            eta_advantage = True
+        elif (
+            keeper_eta is not None
+            and handler_eta is not None
+            and keeper_eta.reachable
+            and handler_eta.reachable
+            and keeper_eta.eta_sec is not None
+            and handler_eta.eta_sec is not None
+        ):
+            keeper_cost = keeper_eta.eta_sec + 0.20 * keeper_eta.uncertainty_sec
+            handler_cost = handler_eta.eta_sec + 0.20 * handler_eta.uncertainty_sec
+            eta_advantage = (
+                keeper_cost + self.tuning.keeper_takeover_advantage_sec
+                < handler_cost
+            )
+        distance_advantage = (
+            keeper_distance + 0.65 < handler_distance
+            or keeper_distance <= 0.80
+        )
+        keeper_advantage = eta_advantage or distance_advantage
+        eligible = (
+            cover_id is not None
+            and keeper_pose is not None
+            and set_play_clear
+            and keeper_distance <= self.tuning.keeper_takeover_max_distance_m
+        )
+        release_confirmed = (
+            prediction is not None
+            and prediction.motion_state == "rolling"
+            and prediction.velocity_x >= 0.45
+            and keeper_distance >= 0.80
+        )
+        reasons = []
+        if goal_corridor:
+            reasons.append("deep goal corridor")
+        if rolling_toward_goal:
+            reasons.append("ball rolling toward own goal")
+        if opponent_threat:
+            reasons.append("opponent close to ball")
+        if eta_advantage:
+            reasons.append("keeper ETA advantage")
+        elif distance_advantage:
+            reasons.append("keeper distance advantage")
+        return self._keeper_takeover.update(
+            now,
+            KeeperTakeoverEvidence(
+                eligible=eligible,
+                ball_in_defensive_area=defensive,
+                emergency_threat=emergency_threat,
+                keeper_advantage=keeper_advantage,
+                release_confirmed=release_confirmed,
+                reason=", ".join(reasons),
+            ),
+        )
+
+    def _is_defending(
+        self, context: PlayContext, active: tuple[int, ...], now: float
+    ) -> bool:
+        ball = context.known_ball
+        if ball.x <= -0.25:
+            return True
+        own_distances = [
+            math.hypot(ball.x - robot.pose.x, ball.y - robot.pose.y)
+            for player_id in active
+            if (robot := context.teammates.get(player_id)) is not None
+            and robot.pose is not None
+        ]
+        opponent_team = self.kit.config.opponent_team_id()
+        opponent_distances = [
+            math.hypot(ball.x - robot.pose.x, ball.y - robot.pose.y)
+            for player_id, robot in context.opponents.items()
+            if robot.pose is not None
+            and robot.is_recent(now)
+            and context.known_game.is_active_player(opponent_team, player_id)
+        ]
+        return (
+            ball.x < 1.0
+            and bool(opponent_distances)
+            and (
+                not own_distances
+                or min(opponent_distances) <= min(own_distances) + 0.35
+            )
+        )
+
+    def _select_marker_target(
+        self,
+        marker_id: int,
+        context: PlayContext,
+        active: tuple[int, ...],
+        now: float,
+    ) -> tuple[int | None, Pose2D | None]:
+        ball = context.known_ball
+        opponent_team = self.kit.config.opponent_team_id()
+        opponents = tuple(
+            (player_id, robot.pose)
+            for player_id, robot in context.opponents.items()
+            if robot.pose is not None
+            and robot.is_recent(now)
+            and context.known_game.is_active_player(opponent_team, player_id)
+        )
+        if not opponents:
+            self._marked_opponent_id = None
+            return None, None
+
+        carrier_id, carrier_pose = min(
+            opponents,
+            key=lambda item: math.hypot(
+                item[1].x - ball.x, item[1].y - ball.y
+            ),
+        )
+        if math.hypot(carrier_pose.x - ball.x, carrier_pose.y - ball.y) > 1.35:
+            carrier_id = None
+        defender_poses = tuple(
+            robot.pose
+            for player_id in active
+            if player_id != marker_id
+            and (robot := context.teammates.get(player_id)) is not None
+            and robot.pose is not None
+        )
+        own_goal = Pose2D(self.kit.field.own_goal_x(), 0.0, 0.0)
+        threat = select_dangerous_opponent(
+            opponents,
+            ball=Pose2D(ball.x, ball.y, 0.0),
+            own_goal=own_goal,
+            defenders=defender_poses,
+            excluded_player_id=carrier_id,
+            previous_player_id=self._marked_opponent_id,
+            switch_margin=self.tuning.marker_switch_margin,
+        )
+        if threat is None:
+            self._marked_opponent_id = None
+            return None, None
+        self._marked_opponent_id = threat.player_id
+        target = marker_target(
+            threat.pose,
+            ball=Pose2D(ball.x, ball.y, 0.0),
+            own_goal=own_goal,
+            marking_distance_m=self.tuning.marker_distance_m,
+        )
+        return threat.player_id, self.kit.field.clamp_inside_field(target)
+
+    def _compute_second_ball_target(
+        self, player_id: int, context: PlayContext
+    ) -> Pose2D:
+        ball = context.known_ball
+        own_goal_x = self.kit.field.own_goal_x()
+        target_x = max(own_goal_x + 1.60, ball.x + 1.15)
+        target_y = ball.y * 0.55
+        target = self.kit.field.clamp_inside_field(
+            Pose2D(target_x, target_y, 0.0)
+        )
+        return Pose2D(
+            target.x,
+            target.y,
+            self.kit.field.face_ball_theta(target.x, target.y, ball),
         )
 
     def _active_players(self, context: PlayContext, now: float) -> tuple[int, ...]:
@@ -1081,9 +1506,63 @@ class ChampionSupporterRole(SupporterRole):
         return self._playbook.outlet_target(player_id, context)
 
 
+class ChampionGoalkeeperRole(GoalkeeperRole):
+    """Keeper may approach or kick only while the team grants ownership."""
+
+    def __init__(self, playbook: ChampionPlaybook):
+        self._playbook = playbook
+
+    def wants_to_kick(self, kit, context: PlayContext) -> bool:
+        if not self._playbook.tuning.enable_team_coordination:
+            return super().wants_to_kick(kit, context)
+        return self._playbook.goalkeeper_owns_ball()
+
+
+class ChampionMarkerRole(RoleStrategy):
+    """Goal-side marker for the selected dangerous off-ball opponent."""
+
+    name = ROLE_MARKER
+
+    def __init__(self, playbook: ChampionPlaybook):
+        self._playbook = playbook
+
+    def build_subtree(self, kit, player_id: int):
+        return MoveToTarget(
+            kit,
+            player_id,
+            lambda context: self._playbook.marker_position_target(
+                player_id, context
+            ),
+            reason_fn=lambda: "marker block dangerous opponent",
+            hold_vyaw=0.12,
+        )
+
+
+class ChampionSecondBallRole(RoleStrategy):
+    """Field player protecting the clearance lane during keeper ownership."""
+
+    name = ROLE_SECOND_BALL
+
+    def __init__(self, playbook: ChampionPlaybook):
+        self._playbook = playbook
+
+    def build_subtree(self, kit, player_id: int):
+        return MoveToTarget(
+            kit,
+            player_id,
+            lambda context: self._playbook.second_ball_position_target(
+                player_id, context
+            ),
+            reason_fn=lambda: "keeper takeover second-ball cover",
+            hold_vyaw=0.12,
+        )
+
+
 __all__ = [
     "ChampionPerformance",
     "ChampionPlaybook",
     "ChampionSnapshot",
     "ChampionTuning",
+    "ROLE_MARKER",
+    "ROLE_SECOND_BALL",
 ]
