@@ -76,6 +76,7 @@ from .team_coordination import (
     OpponentThreat,
     TeamPhase,
     marker_target,
+    own_goal_safe_target,
     select_dangerous_opponent,
 )
 from .kick_hysteresis import KickHysteresis
@@ -140,6 +141,7 @@ __all__ = [
     "calculate_match_risk",
     "estimate_earliest_intercept",
     "marker_target",
+    "own_goal_safe_target",
     "select_dangerous_opponent",
     "own_restart_target",
     "predict_ball_motion",

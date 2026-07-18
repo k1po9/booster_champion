@@ -6,7 +6,8 @@
 
 - schema-v4 球路径模型已封装并接入 Champion 的追球目标，但只做置信度加权的短期引导。
 - 机器人 ETA 已封装基线与 team2 两套参数，并用保守门控动态选择；ETA 只用于 Handler 排序和短期拦截，不是硬实时保证。
-- Champion 已增加统一团队状态与排他 Ball Ownership。正常进攻是 Keeper + Handler + Outlet，防守切换为 Keeper + Pressurer + Marker；门将紧急接管时外场 Chaser 同帧撤销并转为 SecondBall。
+- Champion 已增加统一团队状态与排他 Ball Ownership。正常进攻是 Keeper + Handler + Outlet，防守切换为 Keeper + Pressurer + Marker；门将优先进入 KEEPER_BLOCK 封住球到球门的直线，外场 Handler 负责断球；只有球近、球慢且对手赶不到时，门将才接管并大脚解围，外场 Chaser 同帧转为 SecondBall。
+- 开球第一脚已缩短减力，接球队员在首次触球确认前限制于中线后；滚动球未稳定时禁止第二脚。射门、传球、推进与解围已使用不同力度。
 - 所有模型使用固化的 Python 常量，比赛运行时不读取 JSON、数据集或第三方机器学习库。
 - 预测无效、置信度不足、超出校准时域或机器人不可达时会立即退回几何基线；GameController、定位球、处罚、跌倒恢复和最终安全覆盖仍由既有行为树负责。
 - 离线误差支持把模型作为软决策信号，但尚不足以证明比赛胜率提升。下一步应在仿真环境做 A/B 回放或对局验证。

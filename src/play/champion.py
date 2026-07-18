@@ -47,6 +47,7 @@ from ..tactics import (
     calculate_match_risk,
     estimate_earliest_intercept,
     marker_target,
+    own_goal_safe_target,
     own_restart_target,
     select_dangerous_opponent,
 )
@@ -109,7 +110,12 @@ class ChampionTuning:
     enable_set_pieces: bool = True
     enable_match_management: bool = True
     enable_opponent_adaptation: bool = True
-    kickoff_first_touch_power: float = 0.35
+    kickoff_first_touch_power: float = 0.24
+    kickoff_receiver_halfway_margin_m: float = 0.45
+    keeper_clear_max_ball_speed_mps: float = 0.35
+    keeper_clear_min_opponent_distance_m: float = 1.45
+    keeper_clear_max_ball_distance_m: float = 0.72
+    keeper_clear_goal_line_margin_m: float = 0.65
 
 
 @dataclass(frozen=True)
@@ -255,8 +261,13 @@ class ChampionPlaybook(DefaultPlaybook):
             now=now,
         )
         defending = self._is_defending(context, active, now)
-        if takeover.active:
+        keeper_clear_safe = self._keeper_clear_is_safe(
+            context, cover_id, prediction, now
+        )
+        if takeover.active and keeper_clear_safe:
             team_phase = TeamPhase.KEEPER_EMERGENCY
+        elif takeover.active:
+            team_phase = TeamPhase.KEEPER_BLOCK
         elif takeover.recovering:
             team_phase = TeamPhase.KEEPER_RECOVER
         elif defending:
@@ -301,6 +312,7 @@ class ChampionPlaybook(DefaultPlaybook):
             and self.tuning.enable_marker
             and team_phase in {
                 TeamPhase.DEFEND,
+                TeamPhase.KEEPER_BLOCK,
                 TeamPhase.KEEPER_EMERGENCY,
                 TeamPhase.KEEPER_RECOVER,
             }
@@ -395,6 +407,7 @@ class ChampionPlaybook(DefaultPlaybook):
             coordination_reason=(
                 takeover.reason
                 if team_phase in {
+                    TeamPhase.KEEPER_BLOCK,
                     TeamPhase.KEEPER_EMERGENCY,
                     TeamPhase.KEEPER_RECOVER,
                 }
@@ -541,6 +554,7 @@ class ChampionPlaybook(DefaultPlaybook):
                         "y": round(snapshot.action_selection.selected.target.y, 3),
                     },
                     "utility": round(snapshot.action_selection.selected.utility, 3),
+                    "kick_power": snapshot.action_selection.selected.kick_power,
                     "reason": snapshot.action_selection.selected.reason,
                     "generated": snapshot.action_selection.generated_count,
                     "finalists": len(snapshot.action_selection.finalists),
@@ -555,6 +569,7 @@ class ChampionPlaybook(DefaultPlaybook):
                     "phase": snapshot.kickoff.phase.value,
                     "active": snapshot.kickoff.active,
                     "elapsed_sec": round(snapshot.kickoff.elapsed_sec, 3),
+                    "ball_speed_mps": round(snapshot.kickoff.ball_speed_mps, 3),
                     "reason": snapshot.kickoff.reason,
                 }
             ),
@@ -598,12 +613,42 @@ class ChampionPlaybook(DefaultPlaybook):
         snapshot = self._last_snapshot
         if (
             snapshot is not None
+            and snapshot.kickoff is not None
+            and snapshot.kickoff.active
+            and snapshot.kickoff.phase is KickoffPhase.SECOND_PLAYER_ACQUIRE
+            and snapshot.kickoff.second_player_id == player_id
+            and snapshot.kickoff.receiver_target is not None
+        ):
+            return own_goal_safe_target(
+                snapshot.kickoff.receiver_target,
+                own_goal_x=self.kit.field.own_goal_x(),
+            )
+        if (
+            snapshot is not None
             and snapshot.handler_id == player_id
             and self.tuning.enable_prediction
         ):
-            return snapshot.chase_target
+            return own_goal_safe_target(
+                snapshot.chase_target, own_goal_x=self.kit.field.own_goal_x()
+            )
         ball = context.known_ball
-        return Pose2D(ball.x, ball.y, 0.0)
+        return own_goal_safe_target(
+            Pose2D(ball.x, ball.y, 0.0),
+            own_goal_x=self.kit.field.own_goal_x(),
+        )
+
+    def handler_wants_to_kick(
+        self, player_id: int, context: PlayContext
+    ) -> bool:
+        snapshot = self._last_snapshot
+        if snapshot is None or snapshot.kickoff is None:
+            return True
+        kickoff = snapshot.kickoff
+        return not (
+            kickoff.active
+            and kickoff.second_player_id == player_id
+            and kickoff.phase is KickoffPhase.SECOND_PLAYER_ACQUIRE
+        )
 
     def handler_kick_target(self, player_id: int, context: PlayContext) -> Pose2D:
         fallback = self._default_kick_target(player_id, context)
@@ -653,11 +698,12 @@ class ChampionPlaybook(DefaultPlaybook):
         self, player_id: int, context: PlayContext
     ) -> float | None:
         snapshot = self._last_snapshot
-        if snapshot is None or snapshot.kickoff is None:
+        if snapshot is None:
             return None
         kickoff = snapshot.kickoff
         if (
-            kickoff.active
+            kickoff is not None
+            and kickoff.active
             and player_id == kickoff.first_player_id
             and kickoff.phase in {
                 KickoffPhase.FIRST_TOUCH_ACTIVE,
@@ -665,6 +711,12 @@ class ChampionPlaybook(DefaultPlaybook):
             }
         ):
             return self.tuning.kickoff_first_touch_power
+        if (
+            self.tuning.enable_action_execution
+            and snapshot.handler_id == player_id
+            and snapshot.action_selection is not None
+        ):
+            return snapshot.action_selection.selected.kick_power
         return None
 
     def _select_action(
@@ -764,6 +816,45 @@ class ChampionPlaybook(DefaultPlaybook):
                 player_id, context, self.kit.is_player_allowed
             )
         ball = context.known_ball
+        snapshot = self._last_snapshot
+        if snapshot is not None and snapshot.kickoff is not None:
+            kickoff = snapshot.kickoff
+            if (
+                kickoff.active
+                and kickoff.second_player_id == player_id
+                and kickoff.phase in {
+                    KickoffPhase.FIRST_TOUCH_ACTIVE,
+                    KickoffPhase.VERIFY_FIRST_TOUCH,
+                }
+            ):
+                target_x = min(
+                    -self.tuning.kickoff_receiver_halfway_margin_m,
+                    ball.x - 0.55,
+                )
+                robot = context.teammates.get(player_id)
+                target_y = (
+                    0.80
+                    if robot is None or robot.pose is None or robot.pose.y >= 0.0
+                    else -0.80
+                )
+                return Pose2D(
+                    target_x, target_y,
+                    self.kit.field.face_ball_theta(target_x, target_y, ball),
+                )
+            if (
+                kickoff.active
+                and kickoff.first_player_id == player_id
+                and kickoff.phase in {
+                    KickoffPhase.SECOND_PLAYER_ACQUIRE,
+                    KickoffPhase.SECOND_KICK_ACTIVE,
+                }
+                and kickoff.first_player_hold_target is not None
+            ):
+                target = kickoff.first_player_hold_target
+                return Pose2D(
+                    target.x, target.y,
+                    self.kit.field.face_ball_theta(target.x, target.y, ball),
+                )
         half_length = self.kit.config.field_length / 2.0
         if ball.x < -half_length * 0.20:
             target_x = ball.x + 1.6
@@ -775,7 +866,6 @@ class ChampionPlaybook(DefaultPlaybook):
             target_x = min(self.kit.field.opponent_goal_x() - 1.3, ball.x + 1.0)
             lateral = 1.25
 
-        snapshot = self._last_snapshot
         if snapshot is not None and snapshot.match_risk is not None:
             target_x += (snapshot.match_risk.value - 0.5) * 0.8
         if (
@@ -854,6 +944,49 @@ class ChampionPlaybook(DefaultPlaybook):
         ):
             return self._second_ball_target
         return self.outlet_target(player_id, context)
+
+    def _keeper_clear_is_safe(
+        self,
+        context: PlayContext,
+        cover_id: int | None,
+        prediction: BallMotionPrediction | None,
+        now: float,
+    ) -> bool:
+        if cover_id is None:
+            return False
+        keeper = context.teammates.get(cover_id)
+        if keeper is None or keeper.pose is None:
+            return False
+        ball = context.known_ball
+        keeper_distance = math.hypot(
+            ball.x - keeper.pose.x, ball.y - keeper.pose.y
+        )
+        if keeper_distance > self.tuning.keeper_clear_max_ball_distance_m:
+            return False
+        if (
+            ball.x
+            < self.kit.field.own_goal_x()
+            + self.tuning.keeper_clear_goal_line_margin_m
+        ):
+            return False
+        if (
+            prediction is not None
+            and prediction.speed_mps > self.tuning.keeper_clear_max_ball_speed_mps
+        ):
+            return False
+        nearest_opponent = min(
+            (
+                math.hypot(ball.x - robot.pose.x, ball.y - robot.pose.y)
+                for player_id, robot in context.opponents.items()
+                if robot.pose is not None
+                and robot.is_recent(now)
+                and context.known_game.is_active_player(
+                    self.kit.config.opponent_team_id(), player_id
+                )
+            ),
+            default=math.inf,
+        )
+        return nearest_opponent >= self.tuning.keeper_clear_min_opponent_distance_m
 
     def _update_keeper_takeover(
         self,
@@ -1068,6 +1201,9 @@ class ChampionPlaybook(DefaultPlaybook):
             own_goal=own_goal,
             marking_distance_m=self.tuning.marker_distance_m,
         )
+        target = own_goal_safe_target(
+            target, own_goal_x=self.kit.field.own_goal_x()
+        )
         return threat.player_id, self.kit.field.clamp_inside_field(target)
 
     def _compute_second_ball_target(
@@ -1077,9 +1213,11 @@ class ChampionPlaybook(DefaultPlaybook):
         own_goal_x = self.kit.field.own_goal_x()
         target_x = max(own_goal_x + 1.60, ball.x + 1.15)
         target_y = ball.y * 0.55
-        target = self.kit.field.clamp_inside_field(
-            Pose2D(target_x, target_y, 0.0)
+        target = own_goal_safe_target(
+            Pose2D(target_x, target_y, 0.0),
+            own_goal_x=self.kit.field.own_goal_x(),
         )
+        target = self.kit.field.clamp_inside_field(target)
         return Pose2D(
             target.x,
             target.y,
@@ -1485,6 +1623,9 @@ class ChampionChaserRole(ChaserRole):
                 kick_target_fn=lambda context: self.kick_target(
                     kit, player_id, context
                 ),
+                wants_kick_fn=lambda context: self._playbook.handler_wants_to_kick(
+                    player_id, context
+                ),
                 reason_fn=lambda: self._approach_reason(kit, player_id),
                 kick_reason_fn=lambda target: self._kick_reason(
                     kit, player_id, target
@@ -1511,6 +1652,14 @@ class ChampionGoalkeeperRole(GoalkeeperRole):
 
     def __init__(self, playbook: ChampionPlaybook):
         self._playbook = playbook
+
+    def target(self, kit, context: PlayContext) -> Pose2D:
+        target = super().target(kit, context)
+        return own_goal_safe_target(
+            target,
+            own_goal_x=kit.field.own_goal_x(),
+            minimum_field_clearance_m=0.45,
+        )
 
     def wants_to_kick(self, kit, context: PlayContext) -> bool:
         if not self._playbook.tuning.enable_team_coordination:

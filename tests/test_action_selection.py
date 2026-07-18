@@ -102,6 +102,30 @@ class BoundedActionSelectorTest(unittest.TestCase):
 
         self.assertNotAlmostEqual(shot.target.y, 0.0)
 
+    def test_open_long_shot_uses_power_kick(self):
+        selection = make_selector().select(
+            handler_id=1,
+            context=make_context(Pose2D(0.0, 0.0, 0.0)),
+            pressure_level="manageable",
+            fallback_target=Pose2D(2.0, 0.0, 0.0),
+        )
+        shot = next(
+            item for item in selection.finalists if item.kind is ActionKind.SHOOT
+        )
+        self.assertEqual(shot.kick_power, 2.25)
+
+    def test_defensive_clear_uses_strong_kick(self):
+        selection = make_selector().select(
+            handler_id=1,
+            context=make_context(Pose2D(-5.0, 0.0, 0.0)),
+            pressure_level="immediate",
+            fallback_target=Pose2D(2.0, 0.0, 0.0),
+        )
+        clear = next(
+            item for item in selection.finalists if item.kind is ActionKind.CLEAR
+        )
+        self.assertEqual(clear.kick_power, 2.20)
+
     def test_average_selection_cost_stays_below_five_milliseconds(self):
         selector = make_selector()
         context = make_context(

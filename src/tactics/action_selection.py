@@ -35,6 +35,7 @@ class ActionCandidate:
     turn_cost: float
     reason: str
     receiver_id: int | None = None
+    kick_power: float | None = None
 
 
 @dataclass(frozen=True)
@@ -53,6 +54,11 @@ class ActionSelectionTuning:
     clear_min_utility: float = 0.0
     own_turn_weight: float = 0.32
     lane_weight: float = 1.65
+    close_shot_power: float = 1.45
+    normal_shot_power: float = 1.90
+    power_shot_power: float = 2.25
+    power_shot_min_distance_m: float = 3.0
+    power_shot_min_lane: float = 0.68
 
 
 class BoundedActionSelector:
@@ -150,10 +156,19 @@ class BoundedActionSelector:
                 + (risk - 0.5) * 0.45
             )
             if utility >= self.tuning.shot_min_utility:
+                if distance < 2.0:
+                    kick_power = self.tuning.close_shot_power
+                elif (
+                    distance >= self.tuning.power_shot_min_distance_m
+                    and lane >= self.tuning.power_shot_min_lane
+                ):
+                    kick_power = self.tuning.power_shot_power
+                else:
+                    kick_power = self.tuning.normal_shot_power
                 candidates.append(
                     ActionCandidate(
                         ActionKind.SHOOT, target, utility, lane, turn,
-                        f"shot lane={lane:.2f}",
+                        f"shot lane={lane:.2f}", kick_power=kick_power,
                     )
                 )
         return candidates
@@ -192,6 +207,7 @@ class BoundedActionSelector:
                     ActionCandidate(
                         ActionKind.PASS, target, utility, lane, turn,
                         f"pass p{receiver_id} lane={lane:.2f}", receiver_id,
+                        min(1.65, 1.05 + 0.10 * distance),
                     )
                 )
         scored.sort(key=lambda item: (-item.utility, item.receiver_id or 0))
@@ -226,7 +242,7 @@ class BoundedActionSelector:
                 candidates.append(
                     ActionCandidate(
                         ActionKind.DRIBBLE, target, utility, lane, turn,
-                        f"dribble lane={lane:.2f}",
+                        f"dribble lane={lane:.2f}", kick_power=0.85,
                     )
                 )
         return candidates
@@ -257,7 +273,7 @@ class BoundedActionSelector:
                 candidates.append(
                     ActionCandidate(
                         ActionKind.CLEAR, target, utility, lane, turn,
-                        f"defensive clear lane={lane:.2f}",
+                        f"defensive clear lane={lane:.2f}", kick_power=2.20,
                     )
                 )
         return candidates

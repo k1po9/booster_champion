@@ -91,7 +91,7 @@ class ChampionPlaybookTest(unittest.TestCase):
         self.assertEqual(assignment.role_of(1), ROLE_GOALKEEPER)
         self.assertEqual(assignment.players_of(ROLE_CHASER), ())
 
-    def test_keeper_takeover_removes_field_chaser_in_same_assignment(self):
+    def test_keeper_blocks_line_and_leaves_interception_to_field_player(self):
         context = make_context(
             poses={
                 1: Pose2D(-1.0, 0.0, 0.0),
@@ -109,12 +109,31 @@ class ChampionPlaybookTest(unittest.TestCase):
         snapshot = self.playbook.last_snapshot
         assert snapshot is not None
 
+        self.assertEqual(snapshot.team_phase, TeamPhase.KEEPER_BLOCK)
+        self.assertEqual(snapshot.ball_owner_role, BallOwnerRole.HANDLER)
+        self.assertEqual(len(assignment.players_of(ROLE_CHASER)), 1)
+        self.assertEqual(len(assignment.players_of(ROLE_SECOND_BALL)), 0)
+        self.assertEqual(len(assignment.players_of(ROLE_MARKER)), 1)
+        self.assertFalse(self.playbook.goalkeeper_owns_ball())
+
+    def test_keeper_clears_only_when_ball_is_close_slow_and_unpressured(self):
+        context = make_context(
+            poses={
+                1: Pose2D(-1.0, 0.0, 0.0),
+                2: Pose2D(-2.0, 0.8, 0.0),
+                3: Pose2D(-5.2, 0.0, 0.0),
+            },
+            ball_x=-5.0,
+        )
+
+        assignment = self.playbook.assign_roles(context)
+        snapshot = self.playbook.last_snapshot
+        assert snapshot is not None
+
         self.assertEqual(snapshot.team_phase, TeamPhase.KEEPER_EMERGENCY)
         self.assertEqual(snapshot.ball_owner_role, BallOwnerRole.KEEPER)
-        self.assertEqual(snapshot.ball_owner_id, 3)
         self.assertEqual(assignment.players_of(ROLE_CHASER), ())
         self.assertEqual(len(assignment.players_of(ROLE_SECOND_BALL)), 1)
-        self.assertEqual(len(assignment.players_of(ROLE_MARKER)), 1)
         self.assertTrue(self.playbook.goalkeeper_owns_ball())
 
     def test_keeper_takeover_is_blocked_during_set_play(self):
@@ -315,6 +334,24 @@ class ChampionPlaybookTest(unittest.TestCase):
         target = playbook.handler_kick_target(handler_id, context)
 
         self.assertEqual(target, snapshot.action_selection.selected.target)
+
+    def test_kickoff_receiver_stays_behind_halfway_and_cannot_kick_early(self):
+        context = make_context()
+        context.known_game.kicking_team = self.kit.config.team_id
+        assignment = self.playbook.assign_roles(context)
+        snapshot = self.playbook.last_snapshot
+        assert snapshot is not None and snapshot.kickoff is not None
+        receiver_id = snapshot.kickoff.second_player_id
+        assert receiver_id is not None
+
+        target = self.playbook.outlet_target(receiver_id, context)
+
+        self.assertLessEqual(
+            target.x, -self.playbook.tuning.kickoff_receiver_halfway_margin_m
+        )
+        self.assertTrue(self.playbook.handler_wants_to_kick(
+            assignment.players_of(ROLE_CHASER)[0], context
+        ))
 
     def test_outlet_chooses_side_farther_from_opponent(self):
         context = make_context()

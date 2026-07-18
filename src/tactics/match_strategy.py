@@ -30,6 +30,9 @@ class KickoffStatus:
     second_player_id: int | None
     first_target: Pose2D | None
     second_target: Pose2D | None
+    receiver_target: Pose2D | None
+    first_player_hold_target: Pose2D | None
+    ball_speed_mps: float
     elapsed_sec: float
     reason: str
 
@@ -49,6 +52,9 @@ class KickoffTransaction:
         self._first_id: int | None = None
         self._second_id: int | None = None
         self._saw_own_kickoff = False
+        self._last_ball: Pose2D | None = None
+        self._last_ball_at: float | None = None
+        self._ball_velocity = (0.0, 0.0)
 
     def update(
         self,
@@ -73,6 +79,11 @@ class KickoffTransaction:
             self._second_ball = None
             self._first_id = first_player_id
             self._second_id = second_player_id
+            self._last_ball = Pose2D(ball.x, ball.y, 0.0)
+            self._last_ball_at = now_sec
+            self._ball_velocity = (0.0, 0.0)
+
+        self._update_ball_velocity(now_sec, ball.x, ball.y)
 
         if self._phase in {KickoffPhase.IDLE, KickoffPhase.COMPLETE, KickoffPhase.FALLBACK}:
             return self._status(now_sec)
@@ -92,13 +103,13 @@ class KickoffTransaction:
         )
         if (
             self._phase is KickoffPhase.FIRST_TOUCH_ACTIVE
-            and initial_move >= 0.18
+            and initial_move >= 0.10
             and first_near
             and opponent_clear
         ):
             self._enter(KickoffPhase.VERIFY_FIRST_TOUCH, now_sec)
         elif self._phase is KickoffPhase.VERIFY_FIRST_TOUCH:
-            if initial_move >= 0.25:
+            if initial_move >= 0.16:
                 self._enter(KickoffPhase.SECOND_PLAYER_ACQUIRE, now_sec)
             elif now_sec - self._phase_started_at >= 1.0:
                 self._enter(KickoffPhase.FIRST_TOUCH_ACTIVE, now_sec)
@@ -106,7 +117,7 @@ class KickoffTransaction:
             second = context.teammates.get(self._second_id)
             if second is not None and second.pose is not None:
                 distance = math.hypot(ball.x - second.pose.x, ball.y - second.pose.y)
-                if distance <= 0.85:
+                if distance <= 0.62 and self._ball_speed() <= 0.22:
                     self._second_ball = Pose2D(ball.x, ball.y, 0.0)
                     self._enter(KickoffPhase.SECOND_KICK_ACTIVE, now_sec)
         elif self._phase is KickoffPhase.SECOND_KICK_ACTIVE:
@@ -116,6 +127,23 @@ class KickoffTransaction:
             ):
                 self._enter(KickoffPhase.COMPLETE, now_sec)
         return self._status(now_sec)
+
+    def _update_ball_velocity(self, now_sec: float, x: float, y: float) -> None:
+        previous = self._last_ball
+        previous_at = self._last_ball_at
+        if previous is not None and previous_at is not None:
+            dt = now_sec - previous_at
+            if 0.02 <= dt <= 0.50:
+                measured = ((x - previous.x) / dt, (y - previous.y) / dt)
+                self._ball_velocity = (
+                    0.55 * measured[0] + 0.45 * self._ball_velocity[0],
+                    0.55 * measured[1] + 0.45 * self._ball_velocity[1],
+                )
+        self._last_ball = Pose2D(x, y, 0.0)
+        self._last_ball_at = now_sec
+
+    def _ball_speed(self) -> float:
+        return math.hypot(*self._ball_velocity)
 
     def _enter(self, phase: KickoffPhase, now_sec: float) -> None:
         self._phase = phase
@@ -145,10 +173,28 @@ class KickoffTransaction:
     def _status(self, now_sec: float, reason: str | None = None) -> KickoffStatus:
         first_target = None
         second_target = None
+        receiver_target = None
+        first_player_hold_target = None
         if self._initial_ball is not None:
-            # A weak diagonal first touch avoids a straight, easily blocked push.
+            # Keep the first touch short so the receiver collects a settled ball.
             first_target = self.field.clamp_inside_field(
-                Pose2D(self._initial_ball.x + 0.38, self._initial_ball.y + 0.18, 0.0)
+                Pose2D(self._initial_ball.x + 0.24, self._initial_ball.y + 0.10, 0.0)
+            )
+            lead_sec = min(0.28, 0.08 + 0.10 * self._ball_speed())
+            current = self._last_ball or self._initial_ball
+            receiver_target = self.field.clamp_inside_field(
+                Pose2D(
+                    current.x + self._ball_velocity[0] * lead_sec,
+                    current.y + self._ball_velocity[1] * lead_sec,
+                    0.0,
+                )
+            )
+            first_player_hold_target = self.field.clamp_inside_field(
+                Pose2D(
+                    min(-0.45, self._initial_ball.x - 0.65),
+                    self._initial_ball.y - 0.75,
+                    0.0,
+                )
             )
             second_target = Pose2D(
                 self.field.opponent_goal_x(),
@@ -166,6 +212,9 @@ class KickoffTransaction:
             second_player_id=self._second_id,
             first_target=first_target,
             second_target=second_target,
+            receiver_target=receiver_target,
+            first_player_hold_target=first_player_hold_target,
+            ball_speed_mps=self._ball_speed(),
             elapsed_sec=max(0.0, now_sec - self._started_at) if self._epoch else 0.0,
             reason=phase_reason,
         )

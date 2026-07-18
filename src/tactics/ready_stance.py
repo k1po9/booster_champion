@@ -96,7 +96,15 @@ class ReadyStance:
     ) -> Pose2D:
         """Goalkeeper guard formula; the default goalkeeper role calls this."""
         keeper_x = self.field.own_goal_x() + self.config.goal_area_length + 0.50
-        keeper_y = clamp((ball.y * 0.38) if ball else 0.0, -1.35, 1.35)
+        keeper_y = 0.0
+        if ball is not None:
+            goal_x = self.field.own_goal_x()
+            span_x = ball.x - goal_x
+            if span_x > 1e-6:
+                line_fraction = clamp((keeper_x - goal_x) / span_x, 0.0, 1.0)
+                keeper_y = ball.y * line_fraction
+        post_safe_half_width = max(0.20, self.config.goal_width / 2.0 - 0.40)
+        keeper_y = clamp(keeper_y, -post_safe_half_width, post_safe_half_width)
         return Pose2D(
             keeper_x,
             keeper_y,

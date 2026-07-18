@@ -5,6 +5,7 @@ from src.tactics.team_coordination import (
     KeeperTakeoverCoordinator,
     KeeperTakeoverEvidence,
     marker_target,
+    own_goal_safe_target,
     select_dangerous_opponent,
 )
 
@@ -128,6 +129,12 @@ class MarkerGeometryTest(unittest.TestCase):
         )
         self.assertGreater(target.x, own_goal.x)
         self.assertLess(target.x, opponent.x)
+
+    def test_goal_safe_target_stays_clear_of_frame(self):
+        target = own_goal_safe_target(
+            Pose2D(-6.9, 1.0, 0.0), own_goal_x=-7.0
+        )
+        self.assertGreaterEqual(target.x, -6.45)
 
     def test_marker_target_is_between_opponent_and_goal(self):
         opponent = Pose2D(-3.0, 1.0, 0.0)

@@ -19,6 +19,7 @@ from .geometry import normalize_angle
 class TeamPhase(str, Enum):
     ATTACK = "attack"
     DEFEND = "defend"
+    KEEPER_BLOCK = "keeper_block"
     KEEPER_EMERGENCY = "keeper_emergency"
     KEEPER_RECOVER = "keeper_recover"
 
@@ -205,6 +206,21 @@ def marker_target(
     return Pose2D(x, y, normalize_angle(math.atan2(ball.y - y, ball.x - x)))
 
 
+def own_goal_safe_target(
+    target: Pose2D,
+    *,
+    own_goal_x: float,
+    minimum_field_clearance_m: float = 0.55,
+) -> Pose2D:
+    """Keep navigation targets on the field side of posts and the goal frame."""
+
+    return Pose2D(
+        max(target.x, own_goal_x + max(0.35, minimum_field_clearance_m)),
+        target.y,
+        target.theta,
+    )
+
+
 __all__ = [
     "BallOwnerRole",
     "KeeperTakeoverCoordinator",
@@ -213,5 +229,6 @@ __all__ = [
     "OpponentThreat",
     "TeamPhase",
     "marker_target",
+    "own_goal_safe_target",
     "select_dangerous_opponent",
 ]

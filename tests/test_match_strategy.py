@@ -12,6 +12,7 @@ from src.soccer_framework import (
     SoccerConfig,
 )
 from src.tactics.geometry import TeamFieldFrame
+from src.tactics.ready_stance import ReadyStance
 from src.tactics.match_strategy import (
     KickoffPhase,
     KickoffTransaction,
@@ -48,6 +49,8 @@ class KickoffTransactionTest(unittest.TestCase):
             now_sec=1.0, context=context, first_player_id=1, second_player_id=2
         )
         self.assertEqual(status.phase, KickoffPhase.FIRST_TOUCH_ACTIVE)
+        self.assertIsNotNone(status.receiver_target)
+        self.assertLess(status.first_target.x, 0.30)
 
         context.known_game.kicking_team = 0
         context.known_ball.x = 0.20
@@ -66,11 +69,17 @@ class KickoffTransactionTest(unittest.TestCase):
         status = self.transaction.update(
             now_sec=1.4, context=context, first_player_id=1, second_player_id=2
         )
+        self.assertEqual(status.phase, KickoffPhase.SECOND_PLAYER_ACQUIRE)
+        self.assertGreater(status.ball_speed_mps, 0.22)
+
+        status = self.transaction.update(
+            now_sec=1.5, context=context, first_player_id=1, second_player_id=2
+        )
         self.assertEqual(status.phase, KickoffPhase.SECOND_KICK_ACTIVE)
 
         context.known_ball.x = 0.65
         status = self.transaction.update(
-            now_sec=1.5, context=context, first_player_id=1, second_player_id=2
+            now_sec=1.6, context=context, first_player_id=1, second_player_id=2
         )
         self.assertEqual(status.phase, KickoffPhase.COMPLETE)
         self.assertFalse(status.active)
@@ -117,6 +126,20 @@ class MatchManagementTest(unittest.TestCase):
         reduced_risk = calculate_match_risk(config, reduced, "manageable")
 
         self.assertLess(reduced_risk.value, full_risk.value)
+
+    def test_goalkeeper_guard_projects_ball_to_goal_line_and_avoids_posts(self):
+        config = SoccerConfig()
+        field = TeamFieldFrame(config)
+        stance = ReadyStance(config, field)
+        ball = BallState(0.0, 2.5, 1.0)
+
+        target = stance.goalkeeper_guard_target(ball)
+        expected_y = ball.y * (target.x - field.own_goal_x()) / (
+            ball.x - field.own_goal_x()
+        )
+
+        self.assertAlmostEqual(target.y, expected_y)
+        self.assertLessEqual(abs(target.y), config.goal_width / 2.0 - 0.40)
 
     def test_restart_targets_are_deterministic_and_safe(self):
         config = SoccerConfig()
