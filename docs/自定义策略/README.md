@@ -1,31 +1,46 @@
-# 自定义策略能力索引
+# Champion 自定义策略交接入口
 
-本目录只描述基于公开比赛输入构建的自定义能力。规则、安全、裁判阶段和定位球约束仍由现有 behavior tree 与 soccer framework 负责。
+本目录是 agent/champion-strategy 分支的最小完整交接文档。新对话按下面顺序阅读，即可了解当前模型、公共接口、策略接入方式、验证结论和已知限制，无需再查历史计划稿。
 
-## 当前能力
+## 当前结论
 
-| 能力 | 代码 | 状态 | 当前使用方式 |
-| --- | --- | --- | --- |
-| schema-v4 球时间路径 | `src/tactics/ball_trajectory.py` | 已封装、整局留出验证 | 置信度加权进入 Handler 追球目标；失效回退旧预测/当前球位 |
-| 进攻动作看门狗 | `src/tactics/attack_watchdog.py` | 已实现、单元测试通过 | Champion 处球阶段与脱困切换 |
-| 敌方压力时间 | `src/tactics/opponent_pressure.py` | 已实现、单元测试通过 | Champion 动作时间窗和候选风险 |
-| 动态机器人 ETA | `src/tactics/robot_eta.py` | 双参数集已封装、挑战者未胜出 | Handler 排序和短期拦截软目标；禁止硬承诺 |
+- schema-v4 球路径模型已封装并接入 Champion 的追球目标，但只做置信度加权的短期引导。
+- 机器人 ETA 已封装基线与 team2 两套参数，并用保守门控动态选择；ETA 只用于 Handler 排序和短期拦截，不是硬实时保证。
+- Champion 当前使用稳定的 Handler + Outlet + Cover 结构。Cover 优先保留配置门将，另两人动态分配追球和接应。
+- 所有模型使用固化的 Python 常量，比赛运行时不读取 JSON、数据集或第三方机器学习库。
+- 预测无效、置信度不足、超出校准时域或机器人不可达时会立即退回几何基线；GameController、定位球、处罚、跌倒恢复和最终安全覆盖仍由既有行为树负责。
+- 离线误差支持把模型作为软决策信号，但尚不足以证明比赛胜率提升。下一步应在仿真环境做 A/B 回放或对局验证。
 
 ## 阅读顺序
 
-1. [统一比赛数据与能力建设](统一比赛数据与能力建设.md)：数据格式、采集目的和能力地图。
-2. [球轨迹预测能力实施计划](球轨迹预测能力实施计划.md)：物理模型、误差门槛和在线接口。
-3. [进攻看门狗与敌方压力能力](进攻看门狗与敌方压力能力.md)：两个最新能力的配置、输入输出和接入契约。
-4. [机器人 ETA 实验计划与结果](机器人ETA实验计划与结果.md)：保留的运动响应实验，不代表已上线能力。
-5. [球路径与动态 ETA 接入说明](球路径与动态ETA接入说明.md)：公共接口、动态模型门控和当前 Champion 决策链。
+1. [模型说明](模型说明.md)：训练数据、算法、留出误差、动态门控和使用边界。
+2. [预测接口说明](预测接口说明.md)：输入输出、调用方式、无效原因、时间语义和回退契约。
+3. [当前冠军策略说明](当前冠军策略说明.md)：模型如何进入角色分配、追球、动作选择、诊断和安全链。
 
-## 最新验证结论
+## 代码入口
 
-- 正式在线球预测器：观察 0.35 秒时停球点中位误差 0.537 m、p75 1.063 m；观察 0.50 秒时中位误差 0.470 m、p75 0.902 m。
-- 球预测默认使用 `a(v)=0.3791+0.1399v²`，只允许置信度加权使用。
-- 经验巡航地面速度约为命令线速度的 0.8945；经验转向速度约为命令角速度的 0.8789。
-- schema-v4 ETA 已有 277 条完整行程、4,726 个查询；八局模型中位误差 0.486 秒、P90 1.584 秒。
-- team2 挑战者只改善部分长尾，未击败旧模型，因此采用按运动条件动态选择并扩大分歧区间。
-- 敌方压力模型使用更保守的 0.8 m/s 最大追赶速度，不依赖敌方隐藏意图。
+| 目的 | 文件 |
+| --- | --- |
+| 球路径接口 | src/tactics/ball_trajectory.py |
+| 球模型固化参数 | src/tactics/ball_event_model_data.py |
+| ETA 与拦截接口 | src/tactics/robot_eta.py |
+| ETA 双模型固化参数 | src/tactics/robot_eta_model_data.py |
+| tactics 公共导出 | src/tactics/__init__.py |
+| Champion 策略 | src/play/champion.py |
+| 球接口测试 | tests/test_ball_trajectory_v4.py |
+| ETA 接口测试 | tests/test_robot_eta_interface.py |
+| Champion 接入测试 | tests/test_champion_playbook.py |
 
-派生报告索引见 [`analysis/v1/README.md`](../../analysis/v1/README.md)。原始 `dataset/` 不提交 Git。
+模型训练报告保存在 analysis/v4/。原始 dataset/ 不属于比赛运行时依赖，也不应因为整理文档而提交。
+
+## 验证基线
+
+提交前至少运行：
+
+~~~bash
+python3 -m unittest discover -s tests -p 'test_*.py' -v
+python3 -m compileall -q src tests
+git diff --check
+~~~
+
+本地若缺少项目依赖 py_trees，Champion 集成测试会显式跳过；纯模型和接口测试仍应通过。完整仿真环境不在本机，不能把本地单元测试等同于比赛效果验证。
