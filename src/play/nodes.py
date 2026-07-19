@@ -146,6 +146,10 @@ def _default_kick_reason(player_id: int) -> str:
     return f"role {player_id} kick"
 
 
+# Callable type for getting kick intent at runtime
+KickIntentFn = Callable[[], str]
+
+
 @dataclass(frozen=True)
 class AttackSubtreeConfig:
     """Parameters for the standard attack subtree builder."""
@@ -156,6 +160,7 @@ class AttackSubtreeConfig:
     reason_fn: ReasonFn | None = None
     kick_reason_fn: KickReasonFn | None = None
     hold_vyaw: float = 0.0
+    kick_intent_fn: KickIntentFn | None = None  # Runtime function to get kick intent
 
 
 class MoveToTarget(py_trees.behaviour.Behaviour):
@@ -221,12 +226,14 @@ class KickAction(py_trees.behaviour.Behaviour):
         kick_target_fn: TargetFn,
         *,
         reason_fn: KickReasonFn | None = None,
+        kick_intent_fn: KickIntentFn | None = None,
     ):
         super().__init__(f"KickAction({player_id})")
         self._kit = kit
         self._player_id = player_id
         self._kick_target_fn = kick_target_fn
         self._reason_fn = reason_fn
+        self._kick_intent_fn = kick_intent_fn
         self.blackboard = BlackboardClient(name=self.name)
 
     def update(self) -> py_trees.common.Status:
@@ -247,11 +254,19 @@ class KickAction(py_trees.behaviour.Behaviour):
             if self._reason_fn is not None
             else _default_kick_reason(player_id)
         )
+        # Get kick intent at runtime, default to "shoot" if not available
+        kick_intent = "shoot"
+        if self._kick_intent_fn is not None:
+            try:
+                kick_intent = self._kick_intent_fn()
+            except (ValueError, AttributeError):
+                pass  # Context not ready, use default
         command = kit.motion.kick_command(
             player_id,
             context,
             kick_theta,
             reason,
+            kick_intent=kick_intent,
         )
         self.blackboard.write(cmd_key(player_id), command)
         return py_trees.common.Status.SUCCESS
@@ -320,6 +335,7 @@ def build_attack_subtree(
                 player_id,
                 config.kick_target_fn,
                 reason_fn=config.kick_reason_fn,
+                kick_intent_fn=config.kick_intent_fn,
             ),
         ],
     )

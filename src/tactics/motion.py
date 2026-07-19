@@ -129,18 +129,46 @@ class MotionController:
         context: PlayContext,
         kick_theta: float,
         reason: str,
+        kick_intent: str = "shoot",
     ) -> RobotCommand:
-        """Generate a kick command and mark the player as kicking to trigger kick hysteresis."""
+        """Generate a kick command and mark the player as kicking to trigger kick hysteresis.
+        
+        Args:
+            player_id: Player ID
+            context: Play context
+            kick_theta: Kick direction angle
+            reason: Command reason string
+            kick_intent: Kick intent type, one of:
+                - "shoot": 射门 (default)
+                - "pass": 传球
+                - "dribble": 带球
+                - "progressive": 推进触球
+                - "clear": 解围
+                - "kickoff": 开球
+        """
         ball = context.known_ball
         robot = context.teammates.get(player_id)
         if robot is None or robot.pose is None:
             return RobotCommand.stop(f"{reason}: waiting for pose")
         self._kicker.mark_kicking(player_id)
         rel_ball = field_to_relative(ball.x, ball.y, robot.pose)
+        
+        # 根据踢球意图选择对应的力量系数
+        tuning = self._config.strategy
+        power_map = {
+            "shoot": tuning.kick_power_shoot,
+            "pass": tuning.kick_power_pass,
+            "dribble": tuning.kick_power_dribble,
+            "progressive": tuning.kick_power_progressive,
+            "clear": tuning.kick_power_clear,
+            "kickoff": tuning.kick_power_kickoff,
+        }
+        kick_power = power_map.get(kick_intent, tuning.kick_power_shoot)
+        
         return RobotCommand(
             intent=KickIntent(
                 direction=normalize_angle(kick_theta - robot.pose.theta),
-                power=self._config.strategy.soccer_kick_power,
+                power=kick_power,
                 ball_x=rel_ball.x,
                 ball_y=rel_ball.y,
             ),

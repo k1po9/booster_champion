@@ -45,7 +45,23 @@ class PrimaryRole(RoleStrategy):
             PrimaryIntent.DRIBBLE,
             PrimaryIntent.PROGRESSIVE_TOUCH,
             PrimaryIntent.CLEAR,
+            PrimaryIntent.KICKOFF,
         }
+
+    # PrimaryIntent 到 kick_intent 字符串的映射
+    _INTENT_MAP = {
+        PrimaryIntent.SHOOT: "shoot",
+        PrimaryIntent.PASS: "pass",
+        PrimaryIntent.DRIBBLE: "dribble",
+        PrimaryIntent.PROGRESSIVE_TOUCH: "progressive",
+        PrimaryIntent.CLEAR: "clear",
+        PrimaryIntent.KICKOFF: "kickoff",
+    }
+
+    def _get_kick_intent(self) -> str:
+        """Get current kick intent from tactical context. Called at runtime."""
+        snapshot = self._snapshot()
+        return self._INTENT_MAP.get(snapshot.primary_intent, "shoot")
 
     def build_subtree(self, kit, player_id: int) -> py_trees.behaviour.Behaviour:
         return build_attack_subtree(
@@ -62,6 +78,7 @@ class PrimaryRole(RoleStrategy):
                 kick_reason_fn=lambda _target: (
                     f"primary {self._snapshot().primary_intent.value}"
                 ),
+                kick_intent_fn=self._get_kick_intent,
             ),
         )
 

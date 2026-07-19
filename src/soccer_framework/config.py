@@ -112,9 +112,20 @@ class SoccerStrategyTuning:
     # ==========================================================================
     soccer_kick_enter_distance: float = 2.5  # 进入踢球模式的距离阈值 (m)，低于此值进入
     soccer_kick_exit_distance: float = 3.0  # 退出踢球模式的距离阈值 (m)，必须大于 enter
-    soccer_kick_power: float = 1.5  # 踢球力度
+    soccer_kick_power: float = 1.5  # 踢球力度（基础默认值，实际使用下方各意图系数）
     soccer_kick_min_active_sec: float = 1.0  # 最小踢球持续时间 (s)，避免瞬间切换
     soccer_kick_exit_delay_sec: float = 1.5  # 退出条件满足后延迟时间 (s)，才真正离开踢球模式
+
+    # ==========================================================================
+    # 踢球力量系数 (Kick Power Multipliers)
+    # 根据不同踢球意图调整踢球力度，基础力度为 soccer_kick_power
+    # ==========================================================================
+    kick_power_shoot: float = 2.0  # 射门系数：高力度，优先速度和穿透力
+    kick_power_pass: float = 1.1  # 传球系数：中力度，保证传球距离但不过度失控
+    kick_power_dribble: float = 0.6  # 带球系数：低力度，轻触带球避免球脱离控制
+    kick_power_progressive: float = 1.1  # 推进触球系数：中力度，需要明显向前推进但仍方便二次追球
+    kick_power_clear: float = 2.0  # 解围系数：高力度，快速远离危险区
+    kick_power_kickoff: float = 0.6  # 开球系数：低力度，第一脚只需斜向推出方便马上争第二点
 
     # ==========================================================================
     # 定位球与重新开始 (Set Plays and Restarts)
@@ -166,7 +177,7 @@ class SoccerStrategyTuning:
     # 动态三角角色切换与模式选择 (Dynamic Triangle Role Auction and Mode Selection)
     # ==========================================================================
     role_switch_advantage_sec: float = 0.30  # 角色切换优势时间 (s)，新角色需比当前角色快这么多才触发切换
-    role_switch_confirm_ticks: int = 4  # 角色切换确认 tick 数，需连续这么多 tick 确认才真正切换
+    role_switch_confirm_ticks: int = 2  # 角色切换确认 tick 数，需连续这么多 tick 确认才真正切换
     robot_translation_gain: float = 0.8945  # 机器人平移速度增益系数
     robot_yaw_gain: float = 0.8789  # 机器人偏航速度增益系数
     possession_control_radius_m: float = 1.10  # 控球控制半径 (m)，在此范围内认为可以控球
