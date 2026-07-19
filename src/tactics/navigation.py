@@ -93,6 +93,10 @@ class ObstacleCollector:
         Four posts become four small-radius obstacles matching the rule dimensions.
         Three net sides are uniformly sampled so corridor checks see a continuous wall.
 
+        Additionally, goal corner obstacles are placed at the field boundary (x=±7, y=±1.3)
+        and behind the goal line (x=±7.4, y=±1.3) to represent the full goal structure
+        that robots must always avoid.
+
         ``net_step`` is 0.35 m, smaller than opponent radius plus safety margin, so
         any approach angle should hit at least one sample.
         """
@@ -102,6 +106,7 @@ class ObstacleCollector:
         post_radius = 0.18
         net_radius = 0.20
         net_step = 0.35
+        goal_corner_radius = 0.25  # Radius for goal corner obstacles
 
         obstacles: list[Obstacle] = []
         for sign_x in (-1.0, 1.0):
@@ -128,6 +133,29 @@ class ObstacleCollector:
                         step=net_step, radius=net_radius,
                     )
                 )
+
+        # Add goal corner obstacles:
+        # 1. At field boundary (x=±7, y=±1.3)
+        # 2. Behind goal line (x=±7.4, y=±1.3)
+        for sign_x in (-1.0, 1.0):
+            for sign_y in (-1.0, 1.0):
+                # Corner at field boundary
+                obstacles.append(
+                    Obstacle(
+                        x=sign_x * half_length,
+                        y=sign_y * half_goal_width,
+                        radius=goal_corner_radius,
+                    )
+                )
+                # Corner behind goal line (x=±7.4)
+                obstacles.append(
+                    Obstacle(
+                        x=sign_x * 7.4,
+                        y=sign_y * half_goal_width,
+                        radius=goal_corner_radius,
+                    )
+                )
+
         return tuple(obstacles)
 
     def collect_all(
