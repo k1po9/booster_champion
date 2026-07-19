@@ -257,6 +257,9 @@ class DynamicTriangleCoordinator:
         self._primary_switch = _SwitchState()
         # 上一次生成的战术上下文
         self.last_context: TacticalContext | None = None
+        # 我方中圈开球第一脚状态
+        self._kickoff_start_ball: Pose2D | None = None
+        self._kickoff_first_touch_done: bool = False
 
     def update(self, context: PlayContext, now_sec: float) -> TacticalContext:
         """主更新方法：每 tick 调用，生成新的战术计划。
@@ -290,7 +293,10 @@ class DynamicTriangleCoordinator:
             BallObservation(stamp, ball.x, ball.y, ball.confidence)
         )
         prediction = self._ball.predict()  # 获取当前球运动预测
-        
+
+        # 更新我方中圈开球第一脚状态
+        self._update_kickoff_state(context)
+
         # --- 步骤 2: 选择战术模式 ---
         mode = self._select_mode(context)
         
@@ -324,13 +330,16 @@ class DynamicTriangleCoordinator:
         )
         
         # --- 步骤 9: 检测进攻停滞 ---
-        if self._attack_is_stalled(
-            primary,
-            intent,
-            action_target,
-            context,
-            prediction,
-            now_sec,
+        if (
+            mode != TacticalMode.RESTART
+            and self._attack_is_stalled(
+                primary,
+                intent,
+                action_target,
+                context,
+                prediction,
+                now_sec,
+            )
         ):
             # 进攻停滞：改为轻触推进，尝试打破僵局
             intent = PrimaryIntent.PROGRESSIVE_TOUCH
@@ -420,7 +429,22 @@ class DynamicTriangleCoordinator:
         
         # 定位球状态 -> 重新开始
         if game.set_play != SetPlay.NONE:
-            return TacticalMode.RESTART
+            is_our_kickoff = (
+                game.set_play == SetPlay.KICKOFF
+                and game.is_kickoff_for_team(self.kit.config.team_id)
+            )
+
+            # 我方中圈开球：
+            # 只有第一脚完成前保持 RESTART。
+            if is_our_kickoff:
+                if not self._kickoff_first_touch_done:
+                    return TacticalMode.RESTART
+
+                # 第一脚已经完成：
+                # 不再返回 RESTART，继续下面的常规态势判断。
+            else:
+                # 其他定位球暂时保持原来的 RESTART 处理
+                return TacticalMode.RESTART
             
         tuning = self.kit.config.strategy
         
@@ -754,6 +778,75 @@ class DynamicTriangleCoordinator:
             <= self.kit.config.strategy.secondary_receive_radius_m
         )
 
+    def _update_kickoff_state(self, context: PlayContext) -> None:
+        """跟踪我方中圈开球第一脚是否已经完成。"""
+        game = context.known_game
+        ball = context.known_ball
+
+        is_our_kickoff = (
+            game.set_play == SetPlay.KICKOFF
+            and game.is_kickoff_for_team(self.kit.config.team_id)
+        )
+
+        # 不再处于我方开球，清空状态，等待下一次开球
+        if not is_our_kickoff:
+            self._kickoff_start_ball = None
+            self._kickoff_first_touch_done = False
+            return
+
+        # 刚进入一次新的我方开球
+        if self._kickoff_start_ball is None:
+            self._kickoff_start_ball = Pose2D(ball.x, ball.y)
+            self._kickoff_first_touch_done = False
+            return
+
+        # 第一脚完成后保持 done，直到本次 KICKOFF 结束
+        if self._kickoff_first_touch_done:
+            return
+
+        moved = math.hypot(
+            ball.x - self._kickoff_start_ball.x,
+            ball.y - self._kickoff_start_ball.y,
+        )
+
+        if moved >= self.kit.config.strategy.restart_touch_distance:
+            self._kickoff_first_touch_done = True
+
+    def _select_kickoff_target(
+        self,
+        context: PlayContext,
+    ) -> Pose2D:
+        """选择我方中圈开球第一脚的斜向推进目标。
+
+        只比较左前和右前两个方向，选择对手阻挡更少的一侧。
+        """
+        ball = context.known_ball
+        opponents = self.kit.obstacles.opponent_obstacles(context)
+
+        candidates = [
+            Pose2D(
+                ball.x + 1.2,
+                ball.y + 0.7,
+                0.0,
+            ),
+            Pose2D(
+                ball.x + 1.2,
+                ball.y - 0.7,
+                0.0,
+            ),
+        ]
+
+        def score(target: Pose2D) -> float:
+            return self.kit.targeting.lane_clear_score(
+                ball.x,
+                ball.y,
+                target.x,
+                target.y,
+                opponents,
+            )
+
+        return max(candidates, key=score)
+
     def _select_clear_target(
         self,
         context: PlayContext,
@@ -881,7 +974,20 @@ class DynamicTriangleCoordinator:
         """
         ball = context.known_ball
         goal = Pose2D(self.kit.field.opponent_goal_x(), 0.0)  # 球门中心
-        
+
+        # 我方中圈开球第一脚：斜向安全推进，不等待 Secondary
+        if mode == TacticalMode.RESTART:
+            game = context.known_game
+
+            if (
+                game.set_play == SetPlay.KICKOFF
+                and game.is_kickoff_for_team(self.kit.config.team_id)
+            ):
+                return (
+                    PrimaryIntent.PROGRESSIVE_TOUCH,
+                    self._select_kickoff_target(context),
+                )
+
         # 紧急防守：大脚解围（使用安全解围目标选择）
         if mode == TacticalMode.EMERGENCY_DEFEND:
             return PrimaryIntent.CLEAR, self._select_clear_target(context)
@@ -1088,7 +1194,31 @@ class DynamicTriangleCoordinator:
             Secondary 应该移动到的目标点
         """
         ball = context.known_ball
-        
+
+        # 开球第一脚完成前，Secondary 留在己方半场，不参与提前接应
+        if mode == TacticalMode.RESTART:
+            robot = context.teammates.get(secondary)
+
+            if robot is not None and robot.pose is not None:
+                x = self.kit.field.own_half_x(
+                    robot.pose.x,
+                    margin=0.15,
+                )
+                y = robot.pose.y
+
+                return Pose2D(
+                    x,
+                    y,
+                    self.kit.field.face_ball_theta(x, y, ball),
+                )
+
+            # 无有效 pose 时的安全兜底
+            return Pose2D(
+                -0.5,
+                0.0,
+                self.kit.field.face_ball_theta(-0.5, 0.0, ball),
+            )
+
         # 没有 Secondary：返回球后方位置
         if secondary is None:
             return Pose2D(ball.x - 1.2, ball.y)
