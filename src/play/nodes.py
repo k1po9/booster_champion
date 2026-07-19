@@ -64,8 +64,11 @@ class AssignRoles(py_trees.behaviour.Behaviour):
         if context is None:
             self.blackboard.write(BlackboardKeys.ROLES, RoleAssignment())
             return py_trees.common.Status.SUCCESS
+        now = self.blackboard.read(BlackboardKeys.NOW, 0.0)
+        self._playbook.prepare_tick(context, float(now or 0.0))
         assignment = self._playbook.assign_roles(context)
         self.blackboard.write(BlackboardKeys.ROLES, assignment)
+        self.blackboard.write(BlackboardKeys.TACTICAL_CONTEXT, self._playbook.tactical_context)
         return py_trees.common.Status.SUCCESS
 
 

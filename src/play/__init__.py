@@ -29,6 +29,7 @@ from .nodes import (
 )
 from .playbook import (
     DefaultPlaybook,
+    DynamicTrianglePlaybook,
     Playbook,
     ROLE_CHASER,
     ROLE_GOALKEEPER,
@@ -42,12 +43,22 @@ from .role import (
     RoleStrategy,
 )
 from .play_subtree import create_play_subtree
+from .dynamic_roles import PrimaryRole, SecondaryRole, SafetyRole
+from .tactical import (
+    DynamicTriangleCoordinator,
+    PrimaryIntent,
+    ROLE_PRIMARY,
+    ROLE_SECONDARY,
+    ROLE_SAFETY,
+    TacticalContext,
+    TacticalMode,
+)
 
 
 # ----------------------------------------------------------------------
 # Built-in Playbook registration is visible and uses the same API as custom Playbooks.
 # ----------------------------------------------------------------------
-PLAYBOOKS.register("default", DefaultPlaybook, default=True)
+PLAYBOOKS.register("dynamic_triangle", DynamicTrianglePlaybook, default=True)
 
 __all__ = [
     "AssignRoles",
@@ -75,4 +86,15 @@ __all__ = [
     "WaitForBall",
     "build_attack_subtree",
     "create_play_subtree",
+    "DynamicTriangleCoordinator",
+    "DynamicTrianglePlaybook",
+    "PrimaryIntent",
+    "PrimaryRole",
+    "ROLE_PRIMARY",
+    "ROLE_SECONDARY",
+    "ROLE_SAFETY",
+    "SafetyRole",
+    "SecondaryRole",
+    "TacticalContext",
+    "TacticalMode",
 ]

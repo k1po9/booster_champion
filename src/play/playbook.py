@@ -20,9 +20,9 @@ from types import MappingProxyType
 from typing import TYPE_CHECKING
 
 from ..soccer_framework import PlayContext, ReadySlot, RobotCommand
-from ..runtime import SoccerKit
 
 if TYPE_CHECKING:
+    from ..runtime import SoccerKit
     from .role import RoleRegistry, RoleStrategy
 
 
@@ -79,6 +79,7 @@ class Playbook:
 
         self.kit = kit
         self._registry = RoleRegistry()
+        self._tactical_context: object | None = None
 
     # Role registry
 
@@ -95,6 +96,17 @@ class Playbook:
     @property
     def role_registry(self) -> RoleRegistry:
         return self._registry
+
+    @property
+    def tactical_context(self) -> object | None:
+        """Immutable team plan prepared for the current tick, if any."""
+
+        return self._tactical_context
+
+    def prepare_tick(self, context: PlayContext, now_sec: float) -> None:
+        """Update cross-role state before assignment; basic playbooks need no work."""
+
+        self._tactical_context = None
 
     # Role assignment, the core strategy node
 
@@ -128,7 +140,7 @@ class Playbook:
 # ----------------------------------------------------------------------
 
 
-class DefaultPlaybook(Playbook):
+class LegacyPlaybook(Playbook):
     """Default SoccerSim playbook: chaser/supporter/goalkeeper dynamic roles plus Targeting scores.
 
     Subclasses can selectively override one method, for example:
@@ -232,3 +244,46 @@ class DefaultPlaybook(Playbook):
         if slot == ReadySlot.SIDE:
             return targeting.side_should_challenge(context)
         return True
+
+class DynamicTrianglePlaybook(Playbook):
+    """Default strategy: tactical modes plus Primary/Secondary/Safety slots."""
+
+    def __init__(self, kit: SoccerKit):
+        super().__init__(kit)
+        from .dynamic_roles import PrimaryRole, SafetyRole, SecondaryRole
+        from .tactical import DynamicTriangleCoordinator
+
+        self.coordinator = DynamicTriangleCoordinator(kit)
+        self.register_role(PrimaryRole(self.coordinator))
+        self.register_role(SecondaryRole(self.coordinator))
+        self._prepared_context: PlayContext | None = None
+        self.register_role(SafetyRole(self.coordinator))
+
+    def prepare_tick(self, context: PlayContext, now_sec: float) -> None:
+        self._tactical_context = self.coordinator.update(context, now_sec)
+
+        self._prepared_context = context
+
+    def assign_roles(self, context: PlayContext) -> RoleAssignment:
+        if self._tactical_context is None or self._prepared_context is not context:
+            now_sec = (
+                context.known_ball.last_seen_at
+                if context.known_ball.last_seen_at > 0.0
+                else 0.0
+            )
+            self.prepare_tick(context, now_sec)
+        snapshot = self._tactical_context
+        from .tactical import TacticalContext
+
+        if not isinstance(snapshot, TacticalContext):
+            return RoleAssignment()
+        mapping = {
+            player_id: snapshot.role_of(player_id)
+            for player_id in self.kit.config.player_ids
+            if snapshot.role_of(player_id) != ROLE_NONE
+        }
+        return RoleAssignment(mapping)
+
+# Public default now means the competition strategy above.  The old fixed
+# Chaser/Supporter/Keeper implementation remains explicitly available as LegacyPlaybook.
+DefaultPlaybook = DynamicTrianglePlaybook

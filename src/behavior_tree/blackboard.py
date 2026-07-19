@@ -25,6 +25,8 @@ class BlackboardKeys:
     # Written by AssignRoles at the front of PLAY; type RoleAssignment | None.
     # All PLAY role-condition leaves read from this slot.
     ROLES = "/team/roles"
+    # Immutable TacticalContext shared by all task branches during this tick.
+    TACTICAL_CONTEXT = "/team/tactical_context"
 
     # Runtime handshake
     # Written by the caller in tick; CommitTeamCommands hands commands to it.

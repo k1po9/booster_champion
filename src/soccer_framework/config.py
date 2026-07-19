@@ -118,6 +118,24 @@ class SoccerStrategyTuning:
         0.15  #  Tie band for teammate ball-claim distances to prevent oscillating handoff.
     )
 
+    # Dynamic triangle role auction and mode selection
+    role_switch_advantage_sec: float = 0.30
+    role_switch_confirm_ticks: int = 4
+    robot_translation_gain: float = 0.8945
+    robot_yaw_gain: float = 0.8789
+    possession_control_radius_m: float = 1.10
+    possession_advantage_m: float = 0.30
+    emergency_defend_x_m: float = -4.20
+    defend_x_m: float = -0.35
+
+    # Dynamic triangle geometry
+    secondary_receive_radius_m: float = 0.65
+    safety_goal_offset_m: float = 1.15
+    safety_lateral_limit_m: float = 1.50
+    rest_defense_depth_m: float = 2.25
+    intercept_prediction_horizon_sec: float = 0.65
+    shot_min_x_m: float = 1.20
+
     # Passing
     pass_enabled: bool = True  #  Master pass switch.
     pass_min_score: float = 0.52  #  Minimum pass-candidate score; below this, dribble instead.
